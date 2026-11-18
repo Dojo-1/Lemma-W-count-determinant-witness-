@@ -1,0 +1,5 @@
+control: on the non-interval word [0,1,2,1,0] the path builder fails for a σ-equal pair, as it must
+K lift (constructive): 9984 Moufang moves of 3-letter images of 4-letter words (n ≤ 7) lifted by gap absorption; 5892 cross components and their lifts cross too: ok
+Prop C (⇐) (constructive): 33216 pairs with equal σ joined by the induction's path, every step a D_N-flip (interval words, n ≤ 7): ok
+Prop T: shapes = cx(q, r), cx = x's before the z in ω_q, absorption word = ω₊/ω₋, on 29646 (tree, y-leaf) pairs, n ≤ 8: ok
+Lemma M (exact, sign and unit included): walk on every restriction; moment = σ·[j S(ω₊) + (b−j) S(ω₋)]·E on 24692 (tree, p, r), n ≤ 7: ok

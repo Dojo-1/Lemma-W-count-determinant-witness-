@@ -125,10 +125,10 @@ The move `x(Y(xC)) → ((xY)x)C` at the last letter of `ρ_{t−1}` is an instan
   - Lemma W's expansion step (`Octonion.lemmaW_expansion`): with letters `1 + θq_ℓ + θ²r_ℓ + θ³t_ℓ` (any `r, t`, so `exp(θq_ℓ)` included), a local associator has zero `θ⁰..θ²` coefficients and `θ³` coefficient `2·det·e₇`;
   - L1 (`Octonion.context_cancel`, `flip_iff_assoc`), from `N(ab) = N(a)N(b)` and the absence of zero divisors;
   - Artin's theorem (`Octonion.artin`) and Lemma V (`lemmaV_two_letters`, `lemmaV_powers*`);
-  - K: specialisation (`kill_ev`, `kill_id`) and the restriction of flips and `D_N`-flips (`kill_flip`, `kill_DN`).
-- **G2 (Lean, in part).** Proposition T's count (`propT_count`, `propT_interior`); Proposition C (⇒) (`propC_forward`); Proposition S's decoding (`PropS.propS_interior`, `propS_boundary`, `propS_kind`).
-- **Prolog.** `algebra.pl` re-checks Lemma W's expansion, L1, Artin and K on random integer octonions. `g2.pl` checks K (with the Moufang lift), Propositions T, S, C and Lemma M exhaustively on small words.
-- **Not formalized in Lean** (manuscript, checked in `g2.pl`): K's Moufang lift; Proposition T's classification; Lemma M; Proposition C (⇐).
+  - K: specialisation (`kill_ev`, `kill_id`), the restriction of flips, `D_N`-flips and reachability (`kill_flip`, `kill_DN`, `kill_reach`), and the Moufang lift (`lift_mouf`, `lift_separates`).
+- **G2 (Lean).** Proposition C as an equivalence (`propC_iff`: `propC_backward`, the induction on root splits, and `reach_sig`); Proposition T's classification (`PropT.propT`: same `D_N`-component ⟺ same invariant) and count (`propT_count`); Lemma M (`LemmaM.lemmaM`, via the walk lemma and `β_eq_ωq`); Proposition S's decoding (`PropS.propS_interior`, `propS_boundary`, `propS_kind`).
+- **Prolog.** `algebra.pl` re-checks Lemma W's expansion, L1, Artin and K on random integer octonions. `g2.pl` checks K, Propositions T, S, C and Lemma M exhaustively on small words. `proofs.pl` runs the constructions of the Lean proofs (the gap-absorption lift, the root-split path builder, cx and the absorption words, the walk) and validates their outputs.
+- **Manuscript steps not in Lean:** the identification of the moment sum with the `sᵖ q tʳ` coefficient (multilinear expansion); Proposition S's step from the linear moments to the profiles `N`, `M(0)`; the assembly of the pieces into one Lean statement of Theorem G2.
 
 **Theorem G3 (P for all n).** Every non-interval word over exactly three letters has a Moufang move between different `D_N`-components. Hence (K) every non-interval word with ≥ 3 letters has a disconnected kernel class.
 *Proof.* Its run sequence is valid. Proposition E gives a caterpillar, Lemma Cat gives a self-certifying `S` and a Moufang move deleting a node of `S`, and Lemma R′ puts `T₁` in a different `D_N`-component. Lemma W turns this into disconnection, and Lemma K lifts it to words with more letters (restrict to `p, q` from a pattern `p…q…p` and any third letter). ∎

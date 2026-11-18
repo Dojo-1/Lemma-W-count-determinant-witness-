@@ -1,6 +1,6 @@
 # Prolog formalization (SWI-Prolog)
 
-Five programs. Each one checks independently what the Lean development proves, and the last two also check the statements Lean does not yet cover:
+Six programs. Each one checks independently what the Lean development proves:
 
 ```bash
 swipl -q -g main -t halt caterpillar.pl   # run-sequence combinatorics, finite base, constructive Prop. E
@@ -8,6 +8,7 @@ swipl -q -g main -t halt octonion.pl      # octonion identities and Lemma W's co
 swipl -q -g main -t halt trees.pl         # G3 end to end, from words to bracketings
 swipl -q -g main -t halt algebra.pl       # Lemma W expansion, L1, Artin, K (octonion side)
 swipl -q -g main -t halt g2.pl            # K (combinatorial side, Moufang lift), G2: T, M, S, C
+swipl -q -g run -t halt proofs.pl         # the Lean constructions for K's lift, C (⇐), T, M, run and validated
 ```
 
 ## `caterpillar.pl`: Proposition E
@@ -74,4 +75,17 @@ Exact `D_N`-components by breadth-first search over all bracketings, with `D_N` 
 
 Controls: for the non-interval word `[0,1,2,1,0]` the σ-classes (11) differ from the components (10); Lemma M with `j` and `b − j` swapped fails.
 
-Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.propC_forward` and `PropS.propS_interior`.
+## `proofs.pl`: the Lean proofs as programs
+
+Each program builds what the corresponding Lean proof builds; independent checkers validate the output ([log](../data/prolog_proofs.log)):
+
+| Lean proof | Program | Range | Result |
+|---|---|---|---|
+| `lift_mouf`, `lift_separates` | gap-absorption lift (`lift_tree`, `lift_mouf`; pivot splits, `wrapL`/`wrapR`) | every Moufang move of every 3-letter image of a 4-letter word, n ≤ 7 | 9,984 lifts; the 5,892 component-crossing moves lift to crossing moves |
+| `propC_backward` | root-split path builder (equal splits, cases B and C, two-letter rotations to a comb) | every σ-equal pair of every interval word with ≥ 3 letters, n ≤ 7 | 33,216 paths, every step a `D_N`-flip |
+| `sh_sub`, `cx_omega`, `β_eq_ωq` | shapes from `cx(q, r)`; `cx` from the absorption word; absorption word = `ω₊`/`ω₋` | every bracketing and `y`-leaf, three-block words, n ≤ 8 | 29,646 pairs |
+| `walk`, `lemmaM` | walk value of every restriction; exact moment (sign and unit) | every bracketing and `(p, r)`, n ≤ 7 | 24,692 cases |
+
+Control: on the non-interval word `[0,1,2,1,0]` the path builder fails for a σ-equal pair.
+
+Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.lift_separates`, `Octonion.propC_iff`, `PropT.propT`, `LemmaM.lemmaM` and `PropS.propS_interior`.

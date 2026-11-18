@@ -22,6 +22,11 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 | `Caterpillar/Kill.lean` | **K.** `kill` deletes the leaves of killed letters. `kill_ev`: setting killed letters to `1` gives the restricted value; `kill_id`: identities restrict to identities; `kill_flip`: a flip restricts to the identity or a flip; `kill_DN`: a `D_N`-flip (all `3 × 3` count minors `0`) restricts to a `D_N`-flip or the identity |
 | `Caterpillar/G2.lean` | **Proposition T, count**: `propT_interior` (`Σ_{p<a,q<c} C(p+q,p) = C(a+c,a) − 1`) and `propT_count` (`(b−1)(C(a+c,a)−1) + C(a+c−1,a) + C(a+c−1,c) = 1 + b(C(a+c,a)−1)`). **Proposition C (⇒), core** (`propC_forward`): in an interval word, a flip whose segments carry pairwise distinct letters has a positive `3 × 3` minor, so `D_N`-flips change no distinct-letter triple shape |
 | `Caterpillar/PropS.lean` | **Proposition S, decoding.** `prof_inj`: a binary word is fixed by its `z`-profile and its number of `x`'s. With the Lemma M profiles `N = j·prof ω₊ + (b−j)·prof ω₋` and `M(0)`: `N_eq` (explicit form), `propS_kind` (interior vs boundary), **`propS_interior`** (`N, M(0)` determine `Φ = (j,a′,c′,W)`), **`propS_boundary`** (`N` fixes the join word) |
+| `Caterpillar/Lift.lean` | **K, Moufang lift.** Leaf lists `lv`, the Moufang relation `Mouf` (left, right, middle, in context). `lift_tree`: every bracketing of the surviving leaves is a restriction. **`lift_mouf`**: every Moufang move between restrictions is the restriction of a Moufang move (killed leaves absorbed by `Y`, `B`, `C` or the context). `kill_reach`: `D_N`-reachability restricts. **`lift_separates`**: a move between different components of the image lifts to one between different components of the word |
+| `Caterpillar/PropC.lean` | **Proposition C (⇐)** (`propC`): triple shapes `sh`, `SigEq`; the induction on root splits (`eq_split`, `uneq_split` with cases B, C and the two-letter case `two_conn`, rotations to a comb `to_rc`) |
+| `Caterpillar/PropCF.lean` | **Proposition C (⇒)** in full (`sh_fill`, `sh_flip`, `reach_sig`) and **`propC_iff`**: same `D_N`-component ⟺ same σ |
+| `Caterpillar/PropT.lean` | **Proposition T, classification.** `core`, `Φ = (j, a′, c′, W)`, `key`; `sh_sub` (shape via the `q`-child of `lca(q, r)`), `sig_iff_cx`, `cx_omega` (cx read off the absorption word `ω_q ∈ {ω₊, ω₋}`), `key_iff_cx`, and **`propT`**: same `D_N`-component ⟺ same key |
+| `Caterpillar/LemmaM.lean` | **Lemma M.** Signed units; `H = ⟨1,e₁,e₄,e₅⟩` associative with `h(cℓ) = (ch)ℓ`, `(cℓ)h = (c h̄)ℓ` (`walkL`, `walkR`); `prodW_eq` (ordered product of a word); **`walk`** (a restriction is `(−1)^{#z} e^{ω} e₂`); `β_eq_ωq` (absorption word = `ω₊`/`ω₋`); subset sums (`sum_subs_perm`, `sum_S`); **`lemmaM`**: `moment T p r = σ(p,r)·[j S(ω₊) + (b−j) S(ω₋)]·E(p,r)` |
 | `Caterpillar/Words.lean` | `runSeq` (run collapse), `noAdj_runSeq`, `mem_runSeq`, `valid_runSeq`, and **`cat_of_word`**: every word over three letters that uses all three and is not an interval word (`¬ (runSeq w).Nodup`) has a caterpillar certificate |
 
 **Scope.** Formalized:
@@ -30,13 +35,12 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 - Lemma W: the algebraic core and the expansion step (`lemmaW_expansion`).
 - L1, context cancellation, from the division-algebra property (`context_cancel`, `flip_iff_assoc`).
 - Artin's theorem and Lemma V (`artin`, `lemmaV_*`).
-- K: specialisation and the restriction of (`D_N`-)flips (`kill_ev`, `kill_id`, `kill_DN`).
-- G2, in part: Proposition T's count, Proposition C (⇒), Proposition S's decoding.
+- K: specialisation, restriction of (`D_N`-)flips and reachability, and the Moufang lift (`kill_DN`, `kill_reach`, `lift_mouf`, `lift_separates`).
+- G2: Proposition C as an equivalence (`propC_iff`), Proposition T's classification and count (`propT`, `propT_count`), Lemma M (`lemmaM`), Proposition S's decoding (`propS_interior`, `propS_boundary`).
 
-Not formalized (manuscript arguments in [THEOREM.md](../THEOREM.md), checked on bounded ranges in [`../prolog/g2.pl`](../prolog/g2.pl)):
-- K's Moufang lift (a Moufang move of the image lifts to one of the word);
-- Proposition T's classification (`Φ` constant on `D_N`-components and complete);
-- Lemma M, the moment formula linking octonion maps to the profiles `N, M`;
-- Proposition C (⇐), the induction on root splits.
+Not formalized (manuscript steps between the formalized pieces):
+- the identification of `moment` (defined, as in the manuscript's proof, as the sum over restrictions) with the `sᵖ q tʳ` coefficient of the substituted map (multilinear expansion);
+- Proposition S's step from the linear moments to the profiles `N`, `M(0)` (the basis `(1−s)^α(1+s)^{a−α}`);
+- the final assembly of these pieces into one Lean statement of Theorem G2.
 
 The interval-word predicate is used in its run form (`runSeq w` has no repeated letter).
