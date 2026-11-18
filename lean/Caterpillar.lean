@@ -8,3 +8,4 @@ import Caterpillar.Counts
 import Caterpillar.LemmaCat
 import Caterpillar.RPrime
 import Caterpillar.Glue
+import Caterpillar.Octonion

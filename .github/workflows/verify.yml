@@ -52,14 +52,17 @@ jobs:
         run: |
           lake build
           grep -rn "sorry\|admit\|native_decide" Caterpillar/ && exit 1 || true
-          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n#print axioms Caterpillar.caterpillar_separates\n#print axioms Caterpillar.g3_trees\n' > Axioms.lean
+          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n#print axioms Caterpillar.caterpillar_separates\n#print axioms Caterpillar.g3_trees\n#print axioms Octonion.moufang_middle\n#print axioms Octonion.lemmaW_span\n' > Axioms.lean
           lake env lean Axioms.lean
   prolog:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq swi-prolog-core
       - name: Prolog formalization (base, constructive induction re-checked, words)
         working-directory: prolog
-        run: swipl -q -g main -t halt caterpillar.pl
+        run: |
+          swipl -q -g main -t halt caterpillar.pl
+          swipl -q -g main -t halt octonion.pl
+          swipl -q -g main -t halt trees.pl

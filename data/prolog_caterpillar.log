@@ -1,0 +1,4 @@
+base R in {4,5}: 240 (sequence, entry) pairs, Good <=> not failure: ok
+construct/3 + cat/3 check, 4..12 runs: 44670 certificates verified
+characterisation Good <=> not failure, 6..9 runs: ok
+words of length <= 9: every non-interval 3-letter word certified via its run sequence

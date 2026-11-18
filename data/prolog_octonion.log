@@ -1,0 +1,10 @@
+moufang_left: polarised basis check, 2304 cases: ok
+moufang_right: polarised basis check, 2304 cases: ok
+moufang_middle: polarised basis check, 2304 cases: ok
+left_alternative: polarised basis check, 288 cases: ok
+right_alternative: polarised basis check, 288 cases: ok
+flexible: polarised basis check, 288 cases: ok
+negative control: associativity fails on (e1, e2, e4), as it must
+random 7-digit integer octonions: 200 rounds of all identities: ok
+[e1,e2,e4] = [0,0,0,0,0,0,0,2]
+Lemma W core [X,Y,Z] = det(X,Y,Z)[e1,e2,e4] on span(e1,e2,e4): ok (27 basis triples, trilinear)

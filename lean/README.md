@@ -15,17 +15,20 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 | `Caterpillar/LemmaCat.lean` | **Lemma Cat**: the laminarity classification. Every rotation compatible with `S` that would delete a chain node has a single-letter sibling (`sibling_left/right`) and a split cutting a single-letter peel; with `rank3` its determinant is nonzero. `certified_inner`, `certified_bottom`, and **`chain_selfCert`**: a position-level caterpillar chain (`PChain`) is self-certifying |
 | `Caterpillar/RPrime.lean` | planar binary trees, rotations, `D_N`-flips (`det = 0`), reachability; **Lemma R′** (`stable_of_reach`: every tree `D_N`-reachable from `T₀` contains a self-certifying `S ⊆ subs T₀`, by the first-loss argument), `separated`, and **`caterpillar_separates`**: Lemma Cat + R′ |
 | `Caterpillar/Glue.lean` | run lists (`Runs`), combs, the Moufang relation `Mouf` (left, right, middle Moufang patterns with a repeated single letter), and the translation of run-level certificates into bracketings (`glue_chain`, `glue_cat`). It ends with **`g3_trees`**: for every word over three letters that uses all three and is not an interval word, there are bracketings `T₀`, `T₁` with `Mouf w T₀ T₁` and `¬ Reach (DNStep w) T₀ T₁`. `DNStep` is symmetric (`dnstep_symm`), so `Reach` is the same-component relation |
+| `Caterpillar/Octonion.lean` | integer octonions (repository table) and a **verified polynomial normaliser** (`norm`, `evalP_norm`, `eq_of_norm`). It proves, for all integer octonions, the **Moufang identities** (`moufang_left`, `moufang_right`, `moufang_middle`), the **alternative and flexible laws**, `[e₁,e₂,e₄] = 2e₇ ≠ 0`, and the **algebraic core of Lemma W** (`lemmaW_span`: `[X,Y,Z] = det(X,Y,Z)·[e₁,e₂,e₄]` on `span(e₁,e₂,e₄)`). Each identity is one kernel check per component; together they take about 7 minutes. Because these are polynomial identities over `ℤ`, they hold over every commutative ring, in particular `ℝ` |
 | `Caterpillar/Words.lean` | `runSeq` (run collapse), `noAdj_runSeq`, `mem_runSeq`, `valid_runSeq`, and **`cat_of_word`**: every word over three letters that uses all three and is not an interval word (`¬ (runSeq w).Nodup`) has a caterpillar certificate |
 
-**Scope.** G3 is formalized in full, as a statement about bracketings (`Caterpillar.g3_trees`):
-- Proposition E;
-- Lemma Cat;
-- Lemma R′;
-- the translation into trees.
+**Scope.** Formalized:
+- G3 in full, as a statement about bracketings (`g3_trees`). It combines Proposition E, Lemma Cat, Lemma R′ and the translation into trees.
+- The octonion identities G3 uses: the Moufang identities that make `T₀` and `T₁` equal maps.
+- The algebraic core of Lemma W.
 
-What remains outside Lean is octonion algebra:
-- the Moufang identities hold in 𝕆, so `T₀` and `T₁` are equal maps;
-- Lemma W: a rank-3 local associator is nonzero, so in-class flips are `D_N`-flips;
-- killing letters (K) and G2.
+Not formalized (manuscript arguments in [THEOREM.md](../THEOREM.md)):
+- **Lemma W's expansion step.** Substituting `x ↦ exp(θe₁)` (or `1 + s e₁`) and reading off the `θ³` coefficient of a local associator.
+- **The remaining octonion lemmas:**
+  - context cancellation (L1);
+  - Artin's theorem behind Lemma V;
+  - killing (K).
+- **G2:** Propositions T, M, S and C.
 
-These are manuscript arguments in [THEOREM.md](../THEOREM.md). The interval-word predicate is used in its run form (`runSeq w` has no repeated letter).
+The interval-word predicate is used in its run form (`runSeq w` has no repeated letter).

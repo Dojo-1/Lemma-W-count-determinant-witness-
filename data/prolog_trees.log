@@ -1,0 +1,8 @@
+negative controls: a node in a two-letter region is not certified; a plain rotation is not a Moufang move
+n=4: 3 non-interval 3-letter words: Moufang pair, chain, Lemma Cat brute force, octonion equality ok (including exact D_N-component search)
+n=5: 19 non-interval 3-letter words: Moufang pair, chain, Lemma Cat brute force, octonion equality ok (including exact D_N-component search)
+n=6: 80 non-interval 3-letter words: Moufang pair, chain, Lemma Cat brute force, octonion equality ok (including exact D_N-component search)
+n=7: 286 non-interval 3-letter words: Moufang pair, chain, Lemma Cat brute force, octonion equality ok (including exact D_N-component search)
+n=8: 945 non-interval 3-letter words: Moufang pair, chain, Lemma Cat brute force, octonion equality ok (including exact D_N-component search)
+n=9: 2997 non-interval 3-letter words: Moufang pair, chain, Lemma Cat brute force, octonion equality ok (including exact D_N-component search)
+n=10: 9294 non-interval 3-letter words: Moufang pair, chain, Lemma Cat brute force, octonion equality ok (certificates only)
