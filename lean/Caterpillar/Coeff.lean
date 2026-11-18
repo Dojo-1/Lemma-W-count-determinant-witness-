@@ -371,4 +371,216 @@ theorem coef_moment (p r : Nat) : coef (polyT a b T) (p, 1, r) = moment a b c T 
 
 end
 
+/-! ## the map determines the coefficients (Kronecker substitution) -/
+
+theorem osum_apply {α : Type} (l : List α) (f : α → O) (k : Fin 8) : (osum (l.map f)) k = isum (l.map fun x => f x k) := by
+  induction l with
+  | nil => rfl
+  | cons x l ih => simp only [List.map, osum, isum, oadd, ih]
+
+/-- base-`M` value of the digits `D 0, …, D (N−1)` -/
+def dsum (M : Int) (D : Nat → Int) : Nat → Int
+  | 0 => 0
+  | N + 1 => D 0 + M * dsum M (fun e => D (e + 1)) N
+
+theorem dsum_add (M : Int) : ∀ N (D1 D2 : Nat → Int), dsum M (fun e => D1 e + D2 e) N = dsum M D1 N + dsum M D2 N
+  | 0, _, _ => rfl
+  | N + 1, D1, D2 => by simp only [dsum, dsum_add M N (fun e => D1 (e + 1)) (fun e => D2 (e + 1)), Int.mul_add]; omega
+
+theorem dsum_sub (M : Int) : ∀ N (D1 D2 : Nat → Int), dsum M (fun e => D1 e - D2 e) N = dsum M D1 N - dsum M D2 N
+  | 0, _, _ => rfl
+  | N + 1, D1, D2 => by simp only [dsum, dsum_sub M N (fun e => D1 (e + 1)) (fun e => D2 (e + 1)), Int.mul_sub]; omega
+
+theorem dsum_zero (M : Int) : ∀ N, dsum M (fun _ => 0) N = 0
+  | 0 => rfl
+  | N + 1 => by simp only [dsum, dsum_zero M N]; simp
+
+theorem dsum_single (M : Int) (d : Int) : ∀ (N e0 : Nat), e0 < N → dsum M (fun e => if e0 = e then d else 0) N = ipow M e0 * d
+  | 0, _, h => absurd h (Nat.not_lt_zero _)
+  | N + 1, 0, _ => by
+    simp only [dsum, if_true]
+    have : (fun e => if 0 = e + 1 then d else (0 : Int)) = fun _ => 0 := funext fun e => by simp
+    rw [this, dsum_zero]; simp [ipow]
+  | N + 1, e0 + 1, h => by
+    simp only [dsum, show ¬ (e0 + 1 = 0) by omega, if_false, Nat.add_right_cancel_iff]
+    rw [dsum_single M d N e0 (by omega), ipow]; simp only [Int.zero_add]
+    rw [Int.mul_comm (ipow M e0) M, Int.mul_assoc]
+
+/-- regroup a sum of monomials by exponent -/
+theorem regroup (M : Int) (E : List Nat → Nat) (v : List Nat → Int) (N : Nat) :
+    ∀ L : List (List Nat), (∀ S ∈ L, E S < N) →
+      isum (L.map fun S => ipow M (E S) * v S) = dsum M (fun e => isum (L.map fun S => if E S = e then v S else 0)) N
+  | [], _ => by simp only [List.map, isum]; rw [dsum_zero]
+  | S :: L, h => by
+    simp only [List.map, isum]
+    rw [dsum_add M N (fun e => if E S = e then v S else 0), dsum_single M (v S) N (E S) (h S (by simp)),
+      regroup M E v N L (fun S' h' => h S' (by simp [h']))]
+
+/-- **balanced base-`M` digits are unique** -/
+theorem digits_zero (M : Int) (hM : 0 < M) : ∀ (N : Nat) (D : Nat → Int), (∀ e < N, -M < 2 * D e ∧ 2 * D e < M) →
+    dsum M D N = 0 → ∀ e < N, D e = 0
+  | 0, _, _, _, e, he => absurd he (Nat.not_lt_zero _)
+  | N + 1, D, hb, hs, e, he => by
+    simp only [dsum] at hs
+    have b0 := hb 0 (by omega)
+    have hr : dsum M (fun e => D (e + 1)) N = 0 := by
+      apply Classical.byContradiction; intro hne
+      rcases Int.lt_or_gt_of_ne hne with hl | hl
+      · have : M * dsum M (fun e => D (e + 1)) N ≤ -M := by
+          have := Int.mul_le_mul_of_nonneg_left (show dsum M (fun e => D (e + 1)) N ≤ -1 by omega) (Int.le_of_lt hM)
+          simpa using this
+        omega
+      · have : M ≤ M * dsum M (fun e => D (e + 1)) N := by
+          have := Int.mul_le_mul_of_nonneg_left (show 1 ≤ dsum M (fun e => D (e + 1)) N by omega) (Int.le_of_lt hM)
+          simpa using this
+        omega
+    rw [hr, Int.mul_zero, Int.add_zero] at hs
+    cases e with
+    | zero => exact hs
+    | succ e => exact digits_zero M hM N (fun e => D (e + 1)) (fun e' h' => hb (e' + 1) (by omega)) hr e (by omega)
+
+theorem ipow_mul (M : Int) (A : Nat) : ∀ e, ipow (ipow M A) e = ipow M (A * e)
+  | 0 => by simp [ipow]
+  | e + 1 => by rw [ipow, ipow_mul M A e, Nat.mul_succ, ipow_add]
+
+theorem sgn_pm : ∀ i j : Fin 8, sgn i j = 1 ∨ sgn i j = -1 := by decide
+
+theorem uev_sign (w : Nat → Nat) (ρ : Nat → Fin 8) : ∀ T, (uev w ρ T).1 = 1 ∨ (uev w ρ T).1 = -1
+  | .leaf _ => Or.inl rfl
+  | .node L R => by
+    simp only [uev, mu]
+    rcases uev_sign w ρ L with h1 | h1 <;> rcases uev_sign w ρ R with h2 | h2 <;>
+      rcases sgn_pm (uev w ρ L).2 (uev w ρ R).2 with h3 | h3 <;> simp [h1, h2, h3]
+
+/-- every term of the expansion has coordinates in `{−1, 0, 1}` -/
+theorem term_bound (U : Tree) (S' : List Nat) (k : Fin 8) :
+    -1 ≤ evo (w3 a b) ρO (restrictTo U S') k ∧ evo (w3 a b) ρO (restrictTo U S') k ≤ 1 := by
+  cases restrictTo U S' with
+  | none => simp only [evo, one, unit]; split <;> omega
+  | some V =>
+    simp only [evo]
+    show -1 ≤ ev (w3 a b) (fun ℓ => unit (ρ3 ℓ)) V k ∧ ev (w3 a b) (fun ℓ => unit (ρ3 ℓ)) V k ≤ 1
+    rw [ev_uev]; simp only [toO, smul, unit]
+    rcases uev_sign (w3 a b) ρ3 V with h | h <;> rw [h] <;> split <;> omega
+
+theorem isum_bound (f : List Nat → Int) (hf : ∀ S, -1 ≤ f S ∧ f S ≤ 1) :
+    ∀ L : List (List Nat), -(L.length : Int) ≤ isum (L.map f) ∧ isum (L.map f) ≤ L.length
+  | [] => by simp [isum]
+  | S :: L => by
+    have := isum_bound f hf L; have := hf S
+    simp only [List.map, isum, List.length_cons]; push_cast; omega
+
+def kron (n : Nat) (S : List Nat) : Nat := ex a S + (n + 1) * (ey a b S + (n + 1) * ez a b S)
+def kron0 (i j l n : Nat) : Nat := i + (n + 1) * (j + (n + 1) * l)
+
+theorem kron_inj (A x y z x' y' z' : Nat) (hA : 0 < A) (hx : x < A) (hx' : x' < A) (hy : y < A) (hy' : y' < A)
+    (h : x + A * (y + A * z) = x' + A * (y' + A * z')) : x = x' ∧ y = y' ∧ z = z' := by
+  have e1 : x = x' := by
+    have := congrArg (· % A) h; simp only [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hx, Nat.mod_eq_of_lt hx'] at this
+    exact this
+  subst e1
+  have h2 : y + A * z = y' + A * z' := Nat.eq_of_mul_eq_mul_left hA (by omega)
+  have e2 : y = y' := by
+    have := congrArg (· % A) h2; simp only [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hy, Nat.mod_eq_of_lt hy'] at this
+    exact this
+  subst e2
+  exact ⟨rfl, rfl, Nat.eq_of_mul_eq_mul_left hA (by omega)⟩
+
+theorem sub_len (T : Tree) (S : List Nat) (hS : S ∈ subsT T) :
+    S.length ≤ (lv T).length := by
+  have hsub : S.Sublist (lv T) := by
+    have := (subsT_perm T).mem_iff.1 hS; exact subs_sub _ S this
+  exact hsub.length_le
+
+theorem ipow_two (n : Nat) : ipow 2 n = ((2 ^ n : Nat) : Int) := by
+  induction n with
+  | zero => rfl
+  | succ n ih => rw [ipow, ih, Nat.pow_succ]; push_cast; rfl
+
+theorem ex_le (S : List Nat) : ex a S ≤ S.length := List.length_filter_le _ _
+theorem ey_le (S : List Nat) : ey a b S ≤ S.length := List.length_filter_le _ _
+theorem ez_le (S : List Nat) : ez a b S ≤ S.length := List.length_filter_le _ _
+
+section
+variable (c : Nat) (ha : 1 ≤ a) (hb : 1 ≤ b) (hc : 1 ≤ c) (T T' : Tree) (h : TB a b c T) (h' : TB a b c T')
+include ha hb hc h h'
+
+/-- **the map determines the coefficients.** Agreement at the single Kronecker point
+`s = M, q = M^{n+1}, t = M^{(n+1)²}`, `M = 2^{n+2} + 1`, forces equal coefficients. -/
+theorem coef_of_map
+    (hev : ev (w3 a b) (ρs (ipow 2 (a + b + c + 2) + 1) (ipow (ipow 2 (a + b + c + 2) + 1) (a + b + c + 1))
+        (ipow (ipow 2 (a + b + c + 2) + 1) ((a + b + c + 1) * (a + b + c + 1)))) T =
+      ev (w3 a b) (ρs (ipow 2 (a + b + c + 2) + 1) (ipow (ipow 2 (a + b + c + 2) + 1) (a + b + c + 1))
+        (ipow (ipow 2 (a + b + c + 2) + 1) ((a + b + c + 1) * (a + b + c + 1)))) T')
+    (i j l : Nat) (hi : i ≤ a + b + c) (hj : j ≤ a + b + c) (hl : l ≤ a + b + c) :
+    coef (polyT a b T) (i, j, l) = coef (polyT a b T') (i, j, l) := by
+  generalize hn : a + b + c = n at hev hi hj hl
+  generalize hM : ipow 2 (n + 2) + 1 = M at hev
+  have X0 : (0 : Int) ≤ ((2 ^ n : Nat) : Int) := Int.ofNat_nonneg _
+  have hM4 : M = 4 * ((2 ^ n : Nat) : Int) + 1 := by
+    rw [← hM, ipow_two, show n + 2 = n + 1 + 1 by omega, Nat.pow_succ, Nat.pow_succ]; push_cast; omega
+  have hM0 : 0 < M := by omega
+  have lenT : (lv T).length = n := by rw [lvT a b c ha hb hc T h, List.length_range']; omega
+  have lenT' : (lv T').length = n := by rw [lvT a b c ha hb hc T' h', List.length_range']; omega
+  let A := n + 1
+  let N := A + A * (A + A * A)
+  have kb : ∀ (U : Tree), (lv U).length = n → ∀ S ∈ subsT U, kron a b n S < N := by
+    intro U hU S hS
+    have := sub_len U S hS
+    have e1 := ex_le a S; have e2 := ey_le a b S; have e3 := ez_le a b S
+    simp only [kron, N, A]
+    have m1 : (n + 1) * ez a b S ≤ (n + 1) * (n + 1) := Nat.mul_le_mul_left _ (by omega)
+    have m2 : (n + 1) * (ey a b S + (n + 1) * ez a b S) ≤ (n + 1) * ((n + 1) + (n + 1) * (n + 1)) :=
+      Nat.mul_le_mul_left _ (by omega)
+    omega
+  let v : Tree → List Nat → Fin 8 → Int := fun U S k => evo (w3 a b) ρO (restrictTo U S) k
+  let C : Tree → Fin 8 → Nat → Int := fun U k e => isum ((subsT U).map fun S => if kron a b n S = e then v U S k else 0)
+  have evC : ∀ U : Tree, TB a b c U → (lv U).length = n → ∀ k,
+      ev (w3 a b) (ρs M (ipow M (n + 1)) (ipow M ((n + 1) * (n + 1)))) U k = dsum M (C U k) N := by
+    intro U hU hlen k
+    rw [subst_eq a b U (pw_wf U hU.wf), evalPoly, polyT, List.map_map, osum_apply]
+    rw [← regroup M (kron a b n) (fun S => v U S k) N (subsT U) (kb U hlen)]
+    congr 1; apply List.map_congr_left; intro S _
+    simp only [Function.comp, smul, mono, ipow_mul, kron, v, A]
+    rw [← ipow_add, ← ipow_add]
+    congr 2; rw [Nat.mul_assoc (n + 1) (n + 1), Nat.mul_add (n + 1) (ey a b S)]; omega
+  have hbound : ∀ U : Tree, (lv U).length = n → ∀ k e, -((2 ^ n : Nat) : Int) ≤ C U k e ∧ C U k e ≤ ((2 ^ n : Nat) : Int) := by
+    intro U hU k e
+    have := isum_bound (fun S => if kron a b n S = e then v U S k else 0) (fun S => by
+      by_cases hk : kron a b n S = e
+      · simp only [hk, if_true]; exact term_bound a b U S k
+      · simp only [hk, if_false]; omega) (subsT U)
+    rw [subsT_length, hU] at this; exact this
+  have coefC : ∀ U : Tree, (lv U).length = n → ∀ k,
+      coef (polyT a b U) (i, j, l) k = C U k (kron0 i j l n) := by
+    intro U hU k
+    simp only [coef, polyT, List.map_map, osum_apply]
+    apply congrArg isum; apply List.map_congr_left; intro S hS
+    have := sub_len U S hS
+    have e1 := ex_le a S; have e2 := ey_le a b S
+    simp only [Function.comp, v, kron0, kron]
+    by_cases e : (ex a S, ey a b S, ez a b S) = (i, j, l)
+    · simp only [Prod.mk.injEq] at e; obtain ⟨r1, r2, r3⟩ := e
+      simp only [r1, r2, r3, if_true]
+    · have ne : ¬ (ex a S + (n + 1) * (ey a b S + (n + 1) * ez a b S) = i + (n + 1) * (j + (n + 1) * l)) := by
+        intro e'
+        obtain ⟨r1, r2, r3⟩ := kron_inj (n + 1) _ _ _ _ _ _ (by omega) (by omega) (by omega) (by omega) (by omega) e'
+        exact e (by rw [r1, r2, r3])
+      rw [if_neg e, if_neg ne]; simp [zero]
+  funext k
+  rw [coefC T lenT k, coefC T' lenT' k]
+  have hd : dsum M (fun e => C T k e - C T' k e) N = 0 := by
+    have e1 := evC T h lenT k; have e2 := evC T' h' lenT' k
+    rw [dsum_sub, ← e1, ← e2, hev]; omega
+  have := digits_zero M hM0 N (fun e => C T k e - C T' k e) (fun e _ => by
+    show -M < 2 * (C T k e - C T' k e) ∧ 2 * (C T k e - C T' k e) < M
+    have b1 := hbound T lenT k e; have b2 := hbound T' lenT' k e; omega) hd (kron0 i j l n) (by
+    simp only [kron0, N, A]
+    have m1 : (n + 1) * l ≤ (n + 1) * (n + 1) := Nat.mul_le_mul_left _ (by omega)
+    have m2 : (n + 1) * (j + (n + 1) * l) ≤ (n + 1) * ((n + 1) + (n + 1) * (n + 1)) := Nat.mul_le_mul_left _ (by omega)
+    omega)
+  exact Int.sub_eq_zero.mp this
+
+end
+
 end Coeff
