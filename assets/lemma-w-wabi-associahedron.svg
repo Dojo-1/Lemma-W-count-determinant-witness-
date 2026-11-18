@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="620" viewBox="0 0 1440 620" role="img" aria-labelledby="title desc">
+<title id="title">Lemma W — a count determinant witnesses nonlocality</title>
+<desc id="desc">Original Wabi-Futurist mathematical artwork. On an obsidian background, five binary bracketings of the distinct-letter word xyzw form the correct five-edge associahedron K4 pentagon. A vermilion edge marks an example of a rank-three reassociation that cannot be an identity edge. The separate identity matrix depicts the rank-three count minor for singleton segments x, y, z. It is a mathematical illustration, not a complete computational certificate.</desc>
+<defs><linearGradient id="field" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111713"/><stop offset=".74" stop-color="#1C231D"/><stop offset="1" stop-color="#111713"/></linearGradient><linearGradient id="veil" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#121915"/><stop offset=".78" stop-color="#121915" stop-opacity=".97"/><stop offset="1" stop-color="#121915" stop-opacity="0"/></linearGradient><clipPath id="frame"><rect x="28" y="28" width="1384" height="564"/></clipPath></defs>
+<rect width="1440" height="620" fill="#0E1511"/>
+<rect x="27" y="27" width="1386" height="566" fill="url(#field)" stroke="#EDE5D7" stroke-opacity=".25"/>
+<g clip-path="url(#frame)">
+<path d="M62 103H1372 M62 532H1372" fill="none" stroke="#EDE5D7" stroke-opacity=".14"/>
+<path d="M741 61V560" fill="none" stroke="#EDE5D7" stroke-opacity=".10"/>
+<g><path d="M767.0 84 C887.0 199.0 1253.0 385.0 1375.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.032" stroke-width=".9"/>
+<path d="M788.0 84 C904.8 217.0 1245.2 374.0 1362.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.046" stroke-width=".9"/>
+<path d="M809.0 84 C916.6 235.0 1226.9 363.0 1349.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.060" stroke-width=".9"/>
+<path d="M830.0 84 C918.4 253.0 1209.9 352.0 1336.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.074" stroke-width=".9"/>
+<path d="M851.0 84 C909.5 271.0 1205.4 341.0 1323.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.032" stroke-width=".9"/>
+<path d="M872.0 84 C893.1 289.0 1216.2 330.0 1310.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.046" stroke-width=".9"/>
+<path d="M893.0 84 C874.6 307.0 1235.3 319.0 1297.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.060" stroke-width=".9"/>
+<path d="M914.0 84 C860.3 325.0 1250.4 308.0 1284.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.074" stroke-width=".9"/>
+<path d="M935.0 84 C855.0 343.0 1251.5 297.0 1271.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.032" stroke-width=".9"/>
+<path d="M956.0 84 C860.5 361.0 1238.0 286.0 1258.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.046" stroke-width=".9"/>
+<path d="M977.0 84 C875.0 379.0 1218.6 275.0 1245.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.060" stroke-width=".9"/>
+<path d="M998.0 84 C893.6 397.0 1206.0 264.0 1232.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.074" stroke-width=".9"/>
+<path d="M1019.0 84 C909.9 415.0 1208.4 253.0 1219.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.032" stroke-width=".9"/>
+<path d="M1040.0 84 C918.5 433.0 1224.1 242.0 1206.0 527" fill="none" stroke="#E5E9DD" stroke-opacity="0.046" stroke-width=".9"/></g>
+<circle cx="1092" cy="314" r="245" fill="none" stroke="#EDE5D7" stroke-opacity=".11" stroke-dasharray="3 11"/>
+<g><path d="M1092.00,134.00L1293.62,258.38" stroke="#D75D46" stroke-opacity=".91" stroke-width="2.3" fill="none"/>
+<path d="M1293.62,258.38L1216.61,459.62" stroke="#EDE5D7" stroke-opacity=".32" stroke-width="1.25" fill="none"/>
+<path d="M1216.61,459.62L967.39,459.62" stroke="#EDE5D7" stroke-opacity=".32" stroke-width="1.25" fill="none"/>
+<path d="M967.39,459.62L890.38,258.38" stroke="#EDE5D7" stroke-opacity=".32" stroke-width="1.25" fill="none"/>
+<path d="M890.38,258.38L1092.00,134.00" stroke="#EDE5D7" stroke-opacity=".32" stroke-width="1.25" fill="none"/></g><g><g><circle cx="1092.00" cy="134.00" r="7.2" fill="#151B17" stroke="#D75D46" stroke-opacity=".9" stroke-width="1.5"/><rect x="1011.00" y="150.00" width="162" height="28" rx="2" fill="#171D19" stroke="#EDE5D7" stroke-opacity=".23"/><text x="1092.00" y="169.00" text-anchor="middle" fill="#EDE5D7" opacity=".84" font-family="monospace" font-size="14">(((xy)z)w)</text></g>
+<g><circle cx="1293.62" cy="258.38" r="7.2" fill="#151B17" stroke="#D75D46" stroke-opacity=".9" stroke-width="1.5"/><rect x="1212.62" y="274.38" width="162" height="28" rx="2" fill="#171D19" stroke="#EDE5D7" stroke-opacity=".23"/><text x="1293.62" y="293.38" text-anchor="middle" fill="#EDE5D7" opacity=".84" font-family="monospace" font-size="14">((xy)(zw))</text></g>
+<g><circle cx="1216.61" cy="459.62" r="7.2" fill="#151B17" stroke="#EDE5D7" stroke-opacity=".68" stroke-width="1.5"/><rect x="1135.61" y="475.62" width="162" height="28" rx="2" fill="#171D19" stroke="#EDE5D7" stroke-opacity=".23"/><text x="1216.61" y="494.62" text-anchor="middle" fill="#EDE5D7" opacity=".84" font-family="monospace" font-size="14">(x(y(zw)))</text></g>
+<g><circle cx="967.39" cy="459.62" r="7.2" fill="#151B17" stroke="#EDE5D7" stroke-opacity=".68" stroke-width="1.5"/><rect x="886.39" y="475.62" width="162" height="28" rx="2" fill="#171D19" stroke="#EDE5D7" stroke-opacity=".23"/><text x="967.39" y="494.62" text-anchor="middle" fill="#EDE5D7" opacity=".84" font-family="monospace" font-size="14">(x((yz)w))</text></g>
+<g><circle cx="890.38" cy="258.38" r="7.2" fill="#151B17" stroke="#EDE5D7" stroke-opacity=".68" stroke-width="1.5"/><rect x="809.38" y="274.38" width="162" height="28" rx="2" fill="#171D19" stroke="#EDE5D7" stroke-opacity=".23"/><text x="890.38" y="293.38" text-anchor="middle" fill="#EDE5D7" opacity=".84" font-family="monospace" font-size="14">((x(yz))w)</text></g></g>
+<g stroke="#EDE5D7" stroke-opacity=".11" fill="none"><path d="M832,314H1349 M1092,89V540"/></g>
+<circle cx="1092" cy="314" r="18" fill="#1D2620" stroke="#EDE5D7" stroke-opacity=".32"/>
+<text x="1092" y="321" text-anchor="middle" font-family="Georgia,serif" font-size="23" fill="#EDE5D7" opacity=".8">K₄</text>
+<g><text x="1310" y="263" font-family="monospace" font-size="15" fill="#EDE5D7" opacity=".87">1</text>
+<text x="1335" y="263" font-family="monospace" font-size="15" fill="#9BABA0" opacity=".48">0</text>
+<text x="1360" y="263" font-family="monospace" font-size="15" fill="#9BABA0" opacity=".48">0</text>
+<text x="1310" y="286" font-family="monospace" font-size="15" fill="#9BABA0" opacity=".48">0</text>
+<text x="1335" y="286" font-family="monospace" font-size="15" fill="#EDE5D7" opacity=".87">1</text>
+<text x="1360" y="286" font-family="monospace" font-size="15" fill="#9BABA0" opacity=".48">0</text>
+<text x="1310" y="309" font-family="monospace" font-size="15" fill="#9BABA0" opacity=".48">0</text>
+<text x="1335" y="309" font-family="monospace" font-size="15" fill="#9BABA0" opacity=".48">0</text>
+<text x="1360" y="309" font-family="monospace" font-size="15" fill="#EDE5D7" opacity=".87">1</text></g>
+<text x="1274" y="238" font-family="monospace" font-size="15" fill="#D75D46">rank N = 3</text>
+<text x="1251" y="355" font-family="monospace" font-size="13" fill="#EDE5D7" opacity=".51">det N ≠ 0</text>
+<rect x="40" y="104" width="691" height="416" fill="url(#veil)"/>
+</g>
+<g fill="#F2EADC">
+<text x="76" y="82" font-family="Arial,sans-serif" font-size="16" letter-spacing="5" opacity=".68">DOJO / THE MATHEMATICS OF THE UNSEEN FLIP</text>
+<text x="75" y="225" font-family="Georgia,serif" font-size="113" letter-spacing="-5">lemma / w</text>
+<text x="81" y="296" font-family="Georgia,serif" font-size="30" font-style="italic">the count remembers.</text>
+<text x="81" y="338" font-family="Georgia,serif" font-size="30" font-style="italic">the bracket may not.</text>
+<text x="80" y="394" font-family="sans-serif" font-size="18" letter-spacing=".8" opacity=".73">A RANK-THREE WITNESS. AN OPEN GLOBAL GATE.</text>
+<path d="M80 435H174" stroke="#D75D46" stroke-width="4"/>
+<text x="80" y="563" font-family="monospace" font-size="15" letter-spacing="2.5" opacity=".62">侘未来 / 形が変わり、証拠が残る。</text>
+<text x="1362" y="80" text-anchor="end" font-family="monospace" font-size="14" letter-spacing="2" opacity=".58">ASSOCIAHEDRON / K4</text>
+<text x="1365" y="571" text-anchor="end" font-family="monospace" font-size="13" opacity=".58">FIVE BRACKETINGS · DISTINCT-LETTER EXAMPLE</text>
+</g>
+</svg>
