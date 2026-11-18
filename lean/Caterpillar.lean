@@ -4,3 +4,6 @@ import Caterpillar.Base
 import Caterpillar.PropE
 import Caterpillar.Det
 import Caterpillar.Words
+import Caterpillar.Counts
+import Caterpillar.LemmaCat
+import Caterpillar.RPrime
