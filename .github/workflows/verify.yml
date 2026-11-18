@@ -19,6 +19,10 @@ jobs:
         run: python src/lemma_m.py 7 10
       - name: Proposition C (D_N-components of interval words) n <= 8
         run: python src/sigma_complete.py 8
+      - name: Lemma R' stable-node separators n <= 8 and the G3-R counterexamples
+        run: |
+          python src/stable_separators.py 8
+          python src/stable_separators.py words xyxyzzyxyx xyyxzzxyyx xyxyzyyzyxyx xyxyzzyyzxzx xyxyzzzzyxyx xyyxzzzzxyyx
       - name: Interval rank lemma, brute force n <= 10
         run: python src/lemmaI_check.py 10
       - name: Exact class certification (full polarization) n <= 5
