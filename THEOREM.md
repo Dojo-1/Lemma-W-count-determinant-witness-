@@ -6,7 +6,7 @@ Evidence labels: **P** proved (general argument), **P-fin** proved for every wor
 
 A *word* `w = w₁…wₙ` over letters; a *bracketing* is a planar binary tree with leaves `1..n`. Each bracketing `T` induces a polynomial map `𝕆^L → 𝕆`. `T ~ T'` iff the maps agree. Bracketings form the vertices of the associahedron `Kₙ`; an edge (*flip*) replaces a subterm `(AB)C` by `A(BC)`, where `A, B, C` are bracketings of consecutive segments `a, b, c` of `w`. A class is *flip-connected* if it induces a connected subgraph of `Kₙ`.
 
-**Theorem ("if": P for all n; "only if": P-fin for n ≤ 14, by local certificates).** In 𝕆 every class of `w` is flip-connected iff `w` has ≤ 2 distinct letters or every letter of `w` occurs in one contiguous run. The number of words of length `n` (up to renaming) with a disconnected class is `Bell(n) − 2ⁿ + n`.
+**Theorem (P for all n).** In 𝕆 every class of `w` is flip-connected iff `w` has ≤ 2 distinct letters or every letter of `w` occurs in one contiguous run. The number of words of length `n` (up to renaming) with a disconnected class is `Bell(n) − 2ⁿ + n`.
 
 ## General lemmas (P)
 
@@ -62,6 +62,55 @@ The move `x(Y(xC)) → ((xY)x)C` at the last letter of `ρ_{t−1}` is an instan
 
 `run_comb.py` re-checks every certificate against `stable(T₀)` and the explicit move, with no failures. Q′ alone covers 92.6 % of non-interval 3-letter words at n = 9. Combined with Theorem B, it leaves 1, 4, 4, 11, 6 words at n = 7, 9, 10, 11, 12, for example `xyyxzzx` and `xyxxyxzxxzx`. A *zipper* tree, which is a right comb on a prefix and a left comb on the suffix, certifies those (`stable_separators.py`).
 
+**Cat (caterpillar certificates, P).** This applies to a 3-letter word `w` with runs `ρ₀ … ρ_{R−1}` and run letters `s = s₀ … s_{R−1}`.
+- **Caterpillars.** A *caterpillar* is a sequence of steps that peel runs off the ends of the current interval of runs. Each step is one of:
+  - **L** peels the left end run;
+  - **R** peels the right end run;
+  - **D** peels both end runs, allowed when they carry the same letter.
+
+  The steps run down to a *bottom* of two runs. The path intervals are `J₀ = w ⊃ J₁ ⊃ … ⊃ J_K`, and `S = {J₁, …, J_K}`.
+- **The tree `T₀`.** Peeled runs hang off the path letter by letter, except as the move below requires. Each `J_k` is a node of `T₀`.
+- **Lemma.** `S` is self-certifying (Lemma R′) when:
+  - **(C1)** for every `J_k`, `1 ≤ k < K`, entered by peeling letter `a` and left by peeling letter `b`: `a ≠ b`, and the third letter `c(a, b)` occurs in `J_{k+1}`;
+  - **(C2)** the bottom `J_K`, with runs `u, v` and entry letter `a`, has `a, u, v` pairwise distinct.
+- **Proof.** Let `J ∈ S`.
+  - *Sibling.* Laminarity with the nearest `S`-ancestor `P` (or the root) forces the sibling `I` of a deleting rotation inside `P ∖ J`. So `I` is a piece of the run(s) peeled to reach `J`, all carrying letter `a`.
+  - *Split.* Laminarity with the next `S`-node `J′` forces the split of `J` to cut inside a run peeled next (letter `b`), leaving `J′` whole on the other side. If `J` is the bottom, any split is allowed.
+  - *Determinant.* In every case two of the three segments are single-letter pieces `aⁱ`, `bʲ`, so `det N = ± i·j·(count of c(a, b) in the third segment)`. The third segment contains `J′`. For the bottom, a direct 3 × 3 computation gives `± i·(…)·det(e_a, e_u, e_v)`.
+  - *Laminarity of the new node.* The node created by each such rotation stays laminar with `S − {J}`, so every case is covered. ∎
+- **Moves.** Each of the following Moufang moves deletes a node of `S`, so it joins two different `D_N`-components:
+  - **M-mid.** A **D** step at `J_k = xᵐ·BC·x^{m′}` uses `x((BC)x) → (xB)(Cx)`, the middle Moufang identity. It deletes `BC = J_{k+1}`. `B, C` are the children of `BC`, both nonempty.
+  - **M-left.** Two consecutive **L** steps peel runs `σ, Y`, and the next left run carries the letter of `σ`. If yet another step follows, it must also be **L**. Then `x(Y(xC)) → ((xY)x)C` is the left Moufang identity, with `Y` a block and `x` the letters adjacent to `Y`. It deletes `J_{k+1} = Y·…`.
+  - **M-right.** The mirror image of M-left.
+
+  `caterpillar.py` builds `T₀` for every non-interval 3-letter word with n ≤ 9. It confirms `S ⊆ stable(T₀)` and that a Moufang move deletes the predicted node: 4,330/4,330.
+
+**Proposition E (existence, P for all R).**
+- **Definitions.** A run sequence `s` is *valid* if it has three letters and `R ≥ 4` runs, i.e. it comes from a non-interval 3-letter word. Let `Good(s, e)` mean: `s` has a caterpillar satisfying (C1), (C2) and some move, where the root, *entered* by a letter `e`, also satisfies (C1). `e = ∅` means no entry.
+- **Statement.** `Good(s, e)` holds unless one of the following holds:
+  - **(F1)** `e = s₀ = s_{R−1}`;
+  - **(F2)** `s₀ = e` and `s₀ … s_{R−2}` uses only two letters;
+  - **(F2′)** the mirror image of (F2).
+
+  In particular `Good(s, ∅)` always holds.
+- **Proof.** Induction on `R`. The base `R ∈ {4, 5}` is a finite exhaustive check (`caterpillar.py`: 240 pairs). Let `R ≥ 6` and assume `(s, e)` is not a failure. Once the remainder after a peel is valid, it contains all three letters, so the third-letter part of (C1) holds automatically.
+  - **Fact.** A valid `s` with `R ≥ 5` cannot become invalid on dropping either end run. If both `s₁…` and `…s_{R−2}` were invalid, both would be 2-letter alternating. Then `s₀` and `s_{R−1}` would each be a unique letter, which is impossible.
+  - **Case `s₀ ≠ s_{R−1}`.** Peel **L** if `e ≠ s₀` and `s₁…` is valid. `Good(s₁…, s₀)` follows by induction, because:
+    - (F1) and (F2) would need `s₁ = s₀`;
+    - (F2′) would need `s_{R−1} = s₀`.
+
+    Otherwise peel **R**, symmetrically. Both peels fail only when, say, `e = s₀` and `…s_{R−2}` is invalid. Then `…s_{R−2}` is 2-letter (it has ≥ 5 runs, hence a repeat), which is (F2).
+  - **Case `s₀ = s_{R−1} = p`**, so `e ≠ p`. Let `s′ = s₁ … s_{R−2}` (≥ 4 runs).
+    - If `s′` is valid, step **D**. `Good(s′, p)` holds by induction, since `p` is neither end letter of `s′`. The **D** step itself supplies the move.
+    - Otherwise `s′` alternates two letters `a, b ≠ p`. Peel **L** and use `Good(s₁…, p)`. Neither (F1) nor (F2) applies, because `s₁ ≠ p`. (F2′) fails because `s₂…` contains `a`, `b` and `p`. ∎
+
+  `caterpillar.py` also confirms the exact characterization for every pair `(s, e)` with `6 ≤ R ≤ 13`, as a sanity check.
+
+**Theorem G3 (P for all n).** Every non-interval word over exactly three letters has a Moufang move between different `D_N`-components. Hence (K) every non-interval word with ≥ 3 letters has a disconnected kernel class.
+*Proof.* Its run sequence is valid. Proposition E gives a caterpillar, Lemma Cat gives a self-certifying `S` and a Moufang move deleting a node of `S`, and Lemma R′ puts `T₁` in a different `D_N`-component. Lemma W turns this into disconnection, and Lemma K lifts it to words with more letters (restrict to `p, q` from a pattern `p…q…p` and any third letter). ∎
+
+**Main theorem, all n.** "If": ≤ 2 letters (Artin) and Theorem G2. "Only if": Theorem G3. So the number of words of length `n` with a disconnected class is `Bell(n) − 2ⁿ + n` for every `n`. The local certificates for n ≤ 14 and the exact classification for n ≤ 9 agree with it.
+
 **Distinct letters (P, general).** If all letters are distinct, all `C_{n−1}` bracketings are pairwise different maps (so `s_n(𝕆) = C_{n−1}`).
 *Proof.* Distinct planar binary trees differ in the shape they induce on some leaf triple. Kill every other letter; the two induced bracketings of `xyz` differ, and `[x,y,z] ≢ 0`. ∎
 
@@ -72,9 +121,9 @@ The move `x(Y(xC)) → ((xY)x)C` at the last letter of `ρ_{t−1}` is an instan
   - *Non-interval:* it finds an axiom move (an instance of a law valid in every alternative algebra, replayable as a ZFC-A- certificate) between two different `D_N`-components. Disconnected by W.
   - *Interval:* every `D_N`-edge satisfies V (Lemma I), and the `D_N`-components are pairwise separated by the `I_v` invariants (Θ) or, where those tie, by exact int64 evaluation at integer octonions. Distinct values prove distinct maps.
   - No randomized identity tests are used.
-- **General n reduces to two combinatorial claims; G2 is now proved (Theorem G2 below):**
+- **General n reduces to two combinatorial claims, both now proved: G2 (Theorem G2 below) and G3 (Theorem G3 below).**
   - **(G2, P)** In an interval word, distinct `D_N`-components are distinct maps (no non-local identities).
-  - **(G3)** Every non-interval word over **exactly three** letters has a **Moufang** move between different `D_N`-components. By K this implies the disconnection claim for every non-interval word with ≥ 3 letters. `g3_check.py` verifies G3 exactly for all 4,330 such words of lengths 4 through 9 (3 + 19 + 80 + 286 + 945 + 2,997). Local certificates (Theorem B, Proposition Q′, Lemma R′) extend this to every such word of length ≤ 14 (see Progress below).
+  - **(G3, P)** Every non-interval word over **exactly three** letters has a **Moufang** move between different `D_N`-components. By K this implies the disconnection claim for every non-interval word with ≥ 3 letters. `g3_check.py` verifies G3 exactly for all 4,330 such words of lengths 4 through 9 (3 + 19 + 80 + 286 + 945 + 2,997). Local certificates (Theorem B, Proposition Q′, Lemma R′) extend this to every such word of length ≤ 14 (see Progress below).
   - **(G3-R), the stronger, local form.** Every such word has a Moufang move toggling an absolutely rigid interval. `rigid_separators.py` verifies it for every word of length ≤ 9 (see `data/rigid9.log`). **It is false in general:** `xyxyzzyxyx`, `xyyxzzxyyx` (n = 10) and four words at n = 12 have no rigid separator. G3 itself still holds for all six (exact `D_N`-component check). Two-letter separators do **not** suffice: separators of length 2 through 6 occur already at n = 7. A general proof needs a uniform choice of (move, J). One family is already uniform: `J = a bᵐ a` over two letters is rigid iff no split balances the `a : b` ratio and both sides of `J` are the third letter or the boundary.
 - **Count.** With the characterization, the non-local words are those with ≥ 3 letters that are not interval words: `Bell(n) − 2^{n−1} − (2^{n−1} − n) = Bell(n) − 2ⁿ + n`.
 
@@ -103,7 +152,7 @@ The repeated variable is a single letter in every case, and every gap borders th
 
 By Lemmas F and K the theorem extends to every word that has a rigid factor, or a 3-letter killing image, satisfying the hypotheses. Interval words never satisfy M1–M5 (they need a letter to recur around another), consistent with G2.
 
-*Coverage* (`block_witness.py`, exhaustive): 100 % of non-interval 3-letter words for n ≤ 6 and n = 8; 99.55 % at n = 12 (86,079 / 86,471). Lemma R′ alone covers all words with n ≤ 10 (`data/stable10.log`). For 11 ≤ n ≤ 14, every word is covered by Theorem B, by Proposition Q′, or by a stable-node certificate from Lemma R′. At n = 13 these cover 260,015, 1,496 and 48 words; at n = 14, 786,168, 2,696 and 28 (`g3_upto14.py`, `data/g3_upto14.log`). **So G3, and with it the full theorem, holds for every n ≤ 14 by local certificates.** Every non-interval word with ≥ 3 letters has a non-interval 3-letter restriction of no greater length (keep `p, q` from a pattern `p…q…p` and any third letter), and Moufang moves lift (K). **G3 for all n stays open:** what is missing is a uniform rule for choosing the move `T₀ → T₁`. Lemma R′ shows that the certificate itself can always be local.
+*Coverage* (`block_witness.py`, exhaustive): 100 % of non-interval 3-letter words for n ≤ 6 and n = 8; 99.55 % at n = 12 (86,079 / 86,471). Lemma R′ alone covers all words with n ≤ 10 (`data/stable10.log`). For 11 ≤ n ≤ 14, every word is covered by Theorem B, by Proposition Q′, or by a stable-node certificate from Lemma R′. At n = 13 these cover 260,015, 1,496 and 48 words; at n = 14, 786,168, 2,696 and 28 (`g3_upto14.py`, `data/g3_upto14.log`). **So G3, and with it the full theorem, holds for every n ≤ 14 by local certificates.** Every non-interval word with ≥ 3 letters has a non-interval 3-letter restriction of no greater length (keep `p, q` from a pattern `p…q…p` and any third letter), and Moufang moves lift (K). *(Superseded: Theorem G3 above gives the uniform rule, caterpillar certificates, and proves G3 for all n.)*
 
 **G2 reduction (rigorous implication; both inputs discharged below).** Killing letters is a specialisation, so equal maps restrict to equal maps. Hence G2 follows from:
 - **(a)** the components of the letter-triple restrictions determine the `D_N`-component, for interval words (verified for all interval words with ≥ 4 letters, n ≤ 7, `g2_reduction.py`);

@@ -25,6 +25,8 @@ jobs:
           python src/stable_separators.py words xyxyzzyxyx xyyxzzxyyx xyxyzyyzyxyx xyxyzzyyzxzx xyxyzzzzyxyx xyyxzzzzxyyx
       - name: Proposition Q' run-comb certificates (cross-checked) n <= 8
         run: python src/run_comb.py 8
+      - name: Caterpillar certificates - Proposition E base cases (R<=5), sanity R<=10, word validation n<=8
+        run: python src/caterpillar.py 10 8
       - name: Interval rank lemma, brute force n <= 10
         run: python src/lemmaI_check.py 10
       - name: Exact class certification (full polarization) n <= 5

@@ -10,7 +10,7 @@
 
 *One word. Many bracketings. A determinant that refuses to forget.*
 
-**The local witness is proved. The global frontier remains open.**
+**The local witness is proved. The global characterization is now proved too (manuscript argument + finite base check).**
 
 <sub>形が変わり、証拠が残る。 · The form moves; the evidence remains.</sub>
 
@@ -111,7 +111,7 @@ flowchart TD
   G -->|"yes"| H["Disconnected kernel class"]
   G -->|"no"| I["No disconnection conclusion"]
 ```
-## 03 / The theorem: one closed direction, one open gate
+## 03 / The theorem: both directions closed
 
 The proposed **all-length characterization** is:
 
@@ -125,12 +125,17 @@ Its proof status must not be flattened:
 | **G2:** interval words have connected kernel classes | General argument in [THEOREM.md](THEOREM.md), via Propositions T, S and C |
 | Complete characterization for $1\leq n\leq9$ | **Exact exhaustive finite verification** |
 | Complete characterization for $10\leq n\leq14$ | **Exhaustive local certificates**: Theorem B, Proposition Q′ or Lemma R′ for every non-interval 3-letter word; [log](data/g3_upto14.log) |
-| **G3:** every non-interval word on exactly three letters has a Moufang move crossing $D_N$ components | **Open for arbitrary lengths**; certified for every length $\leq14$ |
+| **G3:** every non-interval word on exactly three letters has a Moufang move crossing $D_N$ components | **General argument** (Theorem G3: caterpillar certificates, Lemma Cat + Proposition E; induction with an exhaustive base $R\in\{4,5\}$ runs); independently certified for every length $\leq14$ |
 | **Lemma R′:** self-certifying (greatest-fixpoint) node sets are constant on $D_N$ components | General argument; certifies all G3-R counterexamples |
 | **Proposition Q′:** run-comb words satisfying explicit ratio conditions are disconnected | General argument; 92.6 % of words at $n=9$ |
 | **G3-R:** such a move must toggle an absolutely rigid interval | **False from length ten** |
 
-The general only-if direction reduces to G3; proving the stronger G3-R will not work because it has counterexamples. G3 nevertheless holds in all the checked finite cases, including those particular counterexamples to G3-R. For those cases a different local certificate takes over. Nodes that fail absolute rigidity can still certify one another: deleting any of them needs a rank-3 rotation (Lemma R′). What is still missing for all $n$ is a uniform rule for picking the Moufang move, not a different kind of certificate.
+The general only-if direction reduces to G3. The stronger G3-R has counterexamples, so it cannot be the route. Instead, nodes that fail absolute rigidity can still certify one another: deleting any of them needs a rank-3 rotation (Lemma R′). **The uniform rule is the caterpillar.**
+- **Construction.** Peel the word's maximal runs off its two ends, one run or both end runs at a time, down to two runs.
+- **Stability.** The path nodes are then stable under $D_N$-flips. This follows from two letter-level conditions, because every deleting rotation has two single-letter segments, so its determinant is ± a count of the third letter.
+- **Existence.** An induction on the number of runs shows that a valid peeling with a Moufang move always exists. The base cases, 4 and 5 runs, are an exhaustive check over 240 cases.
+
+See [THEOREM.md](THEOREM.md) and [`src/caterpillar.py`](src/caterpillar.py).
 
 A corrected count from the [finite logs](data/rigid9.log) is
 
@@ -166,7 +171,7 @@ $$
 
 For $n\leq9$ the classifier is exhaustive. For $10\leq n\leq14$ the "if" half is Theorem G2 (all $n$). The "only if" half certifies every non-interval 3-letter word, then lifts to all words by killing letters (Lemma K).
 
-The same expression for **all** $n$ remains conditional on G3. It is **not** an established all-length formula.
+With Theorem G3 the same expression holds for **all** $n$. Its proof is a manuscript argument whose base case is a finite exhaustive check. It is not a Lean kernel proof.
 
 The [saved exact log](data/verify9.log) includes all **26,439 words for lengths three through nine**:
 
@@ -193,7 +198,7 @@ $$
 
 Lemma M gives a Cayley-Dickson moment formula and Proposition S separates the components by octonion polynomial values. Proposition C extends the component description to general interval words through the induced shapes of distinct-letter triples.
 
-This is the supplied **all-length G2 argument**; it does not discharge the non-interval G3 obligation.
+This is the supplied **all-length G2 argument**. The non-interval G3 obligation is discharged separately by the caterpillar certificates (§ 03).
 
 [Three-block algorithm](src/three_block.py) · [Moment checks](src/lemma_m.py) · [Interval-word checks](src/sigma_complete.py) · [Mathematical theorem](THEOREM.md).
 
@@ -207,7 +212,8 @@ This is the supplied **all-length G2 argument**; it does not discharge the non-i
 | [Tensor cross-check](src/crosscheck.py) | Zero recorded mismatches through six; [log](data/cross6.log) | Finite implementation parity |
 | [Rigid-separator study](src/rigid_separators.py) | Full finite checks through nine; [log](data/rigid9.log) | Stronger universal G3-R fails |
 | [Stable-node separators](src/stable_separators.py) | Every non-interval 3-letter word through ten; [log](data/stable10.log) | Certificate search, not a uniform rule |
-| [Run-comb certificates](src/run_comb.py) and [tiered G3 check](src/g3_upto14.py) | Every non-interval 3-letter word through fourteen; [log](data/g3_upto14.log) | Finite length, not G3 for all $n$ |
+| [Run-comb certificates](src/run_comb.py) and [tiered G3 check](src/g3_upto14.py) | Every non-interval 3-letter word through fourteen; [log](data/g3_upto14.log) | Finite length; independent of the all-$n$ proof |
+| [Caterpillar certificates](src/caterpillar.py) | Base cases $R\in\{4,5\}$ of Proposition E (exhaustive); characterization sanity check $R\leq13$; word-level validation through nine (4,330/4,330) | The induction step is a manuscript argument |
 | Octonion/sedenion word spectra | Randomized numerical estimates | Neither exact proof nor guaranteed novelty |
 | W, G2 and three-block statements | Proof arguments in [THEOREM.md](THEOREM.md) | No independent Lean formalization claimed |
 
@@ -228,6 +234,7 @@ python src/sigma_complete.py 8
 python src/stable_separators.py 8
 python src/run_comb.py 8
 python src/g3_upto14.py 11 14   # ~8 min
+python src/caterpillar.py 12 8   # Proposition E base + validation
 python src/certify_exact.py 5
 
 # Optional: with a separate ZFC-A- checkout.
@@ -245,7 +252,7 @@ The [verbatim original README](docs/README_MAIN_SNAPSHOT_2026-11-18.md) preserve
 
 Evidence remains typed: **P** — mathematical proof in the supplied manuscript; **P-fin** — exhaustive exact finite procedure; **M** — measured experiment; **H** — conjecture; **R** — refuted stronger candidate.
 
-**The remaining universal gate is G3.** More beautiful notation is not a way around it.
+**The universal gate G3 is closed by caterpillars.** The proof rests on manuscript arguments and finite checks, not a formal kernel. A Lean formalization is the natural next gate.
 
 ---
 
@@ -257,6 +264,6 @@ Evidence remains typed: **P** — mathematical proof in the supplied manuscript;
 
 **the count remembers. the bracket may not.**
 
-<sub>LEMMA / W · LOCAL WITNESS, GLOBAL REMAINDER</sub>
+<sub>LEMMA / W · LOCAL WITNESS, GLOBAL CLOSURE</sub>
 
 </div>
