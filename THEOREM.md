@@ -86,4 +86,25 @@ By Lemmas F and K the theorem extends to every word that has a rigid factor, or 
 - **(a)** the components of the letter-triple restrictions determine the `D_N`-component, for interval words (verified for all interval words with ≥ 4 letters, n ≤ 7, `g2_reduction.py`);
 - **(b)** G2 for three-block words `xᵃyᵇzᶜ`. This is verified for all 162 such words with `a + b + c ≤ 11`, and their component count fits
 
-  `#components(xᵃyᵇzᶜ) = 1 + b·(C(a+c, a) − 1)`   (conjectured closed form, exact on the same range).
+  `#components(xᵃyᵇzᶜ) = 1 + b·(C(a+c, a) − 1)`   (proved below, Proposition T).
+
+**Proposition T (three-block components, P for all a, b, c).** Let `w = xᵃyᵇzᶜ`.
+- **Core and invariant.** For a bracketing `T`, let the core `K = (U, V)` be the lowest node containing the last `x` and the first `z`. Then `U = x^{a′}y^j` and `V = y^{b−j}z^{c′}` with `a′, c′ ≥ 1`. Every ancestor of `K` attaches a pure-`x` block on the left or a pure-`z` block on the right. Let `W` be the word of attached letters read from `K` outward. Put `Φ(T) = (j, a′, c′, W)`.
+- **Classification.** `j` is constant on `D_N`-components. For `0 < j < b`, `Φ` is a complete invariant. For `j = 0` (resp. `j = b`), the complete invariant is the join word from the core outward, where core `x`'s (resp. `z`'s) merge with the adjacent outer run.
+- **Count.**
+
+  `#D_N-components(xᵃyᵇzᶜ) = (b−1)(C(a+c,a) − 1) + C(a+c−1, a) + C(a+c−1, c) = 1 + b·(C(a+c,a) − 1).`
+
+*Proof.* Flips inside `U`, inside `V` or inside a one-letter block involve at most two letters, so they keep `Φ`. The remaining flips are:
+- rotation at `K` moving an `x`-block across: determinant `p·j·c′`;
+- rotation at `K` moving `k` `y`'s across: determinant `a′·k·c′`;
+- an `x`-attachment against a `z`-attachment, through a node holding `n_y ≥ 1` `y`'s: determinant `p·q·n_y`;
+- merging two adjacent attachments on the same side: they are powers of one letter, so the flip is in `D_N` and leaves `W` unchanged.
+
+So `j` never changes. For `0 < j < b`, `a′` and `c′` never change either. For `j = 0` (resp. `j = b`) the first determinant vanishes, and only the merge of core `x`'s (resp. `z`'s) with the adjacent outer run becomes possible.
+
+*Completeness.* Trees with equal invariant differ only in bracketings of ≤ 2-letter regions and in the grouping of consecutive same-side blocks; these are joined by `D_N` moves.
+
+*Counting.* For interior `j`: `Σ_{p<a, q<c} C(p+q, p) = C(a+c, a) − 1`. For `j = 0`: `Σ_{q<c} C(a−1+q, a−1) = C(a+c−1, a)`; symmetrically for `j = b`. Pascal's rule gives the total. ∎ (`three_block.py` checks invariant completeness and counts for `a ≤ 3, b ≤ 4, c ≤ 3`.)
+
+Consequently, **G2 for three-block words is equivalent to: different invariants `Φ` give different octonion maps.** With the triple-restriction claim (a), this is now the only input G2 still needs.
