@@ -23,3 +23,4 @@ import Caterpillar.LemmaM
 import Caterpillar.Coeff
 import Caterpillar.Profiles
 import Caterpillar.G2Final
+import Caterpillar.Closure
