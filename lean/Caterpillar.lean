@@ -19,3 +19,4 @@ import Caterpillar.Lift
 import Caterpillar.PropC
 import Caterpillar.PropCF
 import Caterpillar.PropT
+import Caterpillar.LemmaM
