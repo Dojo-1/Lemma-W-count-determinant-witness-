@@ -6,7 +6,7 @@ Evidence labels: **P** proved (general argument), **P-fin** proved for every wor
 
 A *word* `w = w₁…wₙ` over letters; a *bracketing* is a planar binary tree with leaves `1..n`. Each bracketing `T` induces a polynomial map `𝕆^L → 𝕆`. `T ~ T'` iff the maps agree. Bracketings form the vertices of the associahedron `Kₙ`; an edge (*flip*) replaces a subterm `(AB)C` by `A(BC)`, where `A, B, C` are bracketings of consecutive segments `a, b, c` of `w`. A class is *flip-connected* if it induces a connected subgraph of `Kₙ`.
 
-**Theorem ("if": P for all n; "only if": P-fin for n ≤ 12, by local certificates).** In 𝕆 every class of `w` is flip-connected iff `w` has ≤ 2 distinct letters or every letter of `w` occurs in one contiguous run. The number of words of length `n` (up to renaming) with a disconnected class is `Bell(n) − 2ⁿ + n`.
+**Theorem ("if": P for all n; "only if": P-fin for n ≤ 14, by local certificates).** In 𝕆 every class of `w` is flip-connected iff `w` has ≤ 2 distinct letters or every letter of `w` occurs in one contiguous run. The number of words of length `n` (up to renaming) with a disconnected class is `Bell(n) − 2ⁿ + n`.
 
 ## General lemmas (P)
 
@@ -48,16 +48,19 @@ Exhaustive brute-force check: 1,997,801 segment triples of interval words up to 
 - **Exact checks.** `stable(T)` lies inside the nodes common to the whole component for all 824,310 trees checked, n ≤ 8, with equality in 98 %.
 - **Coverage.** The certificate exists for **every** non-interval 3-letter word with n ≤ 10 (12,624 words). It also exists for all six counterexamples to G3-R (n = 10, 12). See `stable_separators.py` and `data/stable10.log`. Example: `xyxyzzyxyx`, right comb `T₀`, `stable(T₀) = {[1,9], [2,9], [3,9], [4,9]}`. The move `x(y(xC)) → ((xy)x)C` deletes `[2,9]`. None of these four nodes is absolutely rigid; they certify each other.
 
-**Q (comb family, P for all n).** Let `w` be a 3-letter word with `w₀ = w₂ ≠ w₁`. Suppose that for some `m ≥ 1`:
-- **(i)** for `1 ≤ t < m`, `w_{t−1} ≠ w_t` and the third letter occurs in `w[t+1..]`;
-- **(ii)** for every split `w[m..] = A·B` into nonempty parts, the two letters other than `w_{m−1}` occur in `A` in a ratio different from their ratio in `w[m..]`.
+**Q′ (run-comb family, P for all n).** Let `w` be a 3-letter word with runs `ρ₀ρ₁…`, starts `r₀ = 0 < r₁ < …` and letters `ℓ_t`. Fix `m ≥ 1` with:
+- **(i)** for `1 ≤ t < m`, the letter outside `{ℓ_{t−1}, ℓ_t}` occurs in `w[r_{t+1}..]`;
+- **(ii)** with `c = ℓ_{m−1}`, the two other letters never reach, on a nonempty proper prefix of `w[r_m..]`, the ratio they have on all of `w[r_m..]`.
 
-Then `w` has a disconnected class. The mirror statement for the reversed word also holds.
-*Proof.* In the right comb, `S = {[t, n−1] : 1 ≤ t ≤ m}` is self-certifying.
-- For `t < m`, laminarity leaves only the triple `(w_{t−1}, w_t, w[t+1..])`, whose determinant is ± the count of the third letter in `w[t+1..]`.
-- For `t = m`, it leaves `(w_{m−1}, A, B)`, whose determinant is the 2 × 2 ratio test (ii).
+Suppose some `1 ≤ t ≤ m` has `ℓ_{t−1} = ℓ_{t+1}` and `w[r_{t+1}+1..] ≠ ∅`. Then `w` has a disconnected class. The same holds for the reversed word.
+*Proof.* Take `T₀` to be the right comb over letters, except that `Y = ρ_t` forms one block. We show that `S = {[r_u, n−1] : 1 ≤ u ≤ m}` is self-certifying (Lemma R′).
+- *Rotations deleting `[r_u, n−1]`.* Laminarity with `S` forces the sibling to be a suffix `c′ᵏ` of the run `ρ_{u−1}`. It also forces the left child to lie inside the block from `r_u` to the next start in `S`.
+- *Case `u < m`.* The left child is a nonempty piece of the single-letter run `ρ_u`, and the right child contains the third letter by (i). The determinant is ± (count of the third letter) ≠ 0.
+- *Case `u = m`.* Every split `[r_m..s] | [s+1..n−1]` is allowed, and the determinant is exactly the ratio test (ii).
 
-The left Moufang move `x(y(xC)) → ((xy)x)C` deletes `[1, n−1] ∈ S`. ∎ It covers about 36 % of non-interval 3-letter words (n ≤ 12), partly outside Theorem B.
+The move `x(Y(xC)) → ((xY)x)C` at the last letter of `ρ_{t−1}` is an instance of the left Moufang identity, and it deletes `[r_t, n−1] ∈ S`. ∎
+
+`run_comb.py` re-checks every certificate against `stable(T₀)` and the explicit move, with no failures. Q′ alone covers 92.6 % of non-interval 3-letter words at n = 9. Combined with Theorem B, it leaves 1, 4, 4, 11, 6 words at n = 7, 9, 10, 11, 12, for example `xyyxzzx` and `xyxxyxzxxzx`. A *zipper* tree, which is a right comb on a prefix and a left comb on the suffix, certifies those (`stable_separators.py`).
 
 **Distinct letters (P, general).** If all letters are distinct, all `C_{n−1}` bracketings are pairwise different maps (so `s_n(𝕆) = C_{n−1}`).
 *Proof.* Distinct planar binary trees differ in the shape they induce on some leaf triple. Kill every other letter; the two induced bracketings of `xyz` differ, and `[x,y,z] ≢ 0`. ∎
@@ -100,7 +103,7 @@ The repeated variable is a single letter in every case, and every gap borders th
 
 By Lemmas F and K the theorem extends to every word that has a rigid factor, or a 3-letter killing image, satisfying the hypotheses. Interval words never satisfy M1–M5 (they need a letter to recur around another), consistent with G2.
 
-*Coverage* (`block_witness.py`, exhaustive): 100 % of non-interval 3-letter words for n ≤ 6 and n = 8; 99.55 % at n = 12 (86,079 / 86,471). Every word Theorem B misses has a stable-node certificate (Lemma R′). That is 256 words at n = 11 and 392 at n = 12; Lemma R′ alone covers all words with n ≤ 10 (`g3_upto12.py`, `data/stable10.log`). **So G3, and with it the full theorem, holds for every n ≤ 12 by local certificates.** Every non-interval word with ≥ 3 letters has a non-interval 3-letter restriction of no greater length (keep `p, q` from a pattern `p…q…p` and any third letter), and Moufang moves lift (K). **G3 for all n stays open:** what is missing is a uniform rule for choosing the move `T₀ → T₁`. Lemma R′ shows that the certificate itself can always be local.
+*Coverage* (`block_witness.py`, exhaustive): 100 % of non-interval 3-letter words for n ≤ 6 and n = 8; 99.55 % at n = 12 (86,079 / 86,471). Lemma R′ alone covers all words with n ≤ 10 (`data/stable10.log`). For 11 ≤ n ≤ 14, every word is covered by Theorem B, by Proposition Q′, or by a stable-node certificate from Lemma R′. At n = 13 these cover 260,015, 1,496 and 48 words; at n = 14, 786,168, 2,696 and 28 (`g3_upto14.py`, `data/g3_upto14.log`). **So G3, and with it the full theorem, holds for every n ≤ 14 by local certificates.** Every non-interval word with ≥ 3 letters has a non-interval 3-letter restriction of no greater length (keep `p, q` from a pattern `p…q…p` and any third letter), and Moufang moves lift (K). **G3 for all n stays open:** what is missing is a uniform rule for choosing the move `T₀ → T₁`. Lemma R′ shows that the certificate itself can always be local.
 
 **G2 reduction (rigorous implication; both inputs discharged below).** Killing letters is a specialisation, so equal maps restrict to equal maps. Hence G2 follows from:
 - **(a)** the components of the letter-triple restrictions determine the `D_N`-component, for interval words (verified for all interval words with ≥ 4 letters, n ≤ 7, `g2_reduction.py`);
