@@ -1,0 +1,7 @@
+Lemma W expansion: θ⁰..θ² coefficients vanish and θ³ = 2·det·e7, 300 random rounds: ok
+  control: the θ³ coefficient of [x, y, z] is nonzero (det = 1)
+L1: N(ab) = N(a)N(b), a·ā = N(a), no zero divisors, 300 random pairs: ok
+L1: C[S1] = C[S2] ⟺ S1 = S2 for nonzero letter values, 300 random cases (240 equal pairs): ok
+Artin: every bracketing of a word over two random octonions has the same value (n ≤ 7): ok
+  control: with a third generic value the two bracketings of uvz differ
+K: killed letters set to 1 give the restricted bracketing's value, 300 random cases: ok

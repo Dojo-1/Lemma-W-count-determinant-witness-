@@ -3,7 +3,7 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   exact:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,7 +40,7 @@ jobs:
           fi
   lean:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - name: Install elan
@@ -52,7 +52,7 @@ jobs:
         run: |
           lake build
           grep -rn "sorry\|admit\|native_decide" Caterpillar/ && exit 1 || true
-          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n#print axioms Caterpillar.caterpillar_separates\n#print axioms Caterpillar.g3_trees\n#print axioms Octonion.moufang_middle\n#print axioms Octonion.lemmaW_span\n' > Axioms.lean
+          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n#print axioms Caterpillar.caterpillar_separates\n#print axioms Caterpillar.g3_trees\n#print axioms Octonion.moufang_middle\n#print axioms Octonion.lemmaW_span\n#print axioms Octonion.lemmaW_expansion\n#print axioms Octonion.context_cancel\n#print axioms Octonion.artin\n#print axioms Octonion.kill_DN\n#print axioms Octonion.propT_count\n#print axioms Octonion.propC_forward\n#print axioms PropS.propS_interior\n' > Axioms.lean
           lake env lean Axioms.lean
   prolog:
     runs-on: ubuntu-latest
@@ -66,3 +66,5 @@ jobs:
           swipl -q -g main -t halt caterpillar.pl
           swipl -q -g main -t halt octonion.pl
           swipl -q -g main -t halt trees.pl
+          swipl -q -g main -t halt algebra.pl
+          swipl -q -g main -t halt g2.pl

@@ -1,0 +1,9 @@
+control: for the non-interval word [0,1,2,1,0], σ-classes (11) ≠ D_N-components (10)
+control: Lemma M with j and b − j swapped fails on node(leaf(0),node(node(leaf(1),leaf(2)),node(leaf(3),node(leaf(4),node(leaf(5),leaf(6))))))
+K: 426 four-letter words (n ≤ 7), 969400 flips × killed letters: flips ↦ flips or identities, D_N ↦ D_N or identities: ok
+K: 5892 Moufang moves between different D_N-components of a 3-letter image all lift: ok
+Prop T: 56 three-block words (n ≤ 8), 694 components: count 1 + b(C(a+c,a) − 1), invariant constant and complete: ok
+Lemma M: A_T(p, r) = σ(w, p, r)[j S_ω₊ + (b−j) S_ω₋] on all 521 bracketings of three-block words, n ≤ 6: ok
+Prop S: the linear profiles decode the invariant on every bracketing; 291 components, n ≤ 7: ok
+Prop S: formula over the full Φ range, a + b + c ≤ 10: 3422 distinct maps, each decoded, count 1 + b(C(a+c,a) − 1): ok
+Prop C: 99 interval words with ≥ 3 letters (n ≤ 7), 2804 components: D_N-components = σ-classes: ok

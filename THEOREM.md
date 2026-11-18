@@ -121,12 +121,14 @@ The move `x(Y(xC)) → ((xY)x)C` at the last letter of `ρ_{t−1}` is an instan
   - `[e₁,e₂,e₄] = 2e₇ ≠ 0`;
   - the algebraic core of Lemma W (`Octonion.lemmaW_span`): `[X,Y,Z] = det(X,Y,Z)·[e₁,e₂,e₄]` on `span(e₁,e₂,e₄)`.
 - **Prolog.** [`prolog/`](prolog/) checks the same chain independently and end to end (`trees.pl`): certificate, bracketings, Moufang move, Lemma Cat by brute force, exact `D_N`-components (n ≤ 9) and octonion equality. `octonion.pl` holds complete polarised basis checks of the identities.
-- **Not formalized.**
-  - Lemma W's expansion step (the `θ³` coefficient of a local associator);
-  - context cancellation (L1);
-  - Artin's theorem (Lemma V);
-  - killing (K);
-  - G2's Propositions T, M, S and C.
+- **Octonion lemmas (Lean).**
+  - Lemma W's expansion step (`Octonion.lemmaW_expansion`): with letters `1 + θq_ℓ + θ²r_ℓ + θ³t_ℓ` (any `r, t`, so `exp(θq_ℓ)` included), a local associator has zero `θ⁰..θ²` coefficients and `θ³` coefficient `2·det·e₇`;
+  - L1 (`Octonion.context_cancel`, `flip_iff_assoc`), from `N(ab) = N(a)N(b)` and the absence of zero divisors;
+  - Artin's theorem (`Octonion.artin`) and Lemma V (`lemmaV_two_letters`, `lemmaV_powers*`);
+  - K: specialisation (`kill_ev`, `kill_id`) and the restriction of flips and `D_N`-flips (`kill_flip`, `kill_DN`).
+- **G2 (Lean, in part).** Proposition T's count (`propT_count`, `propT_interior`); Proposition C (⇒) (`propC_forward`); Proposition S's decoding (`PropS.propS_interior`, `propS_boundary`, `propS_kind`).
+- **Prolog.** `algebra.pl` re-checks Lemma W's expansion, L1, Artin and K on random integer octonions. `g2.pl` checks K (with the Moufang lift), Propositions T, S, C and Lemma M exhaustively on small words.
+- **Not formalized in Lean** (manuscript, checked in `g2.pl`): K's Moufang lift; Proposition T's classification; Lemma M; Proposition C (⇐).
 
 **Theorem G3 (P for all n).** Every non-interval word over exactly three letters has a Moufang move between different `D_N`-components. Hence (K) every non-interval word with ≥ 3 letters has a disconnected kernel class.
 *Proof.* Its run sequence is valid. Proposition E gives a caterpillar, Lemma Cat gives a self-certifying `S` and a Moufang move deleting a node of `S`, and Lemma R′ puts `T₁` in a different `D_N`-component. Lemma W turns this into disconnection, and Lemma K lifts it to words with more letters (restrict to `p, q` from a pattern `p…q…p` and any third letter). ∎

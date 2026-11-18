@@ -1,11 +1,13 @@
 # Prolog formalization (SWI-Prolog)
 
-Three programs. Each one checks independently what the Lean development proves:
+Five programs. Each one checks independently what the Lean development proves, and the last two also check the statements Lean does not yet cover:
 
 ```bash
 swipl -q -g main -t halt caterpillar.pl   # run-sequence combinatorics, finite base, constructive Prop. E
 swipl -q -g main -t halt octonion.pl      # octonion identities and Lemma W's core
 swipl -q -g main -t halt trees.pl         # G3 end to end, from words to bracketings
+swipl -q -g main -t halt algebra.pl       # Lemma W expansion, L1, Artin, K (octonion side)
+swipl -q -g main -t halt g2.pl            # K (combinatorial side, Moufang lift), G2: T, M, S, C
 ```
 
 ## `caterpillar.pl`: Proposition E
@@ -49,4 +51,27 @@ Results (`../data/prolog_trees.log`):
 
 Negative controls confirm that `certified/4` and `mouf/3` can fail.
 
-Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees` and `Octonion.moufang_*`.
+## `algebra.pl`: Lemma W's expansion, L1, Artin, K
+
+Random integer tests with a fixed seed ([log](../data/prolog_algebra.log)):
+- **Lemma W.** Series truncated after `θ³`, letters `x, y, z` substituted by `1 + θe₁/e₂/e₄ + θ²r + θ³t` (`r, t` random), a fourth letter with `q = 0`. The local associator has zero `θ⁰..θ²` coefficients and `θ³` coefficient `2·det·e₇` (300 rounds). Control: `[x,y,z]` has a nonzero `θ³` term.
+- **L1.** `N(ab) = N(a)N(b)`, `a·ā = N(a)`, no zero divisors; `C[S₁] = C[S₂] ⟺ S₁ = S₂` for random contexts and nonzero letter values (300 cases, both outcomes occur).
+- **Artin.** Every bracketing of a word over two random octonions (n ≤ 7) has one value. Control: a third value separates the bracketings of `uvz`.
+- **K.** Killed letters set to `1` give the restricted bracketing's value.
+
+## `g2.pl`: K and G2, exhaustively on small words
+
+Exact `D_N`-components by breadth-first search over all bracketings, with `D_N` = all `3 × 3` count minors zero ([log](../data/prolog_g2.log)):
+
+| Statement | Range | Result |
+|---|---|---|
+| K: flips ↦ flips or identities, `D_N` ↦ `D_N` or identities | all 426 four-letter words, n ≤ 7, every letter killed | ok |
+| K: Moufang moves between different components of the 3-letter image lift | same words | 5,892 moves, all lift |
+| Prop. T: invariant constant and complete, count `1 + b(C(a+c,a) − 1)` | 56 three-block words, n ≤ 8 | 694 components |
+| Lemma M: direct octonion-unit coefficients = `±[j S_{ω₊} + (b−j) S_{ω₋}]`, sign uniform in `T` | every bracketing, n ≤ 6 | 521 bracketings |
+| Prop. S: profiles decode the invariant | every bracketing, n ≤ 7; formula range `a+b+c ≤ 10` | 291 components; 3,422 maps |
+| Prop. C: `D_N`-components = σ-classes | 99 interval words with ≥ 3 letters, n ≤ 7 | 2,804 components |
+
+Controls: for the non-interval word `[0,1,2,1,0]` the σ-classes (11) differ from the components (10); Lemma M with `j` and `b − j` swapped fails.
+
+Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.propC_forward` and `PropS.propS_interior`.
