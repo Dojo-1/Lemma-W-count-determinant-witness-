@@ -1,0 +1,6 @@
+n=3: 5/5 words proved  fails=[]  (0s)
+n=4: 15/15 words proved  fails=[]  (0s)
+n=5: 52/52 words proved  fails=[]  (0s)
+n=6: 203/203 words proved  fails=[]  (0s)
+n=7: 877/877 words proved  fails=[]  (2s)
+n=8: 4140/4140 words proved  fails=[]  (29s)

@@ -1,0 +1,77 @@
+{
+ "format": "zfca-equational-certificate-v1",
+ "theory_sha256": "639a35b4d05f6912a66cb41a6de05278bd7de83d7b3ac9298ddd729075d3e30d",
+ "steps": [
+  {
+   "rule": "axiom",
+   "name": "moufang_mid",
+   "subst": {
+    "a": [
+     "x"
+    ],
+    "b": [
+     "y"
+    ],
+    "c": [
+     "z"
+    ]
+   },
+   "id": "s0"
+  },
+  {
+   "rule": "symm",
+   "premise": "s0",
+   "id": "s1"
+  }
+ ],
+ "result": "s1",
+ "goal": {
+  "equation": {
+   "lhs": [
+    "mul",
+    [
+     "x"
+    ],
+    [
+     "mul",
+     [
+      "mul",
+      [
+       "y"
+      ],
+      [
+       "z"
+      ]
+     ],
+     [
+      "x"
+     ]
+    ]
+   ],
+   "rhs": [
+    "mul",
+    [
+     "mul",
+     [
+      "x"
+     ],
+     [
+      "y"
+     ]
+    ],
+    [
+     "mul",
+     [
+      "z"
+     ],
+     [
+      "x"
+     ]
+    ]
+   ]
+  },
+  "assumptions": [
+   "moufang_mid"
+  ]
+ }
+}

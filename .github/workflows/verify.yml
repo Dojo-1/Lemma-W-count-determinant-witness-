@@ -1,0 +1,26 @@
+name: verify
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - name: Theorem, exact, all words n <= 7
+        run: python src/verify_theorem.py 7
+      - name: G3 (Moufang crossing) for 3-letter words n <= 8
+        run: python src/g3_check.py 8
+      - name: Interval rank lemma, brute force n <= 10
+        run: python src/lemmaI_check.py 10
+      - name: Exact class certification (full polarization) n <= 5
+        run: python src/certify_exact.py 5
+      - name: Certificate replay with Dojo-1/ZFC-A- certcheck (skipped if not accessible)
+        run: |
+          if git clone --depth 1 https://github.com/Dojo-1/ZFC-A- ZFC-A- 2>/dev/null; then
+            python src/certs.py 5
+          else
+            echo "ZFC-A- not accessible from CI; skipping certificate replay"
+          fi
