@@ -21,3 +21,4 @@ import Caterpillar.PropCF
 import Caterpillar.PropT
 import Caterpillar.LemmaM
 import Caterpillar.Coeff
+import Caterpillar.Profiles
