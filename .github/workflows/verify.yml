@@ -13,6 +13,8 @@ jobs:
         run: python src/verify_theorem.py 7
       - name: G3 (Moufang crossing) for 3-letter words n <= 8
         run: python src/g3_check.py 8
+      - name: G3-R rigid-separator certificates n <= 8
+        run: python src/rigid_separators.py 8
       - name: Interval rank lemma, brute force n <= 10
         run: python src/lemmaI_check.py 10
       - name: Exact class certification (full polarization) n <= 5

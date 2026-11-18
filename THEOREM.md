@@ -33,6 +33,12 @@ Exhaustive brute-force check: 1,997,801 segment triples of interval words up to 
 
 **K (killing).** Setting a letter to `1` sends bracketings of `w` to bracketings of the shorter word `w′`. It maps `D_N`-edges to `D_N`-edges or to identities (deleting columns cannot raise rank), and identities to identities. **Moufang moves lift.** In each pattern, `(ab)(ca)`, `((ab)a)c`, `((ca)b)a`, every gap between consecutive leaves borders a non-repeated variable (`b` or `c`), so killed letters can be absorbed there or into the context. Hence a Moufang move between different `D_N`-components of `w′` lifts to one in `w`. (Alternative-law moves need not lift: `(xx)y` from `x d x y`.)
 
+**R (rigid separator).** Call an interval `J` (|J| ≥ 2) *absolutely rigid* if every triple (split of `J`, adjacent nonempty interval on either side) has `rank N = 3`.
+- **Lemma.** If `J` is absolutely rigid, then "`J` is a node of `T`" is constant on `D_N`-components.
+- **Proof.** A node with span `J` is created or removed only by a rotation at its parent in which `J` is the inner node. That rotation's segment triple is (split of `J`, sibling), and the sibling is an adjacent nonempty interval. By rigidity it has rank 3, so it is not a `D_N`-edge. ∎
+- **Closed form (three letters).** Let `t = counts(J)`, and `n_s = u_s × t` for each split `s` (`u_s` = counts of the left part). `J` is rigid iff no nonempty prefix-count vector of the right context and no nonempty suffix-count vector of the left context is orthogonal to any `n_s`, i.e. two lattice walks avoid finitely many planes. For `J = pq`: rigid iff each side of `J` is the word boundary or the third letter.
+- **Consequence.** A Moufang move `T0 → T1` together with a rigid `J ∈ nodes(T0) Δ nodes(T1)` is a *local, finitely checkable* certificate that `T0, T1` lie in different `D_N`-components: no component search is needed.
+
 **Distinct letters (P, general).** If all letters are distinct, all `C_{n−1}` bracketings are pairwise different maps (so `s_n(𝕆) = C_{n−1}`).
 *Proof.* Distinct planar binary trees differ in the shape they induce on some leaf triple. Kill every other letter; the two induced bracketings of `xyz` differ, and `[x,y,z] ≢ 0`. ∎
 
@@ -46,4 +52,5 @@ Exhaustive brute-force check: 1,997,801 segment triples of interval words up to 
 - **General n reduces to two combinatorial claims (H):**
   - **(G2)** In an interval word, distinct `D_N`-components are distinct maps (no non-local identities).
   - **(G3)** Every non-interval word over **exactly three** letters has a **Moufang** move between different `D_N`-components. By K this implies the disconnection claim for every non-interval word with ≥ 3 letters. `g3_check.py` verifies G3 exactly for all 3,385 such words of length ≤ 9.
+  - **(G3-R), the stronger, local form.** Every such word has a Moufang move toggling an absolutely rigid interval. `rigid_separators.py` verifies it for every word of length ≤ 9 (see `data/rigid9.log`). Two-letter separators do **not** suffice: separators of length 2 through 6 occur already at n = 7. A general proof needs a uniform choice of (move, J). One family is already uniform: `J = a bᵐ a` over two letters is rigid iff no split balances the `a : b` ratio and both sides of `J` are the third letter or the boundary.
 - **Count.** With the characterization, the non-local words are those with ≥ 3 letters that are not interval words: `Bell(n) − 2^{n−1} − (2^{n−1} − n) = Bell(n) − 2ⁿ + n`.
