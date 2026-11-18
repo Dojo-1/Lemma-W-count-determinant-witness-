@@ -12,3 +12,5 @@ import Caterpillar.Octonion
 import Caterpillar.LemmaW
 import Caterpillar.Division
 import Caterpillar.Artin
+import Caterpillar.Kill
+import Caterpillar.G2
