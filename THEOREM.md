@@ -49,8 +49,8 @@ Exhaustive brute-force check: 1,997,801 segment triples of interval words up to 
   - *Non-interval:* it finds an axiom move (an instance of a law valid in every alternative algebra, replayable as a ZFC-A- certificate) between two different `D_N`-components. Disconnected by W.
   - *Interval:* every `D_N`-edge satisfies V (Lemma I), and the `D_N`-components are pairwise separated by the `I_v` invariants (Θ) or, where those tie, by exact int64 evaluation at integer octonions. Distinct values prove distinct maps.
   - No randomized identity tests are used.
-- **General n reduces to two combinatorial claims (H):**
-  - **(G2)** In an interval word, distinct `D_N`-components are distinct maps (no non-local identities).
+- **General n reduces to two combinatorial claims; G2 is now proved (Theorem G2 below):**
+  - **(G2, P)** In an interval word, distinct `D_N`-components are distinct maps (no non-local identities).
   - **(G3)** Every non-interval word over **exactly three** letters has a **Moufang** move between different `D_N`-components. By K this implies the disconnection claim for every non-interval word with ≥ 3 letters. `g3_check.py` verifies G3 exactly for all 3,385 such words of length ≤ 9.
   - **(G3-R), the stronger, local form.** Every such word has a Moufang move toggling an absolutely rigid interval. `rigid_separators.py` verifies it for every word of length ≤ 9 (see `data/rigid9.log`). **It is false in general:** `xyxyzzyxyx`, `xyyxzzxyyx` (n = 10) and four words at n = 12 have no rigid separator. G3 itself still holds for all six (exact `D_N`-component check). Two-letter separators do **not** suffice: separators of length 2 through 6 occur already at n = 7. A general proof needs a uniform choice of (move, J). One family is already uniform: `J = a bᵐ a` over two letters is rigid iff no split balances the `a : b` ratio and both sides of `J` are the third letter or the boundary.
 - **Count.** With the characterization, the non-local words are those with ≥ 3 letters that are not interval words: `Bell(n) − 2^{n−1} − (2^{n−1} − n) = Bell(n) − 2ⁿ + n`.
@@ -129,4 +129,21 @@ By Proposition T, the ancestors of `y_k` absorb the attachments in order `W`. Be
 - If `N(0), M(0) > 0`, then `j` is interior. In that case `a′ = min{α > 0 : N(α) ≠ 0}`, `c′ = min{γ > 0 : M(γ) ≠ 0}` and `j = b − N(0)/c′`. Then `N_W` follows by subtraction. A binary word is fixed by its z-profile and its number of x's, so `W` is determined.
 - If `M(0) = 0`, then `j = 0` and `N = b·N_{ω₋}`. If `N(0) = 0`, then `j = b` and `N = b·N_{ω₊}`. Either way the profile fixes the join word, which is the complete invariant for boundary `j` (Proposition T). ∎ (`lemma_m.py` decodes every component, n ≤ 8, and checks injectivity of the formula over all `Φ` with `a + b + c ≤ 12`: 15,133 maps, count `1 + b(C(a+c,a) − 1)` each.)
 
-**Corollary (G2 for three-block words, P for all a, b, c).** For `xᵃyᵇzᶜ`, kernel classes coincide with `D_N`-components and are flip-connected. Input (b) of the G2 reduction is therefore proved; **G2 now rests only on (a)**, the triple-restriction completeness for interval words.
+**Corollary (G2 for three-block words, P for all a, b, c).** For `xᵃyᵇzᶜ`, kernel classes coincide with `D_N`-components and are flip-connected. Input (b) of the G2 reduction is therefore proved.
+
+**Proposition C (D_N-components of interval words, P for all n).** Let `w` be an interval word. For a bracketing `T`, let `σ(T)` record the shape, `((ij)k)` or `(i(jk))`, that `T` induces on each leaf triple `i < j < k` whose letters `wᵢ, wⱼ, w_k` are pairwise distinct. Then `T, T′` lie in the same `D_N`-component iff `σ(T) = σ(T′)`.
+
+*Proof.*
+- **(⇒)** A flip `(AB)C → A(BC)` changes exactly the shapes of the triples in `A × B × C`. If it is a `D_N`-flip, Lemma I says `abc` has ≤ 2 letters or two of `a, b, c` are powers of one letter. In an interval word, `a` and `c` powers of `x` force `b` to be a power of `x` too. In every case each triple of `A × B × C` repeats a letter, so `σ` is unchanged.
+- **(⇐)** Induction on `n`; words with ≤ 2 letters have a single component. Let `T = (T_L, T_R)` and `T′ = (T′_L, T′_R)` have root splits after positions `m` and `m′`.
+  - *Equal splits.* If `m = m′`, `σ` restricts to the two factors, and `D_N`-flips inside a subtree are `D_N`-flips of `T` (the count matrix is local). Induction applies to each side.
+  - *Unequal splits.* Say `m < m′`. Every triple `(i, j, k) ∈ [1,m] × (m,m′] × (m′,n]` has shape `i(jk)` in `T` and `(ij)k` in `T′`. So no such triple has three distinct letters. Let `X, Y, Z` be the letter sets of the three segments; then every `x ∈ X, y ∈ Y, z ∈ Z` has `x = y` or `y = z`, with letters ordered by block (`x ≤ y ≤ z`). If `|Y| ≥ 3`, a middle letter of `Y` gives a distinct triple. If `Y = {y₁ < y₂}`, then `X = {y₁}` and `Z = {y₂}`, so `w` has two letters. If `Y = {y}`, then `X = {y}` or `Z = {y}`.
+  - *Case `X = Y = {y}`* (`w[1..m′]` is a power of `y`). Let `T″ = (P, T′_R)` on `w[m+1..n]`, with `P` any bracketing of `(m, m′]`. Its distinct-letter triples lie in `(m′, n]`, where `T″` agrees with `T′`, or have the shape `i(jk)` with `i ∈ (m, m′]`. `T` has the same shape there because `σ(T) = σ(T′)`. So `σ(T_R) = σ(T″)`, and by induction `T_R ∼_D T″`. Then `(T_L, (P, T′_R)) → ((T_L, P), T′_R)` is a `D_N`-flip, since `a, b` are powers of `y`. Its root split is `m′`, which reduces to the case of equal splits.
+  - *Case `Y = Z = {y}`* is the mirror image, applied to `T′`. ∎
+
+`sigma_complete.py` confirms it on all 72,622 components of the 247 interval words with n = 9 (and all n ≤ 9).
+
+**Theorem G2 (P for all n).** In an interval word, distinct `D_N`-components are distinct maps. Hence the kernel classes are exactly the `D_N`-components, and they are flip-connected.
+*Proof.* Take `T, T′` in different components. By Proposition C, they induce different shapes on a leaf triple with distinct letters `p < q < r`. Kill every other letter; both restrictions are bracketings of the three-block word `pᵃqᵇrᶜ` and still differ on that triple. By Proposition C (⇒) they lie in different components, and by Proposition S they are different maps. Killing is a specialisation, so `T ≁ T′`. Lemma I makes each component lie inside one class. ∎
+
+This also proves input (a), triple-restriction completeness, as a corollary. **The "if" direction of the theorem — interval words and ≤ 2-letter words have only flip-connected classes — is proved for all n.**

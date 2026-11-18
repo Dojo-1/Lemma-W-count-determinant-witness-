@@ -4,7 +4,7 @@
 
 A bracketing of a word `w` (letters may repeat) is a vertex of the associahedron `Kₙ`; a single reassociation is an edge. In the octonions 𝕆 several bracketings can induce the same polynomial map. This repository studies those *kernel classes*. When is every class connected in `Kₙ`, so that every identity is reachable by single reassociations that are themselves identities?
 
-**Theorem (proved for every word of length ≤ 9; general n reduced to two stated claims).** In 𝕆 every kernel class of `w` is flip-connected **iff** `w` has at most two distinct letters, or each letter occurs in one contiguous run. The number of words of length `n` (up to renaming letters) with a disconnected class is
+**Theorem (proved for every word of length ≤ 9; the "if" direction — interval and ≤ 2-letter words — proved for all n; the "only if" direction for all n reduces to claim G3).** In 𝕆 every kernel class of `w` is flip-connected **iff** `w` has at most two distinct letters, or each letter occurs in one contiguous run. The number of words of length `n` (up to renaming letters) with a disconnected class is
 
 ```
 Bell(n) − 2ⁿ + n  =  0, 0, 0, 3, 25, 145, 756, 3892, 20644   (n = 1..9)
@@ -29,10 +29,11 @@ Basis-unit sign evaluations see only parities, and miss cases such as `[x², y, 
 | (G3) every non-interval 3-letter word has a Moufang move across `D_N`-components | n ≤ 9 exact; general open | `src/g3_check.py` |
 | (G3-R) …via a Moufang move toggling an *absolutely rigid* interval (Lemma R) | holds n ≤ 9; **false** from n = 10 (G3 still holds there) | `src/rigid_separators.py` ([log](data/rigid9.log)) |
 | Theorem B: words with a ratio-primitive block witness are disconnected (all n) | proved; covers 99.55 % of non-interval 3-letter words at n = 12 | `src/block_witness.py` |
-| G2 ⇐ triple-restriction completeness (a) + three-block case (b) | reduction proved; (b) proved (below); (a) verified n ≤ 7 | `src/g2_reduction.py` |
+| G2 ⇐ triple-restriction completeness (a) + three-block case (b) | reduction proved; (a) and (b) both proved | `src/g2_reduction.py` |
 | Proposition T: `D_N`-components of `xᵃyᵇzᶜ` classified by an explicit invariant; count `1 + b(C(a+c,a) − 1)` | proved (all a, b, c) | `src/three_block.py` |
 | Lemma M + Proposition S: moment formula via Cayley–Dickson absorption; linear moments separate all components of `xᵃyᵇzᶜ`, so G2 holds for every three-block word | proved (all a, b, c); exact checks n ≤ 8, formula injectivity a+b+c ≤ 12 | `src/lemma_m.py` |
-| (G2) interval words have no non-local identities | n ≤ 9 exact; general open | `src/verify_theorem.py` |
+| Proposition C: `D_N`-components of interval words = fibres of the distinct-letter triple shapes | proved (all n); checked n ≤ 9 (72,622 components) | `src/sigma_complete.py` |
+| **(G2) interval words have no non-local identities — the "if" direction of the theorem** | **proved (all n)**: Prop. C + Prop. S; exact n ≤ 9 | THEOREM.md, `src/verify_theorem.py` |
 | Interval rank lemma (also proved by cases) | brute force: 1,997,801 triples, n ≤ 12 | `src/lemmaI_check.py` |
 | Every class exactly certified by full polarization over basis tuples | n ≤ 6 | `src/certify_exact.py`, `src/exact.py` ([log](data/exact6.log)) |
 | Equalities derivable from flexible/alternative/Moufang/Artin laws serialised as certificates | 517/517 replay (n ≤ 5) under Dojo-1/ZFC-A- `certcheck.replay` | `src/certs.py`, [certificates/](certificates/) |
