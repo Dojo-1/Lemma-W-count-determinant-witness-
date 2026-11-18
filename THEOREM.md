@@ -106,6 +106,16 @@ The move `x(Y(xC)) → ((xY)x)C` at the last letter of `ρ_{t−1}` is an instan
 
   `caterpillar.py` also confirms the exact characterization for every pair `(s, e)` with `6 ≤ R ≤ 13`, as a sanity check.
 
+**Formalization.**
+- **Lean 4.** [`lean/`](lean/) proves in Lean 4 / Lake, with the kernel checking every step:
+  - Proposition E for all lengths (`Caterpillar.propE`), with the finite base by `decide +kernel`;
+  - the run-sequence form of G3 for words (`Caterpillar.cat_of_word`);
+  - the determinant arithmetic of Lemma Cat (`Caterpillar.rank3`).
+
+  It uses no `sorry`, only the standard axioms.
+- **Prolog.** [`prolog/`](prolog/) runs the same definitions as logic programs. The induction proof is a program (`construct/3`) whose output, 44,670 certificates up to 12 runs, is re-checked by the certificate relation.
+- **Not formalized.** The laminarity classification inside Lemma Cat, Lemma R′, and the octonion lemmas (W, K, Moufang identities, G2) remain manuscript arguments.
+
 **Theorem G3 (P for all n).** Every non-interval word over exactly three letters has a Moufang move between different `D_N`-components. Hence (K) every non-interval word with ≥ 3 letters has a disconnected kernel class.
 *Proof.* Its run sequence is valid. Proposition E gives a caterpillar, Lemma Cat gives a self-certifying `S` and a Moufang move deleting a node of `S`, and Lemma R′ puts `T₁` in a different `D_N`-component. Lemma W turns this into disconnection, and Lemma K lifts it to words with more letters (restrict to `p, q` from a pattern `p…q…p` and any third letter). ∎
 

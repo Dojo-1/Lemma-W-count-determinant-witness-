@@ -145,7 +145,7 @@ $$
 
 These are the **4,330 non-interval three-letter words of lengths four through nine** covered by the finite G3 investigation. [THEOREM.md](THEOREM.md) now carries that corrected sum.
 
-The general mathematical proofs are **manuscript arguments**, not Lean kernel proofs in this repository. The finite classifier is exact and sampling-free within its declared range.
+The general mathematical proofs are **manuscript arguments**, except for the parts formalized in [Lean](lean/). Those are the run-sequence combinatorics of G3 (Proposition E, all lengths), its finite base, and the determinant arithmetic of Lemma Cat. [Prolog](prolog/) runs the same constructive proof. The finite classifier is exact and sampling-free within its declared range.
 
 ## 04 / The Bell-number count and its actual scope
 
@@ -213,6 +213,8 @@ This is the supplied **all-length G2 argument**. The non-interval G3 obligation 
 | [Rigid-separator study](src/rigid_separators.py) | Full finite checks through nine; [log](data/rigid9.log) | Stronger universal G3-R fails |
 | [Stable-node separators](src/stable_separators.py) | Every non-interval 3-letter word through ten; [log](data/stable10.log) | Certificate search, not a uniform rule |
 | [Run-comb certificates](src/run_comb.py) and [tiered G3 check](src/g3_upto14.py) | Every non-interval 3-letter word through fourteen; [log](data/g3_upto14.log) | Finite length; independent of the all-$n$ proof |
+| [Lean 4 formalization](lean/) | Proposition E for **all** lengths; finite base by kernel `decide`; G3 in run-sequence form for words; Lemma Cat determinant arithmetic. No `sorry`, standard axioms only | Laminarity part of Lemma Cat, Lemma R′ and the octonion lemmas are not formalized |
+| [Prolog formalization](prolog/) | Same definitions as logic programs; the induction proof run as a program and its 44,670 certificates (≤ 12 runs) re-checked | Executable, not a proof assistant |
 | [Caterpillar certificates](src/caterpillar.py) | Base cases $R\in\{4,5\}$ of Proposition E (exhaustive); characterization sanity check $R\leq13$; word-level validation through nine (4,330/4,330) | The induction step is a manuscript argument |
 | Octonion/sedenion word spectra | Randomized numerical estimates | Neither exact proof nor guaranteed novelty |
 | W, G2 and three-block statements | Proof arguments in [THEOREM.md](THEOREM.md) | No independent Lean formalization claimed |
@@ -252,7 +254,7 @@ The [verbatim original README](docs/README_MAIN_SNAPSHOT_2026-11-18.md) preserve
 
 Evidence remains typed: **P** — mathematical proof in the supplied manuscript; **P-fin** — exhaustive exact finite procedure; **M** — measured experiment; **H** — conjecture; **R** — refuted stronger candidate.
 
-**The universal gate G3 is closed by caterpillars.** The proof rests on manuscript arguments and finite checks, not a formal kernel. A Lean formalization is the natural next gate.
+**The universal gate G3 is closed by caterpillars.** Its combinatorial core, Proposition E for all lengths together with its finite base, is now checked by the Lean kernel. Two parts are still not machine-checked: the laminarity half of Lemma Cat and the octonion lemmas. They are the next gate.
 
 ---
 

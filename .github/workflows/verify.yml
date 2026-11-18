@@ -38,3 +38,28 @@ jobs:
           else
             echo "ZFC-A- not accessible from CI; skipping certificate replay"
           fi
+  lean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build the Lean formalization (Proposition E, finite base, Lemma Cat determinants)
+        working-directory: lean
+        run: |
+          lake build
+          grep -rn "sorry\|admit\|native_decide" Caterpillar/ && exit 1 || true
+          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n' > Axioms.lean
+          lake env lean Axioms.lean
+  prolog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq swi-prolog-core
+      - name: Prolog formalization (base, constructive induction re-checked, words)
+        working-directory: prolog
+        run: swipl -q -g main -t halt caterpillar.pl
