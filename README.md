@@ -27,7 +27,9 @@ Basis-unit sign evaluations see only parities, and miss cases such as `[x², y, 
 | General lemmas: context cancellation, Lemma W, vanishing via Artin, interval rank lemma, θ³ invariant, Moufang lifting under killing, Catalan-ness for distinct letters | proved | [THEOREM.md](THEOREM.md) |
 | Characterization for all 26,439 words, n ≤ 9 | proved by exact computation; no sampling | `src/verify_theorem.py` ([log n ≤ 9](data/verify9.log)) |
 | (G3) every non-interval 3-letter word has a Moufang move across `D_N`-components | n ≤ 9 exact; general open | `src/g3_check.py` |
-| (G3-R) …via a Moufang move toggling an *absolutely rigid* interval (Lemma R: local certificate, no component search) | all 3,385 words, n ≤ 9; general open | `src/rigid_separators.py` ([log](data/rigid9.log)) |
+| (G3-R) …via a Moufang move toggling an *absolutely rigid* interval (Lemma R) | holds n ≤ 9; **false** from n = 10 (G3 still holds there) | `src/rigid_separators.py` ([log](data/rigid9.log)) |
+| Theorem B: words with a ratio-primitive block witness are disconnected (all n) | proved; covers 99.55 % of non-interval 3-letter words at n = 12 | `src/block_witness.py` |
+| G2 ⇐ triple-restriction completeness + three-block case; `#components(xᵃyᵇzᶜ) = 1 + b(C(a+c,a) − 1)` | reduction proved; inputs verified (n ≤ 7; a+b+c ≤ 11) | `src/g2_reduction.py` |
 | (G2) interval words have no non-local identities | n ≤ 9 exact; general open | `src/verify_theorem.py` |
 | Interval rank lemma (also proved by cases) | brute force: 1,997,801 triples, n ≤ 12 | `src/lemmaI_check.py` |
 | Every class exactly certified by full polarization over basis tuples | n ≤ 6 | `src/certify_exact.py`, `src/exact.py` ([log](data/exact6.log)) |

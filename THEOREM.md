@@ -52,5 +52,38 @@ Exhaustive brute-force check: 1,997,801 segment triples of interval words up to 
 - **General n reduces to two combinatorial claims (H):**
   - **(G2)** In an interval word, distinct `D_N`-components are distinct maps (no non-local identities).
   - **(G3)** Every non-interval word over **exactly three** letters has a **Moufang** move between different `D_N`-components. By K this implies the disconnection claim for every non-interval word with ≥ 3 letters. `g3_check.py` verifies G3 exactly for all 3,385 such words of length ≤ 9.
-  - **(G3-R), the stronger, local form.** Every such word has a Moufang move toggling an absolutely rigid interval. `rigid_separators.py` verifies it for every word of length ≤ 9 (see `data/rigid9.log`). Two-letter separators do **not** suffice: separators of length 2 through 6 occur already at n = 7. A general proof needs a uniform choice of (move, J). One family is already uniform: `J = a bᵐ a` over two letters is rigid iff no split balances the `a : b` ratio and both sides of `J` are the third letter or the boundary.
+  - **(G3-R), the stronger, local form.** Every such word has a Moufang move toggling an absolutely rigid interval. `rigid_separators.py` verifies it for every word of length ≤ 9 (see `data/rigid9.log`). **It is false in general:** `xyxyzzyxyx`, `xyyxzzxyyx` (n = 10) and four words at n = 12 have no rigid separator. G3 itself still holds for all six (exact `D_N`-component check). Two-letter separators do **not** suffice: separators of length 2 through 6 occur already at n = 7. A general proof needs a uniform choice of (move, J). One family is already uniform: `J = a bᵐ a` over two letters is rigid iff no split balances the `a : b` ratio and both sides of `J` are the third letter or the boundary.
 - **Count.** With the characterization, the non-local words are those with ≥ 3 letters that are not interval words: `Bell(n) − 2^{n−1} − (2^{n−1} − n) = Bell(n) − 2ⁿ + n`.
+
+## Progress towards all n (2026-11-18)
+
+**F (factor reduction, P).** Let `J` be absolutely rigid in `w`, and `u = w[J]`. Then restricting to the subtree at `J` maps `D_N(w)`-paths through bracketings containing `J` to `D_N(u)`-paths: flips inside `J` see the same count matrices, flips outside treat `J` as one block, and no flip removes `J`. So a Moufang pair separated in `u` lifts, inside any fixed context, to a separated Moufang pair in `w`. G3 for `w` follows from G3 for any rigid non-interval 3-letter proper factor.
+
+**Theorem B (P, every n).** Let `w` be a 3-letter word. Suppose some letter `r` has a maximal `r`-free block `J` over `{p, q}` such that:
+- **(R1)** `J` contains both `p` and `q`, and no proper prefix of `J` has the `p : q` ratio of `J`;
+- one of the following holds:
+  - **(M1)** the first letter of `J` occurs after `J`;
+  - **(M2)** the last letter occurs before `J`;
+  - **(M4)** the first letter occurs before `J`;
+  - **(M5)** the last letter occurs after `J`;
+  - **(M3)** `J` begins and ends with the same letter.
+
+Then `w` has a disconnected kernel class.
+*Proof.* (R1) together with the `r`/boundary flanks is exactly absolute rigidity of a two-letter interval (closed form above). Each condition names a Moufang move that toggles node `J`:
+- M1: `(pB)(Cp) ↔ p((BC)p)` with `J = pB`;
+- M2: `(sB)(Cs)` with `J = Cs`;
+- M4: `((pB)p)C ↔ p(B(pC))` with `J = pC`;
+- M5: `((Cs)B)s` with `J = Cs`;
+- M3: `((pB)p)C` or `C((pB)p)`, with `J = (pB)p`.
+
+The repeated variable is a single letter in every case, and every gap borders the third letter, so all variables are nonempty. Lemma R gives different `D_N`-components, and Lemma W gives disconnection. ∎
+
+By Lemmas F and K the theorem extends to every word that has a rigid factor, or a 3-letter killing image, satisfying the hypotheses. Interval words never satisfy M1–M5 (they need a letter to recur around another), consistent with G2.
+
+*Coverage* (`block_witness.py`, exhaustive): 100 % of non-interval 3-letter words for n ≤ 6 and n = 8; 99.55 % at n = 12 (86,079 / 86,471). Adding M6 and factor reduction leaves 2 words at n = 10 and 4 at n = 12, all near-palindromic balanced words. G3 holds for those by exact `D_N` search but not via a rigid node. **G3 for all n stays open:** what is missing is a separator mechanism for balanced near-palindromic words.
+
+**G2 reduction (rigorous implication, two open inputs).** Killing letters is a specialisation, so equal maps restrict to equal maps. Hence G2 follows from:
+- **(a)** the components of the letter-triple restrictions determine the `D_N`-component, for interval words (verified for all interval words with ≥ 4 letters, n ≤ 7, `g2_reduction.py`);
+- **(b)** G2 for three-block words `xᵃyᵇzᶜ`. This is verified for all 162 such words with `a + b + c ≤ 11`, and their component count fits
+
+  `#components(xᵃyᵇzᶜ) = 1 + b·(C(a+c, a) − 1)`   (conjectured closed form, exact on the same range).
