@@ -1,74 +1,246 @@
-# Lemma W — count-determinant witness
+<div align="center">
 
-**Octonion bracketings, the associahedron, and which identities are local.**
+![Lemma W — an original Wabi-Futurist associahedron and determinant witness](assets/lemma-w-wabi-associahedron.svg)
 
-A bracketing of a word `w` (letters may repeat) is a vertex of the associahedron `Kₙ`; a single reassociation is an edge. In the octonions 𝕆 several bracketings can induce the same polynomial map. This repository studies those *kernel classes*. When is every class connected in `Kₙ`, so that every identity is reachable by single reassociations that are themselves identities?
+<sub>侘未来 · WABI-FUTURISM / OCTONIONS × ASSOCIAHEDRA × EXACT WITNESSES</sub>
 
-**Theorem (proved for every word of length ≤ 9; the "if" direction — interval and ≤ 2-letter words — proved for all n; the "only if" direction for all n reduces to claim G3).** In 𝕆 every kernel class of `w` is flip-connected **iff** `w` has at most two distinct letters, or each letter occurs in one contiguous run. The number of words of length `n` (up to renaming letters) with a disconnected class is
+# lemma / w
 
+### the count remembers. the bracket may not.
+
+*One word. Many bracketings. A determinant that refuses to forget.*
+
+**The local witness is proved. The global frontier remains open.**
+
+<sub>形が変わり、証拠が残る。 · The form moves; the evidence remains.</sub>
+
+</div>
+
+---
+
+## 00 / The question in a parenthesis
+
+In the **real octonions** $\mathbb{O}$, parentheses can change the result of multiplication. But repeated letters sometimes make different bracketings define the *same polynomial map*.
+
+For a word $w$ of length $n$, each full binary bracketing is a vertex of the **associahedron** $K_n$. A single reassociation is an edge:
+
+$$
+(AB)C\longleftrightarrow A(BC).
+$$
+
+Let $F_T$ denote the octonion polynomial map defined by a bracketing $T$, using **one variable per distinct letter**. Write
+
+$$
+T\sim T' \quad\Longleftrightarrow\quad F_T=F_{T'}.
+$$
+
+The equivalence classes are *kernel classes*. **Are the vertices belonging to each class connected by flips that are themselves polynomial identities?**
+
+The artwork shows the five vertices and five edges of the genuine $K_4$ pentagon for the distinct-letter word $xyzw$. Its highlighted edge cannot be an octonion identity: it has a rank-three count witness. The artwork is a conceptual diagram, not a computational certificate for other words.
+
+## 01 / Lemma W: an integer that witnesses nonidentity
+
+Choose three **nonempty consecutive segments** $a,b,c$ of $w$, with arbitrary internal bracketings $A,B,C$.
+
+Let $L(w)$ be the set of distinct letters. Define the **count matrix**
+
+$$
+N\in\mathbb{Z}_{\geq 0}^{\,3\times |L(w)|},
+$$
+
+where $N_{i\ell}$ is the multiplicity of letter $\ell$ in the $i$-th segment.
+
+**Lemma W.** If $\mathrm{rank}(N)=3$, the local associator
+
+$$
+[A,B,C]=(AB)C-A(BC)
+$$
+
+is *not* identically zero as an octonionic polynomial, irrespective of the internal bracketings.
+
+**Proof mechanism.** Rank three supplies letters $x,y,z$ with
+
+$$
+\det(N_{xyz})\ne0.
+$$
+
+Send these letters to octonionic exponentials and all others to $1$:
+
+$$
+x\mapsto\exp(\theta e_1),\qquad
+y\mapsto\exp(\theta e_2),\qquad
+z\mapsto\exp(\theta e_4).
+$$
+
+Trilinearity and alternation of the associator, together with its vanishing when an argument is real, give the leading term
+
+$$
+[A,B,C]=
+\theta^3\det(N_{xyz})[e_1,e_2,e_4]
++\mathcal{O}(\theta^4).
+$$
+
+Because $[e_1,e_2,e_4]\ne0$, the cubic coefficient is nonzero. **The multiplicities of repeated letters survive in $N$**; a simple basis-unit sign test would lose information. Even $[x^2,y,z]$ need not vanish as a polynomial.
+
+For $(a,b,c)=(x,y,z)$, the minor $N_{xyz}$ is the $3\times3$ identity with determinant one. The small matrix in the hero depicts exactly that illustrative instance.
+
+[Full statement and proof details](THEOREM.md).
+
+## 02 / Not every allowed edge is an identity
+
+Define $D_N(w)$ as the graph of all bracketings, retaining only those flips whose three-segment count matrix has **rank at most two**.
+
+The count witness and context cancellation imply the **one-way inclusion**
+
+$$
+E_{\mathrm{identity}}(w)\subseteq E(D_N(w)).
+$$
+
+A rank-at-most-two flip need not automatically be a polynomial identity. For special classes of words, other arguments supply the missing vanishing direction.
+
+Hence, **two bracketings defining the same polynomial map but lying in different $D_N(w)$ components certify a disconnected kernel class**. Equality and component separation are two distinct proof obligations.
+
+```mermaid
+flowchart TD
+  A["Word and its associahedron"] --> B["Count matrix for a candidate flip"]
+  B --> C{"Rank?"}
+  C -->|"3"| D["Lemma W: identity impossible"]
+  C -->|"at most 2"| E["Allowed D_N edge, identity not automatic"]
+  A --> F["Two equal polynomial maps"]
+  F --> G{"Different D_N components?"}
+  G -->|"yes"| H["Disconnected kernel class"]
+  G -->|"no"| I["No disconnection conclusion"]
 ```
-Bell(n) − 2ⁿ + n  =  0, 0, 0, 3, 25, 145, 756, 3892, 20644   (n = 1..9)
-```
+## 03 / The theorem: one closed direction, one open gate
 
-Full statements and proofs: **[THEOREM.md](THEOREM.md)**.
+The proposed **all-length characterization** is:
 
-## Lemma W
+> Every kernel class of $w$ is flip-connected if and only if $w$ uses at most two distinct letters, or each letter occurs in one contiguous run (*an interval word*).
 
-> Let `a, b, c` be consecutive segments of `w` and `N` the 3 × |letters| matrix of letter multiplicities. If `rank N = 3`, then the local associator `[A, B, C]` is not identically zero, for **every** bracketing `A, B, C` of the segments.
+Its proof status must not be flattened:
 
-*Proof.* Choose letters `x, y, z` with `det N_{xyz} ≠ 0`. Specialise `x, y, z ↦ exp(θe₁), exp(θe₂), exp(θe₄)` and every other letter to `1`. Then `[A,B,C] = θ³ det(N_{xyz}) [e₁,e₂,e₄] + O(θ⁴)` by trilinearity and alternation, and `[e₁,e₂,e₄] ≠ 0`. ∎
+| Mathematical statement | Evidence / status |
+| :-- | :-- |
+| At most two distinct letters | General argument using Artin's theorem |
+| **G2:** interval words have connected kernel classes | General argument in [THEOREM.md](THEOREM.md), via Propositions T, S and C |
+| Complete characterization for $1\leq n\leq9$ | **Exact exhaustive finite verification** |
+| **G3:** every non-interval word on exactly three letters has a Moufang move crossing $D_N$ components | **Open for arbitrary lengths** |
+| **G3-R:** such a move must toggle an absolutely rigid interval | **False from length ten** |
 
-Basis-unit sign evaluations see only parities, and miss cases such as `[x², y, z] ≠ 0`; exponentials keep the counts. Lemma W combines with **context cancellation** (𝕆 is a division algebra, so an edge stays inside a class iff its local associator vanishes). Together they say the in-class flip graph lies inside `D_N`, the flips with `rank N ≤ 2`. Two equal bracketings in different `D_N`-components therefore *prove* a class disconnected.
+The general only-if direction reduces to G3; proving the stronger G3-R will not work because it has counterexamples. G3 nevertheless holds in all the checked finite cases, including those particular counterexamples to G3-R.
 
-## Evidence
+A corrected count from the [finite logs](data/rigid9.log) is
 
-| claim | status | instrument |
-|---|---|---|
-| General lemmas: context cancellation, Lemma W, vanishing via Artin, interval rank lemma, θ³ invariant, Moufang lifting under killing, Catalan-ness for distinct letters | proved | [THEOREM.md](THEOREM.md) |
-| Characterization for all 26,439 words, n ≤ 9 | proved by exact computation; no sampling | `src/verify_theorem.py` ([log n ≤ 9](data/verify9.log)) |
-| (G3) every non-interval 3-letter word has a Moufang move across `D_N`-components | n ≤ 9 exact; general open | `src/g3_check.py` |
-| (G3-R) …via a Moufang move toggling an *absolutely rigid* interval (Lemma R) | holds n ≤ 9; **false** from n = 10 (G3 still holds there) | `src/rigid_separators.py` ([log](data/rigid9.log)) |
-| Theorem B: words with a ratio-primitive block witness are disconnected (all n) | proved; covers 99.55 % of non-interval 3-letter words at n = 12 | `src/block_witness.py` |
-| G2 ⇐ triple-restriction completeness (a) + three-block case (b) | reduction proved; (a) and (b) both proved | `src/g2_reduction.py` |
-| Proposition T: `D_N`-components of `xᵃyᵇzᶜ` classified by an explicit invariant; count `1 + b(C(a+c,a) − 1)` | proved (all a, b, c) | `src/three_block.py` |
-| Lemma M + Proposition S: moment formula via Cayley–Dickson absorption; linear moments separate all components of `xᵃyᵇzᶜ`, so G2 holds for every three-block word | proved (all a, b, c); exact checks n ≤ 8, formula injectivity a+b+c ≤ 12 | `src/lemma_m.py` |
-| Proposition C: `D_N`-components of interval words = fibres of the distinct-letter triple shapes | proved (all n); checked n ≤ 9 (72,622 components) | `src/sigma_complete.py` |
-| **(G2) interval words have no non-local identities — the "if" direction of the theorem** | **proved (all n)**: Prop. C + Prop. S; exact n ≤ 9 | THEOREM.md, `src/verify_theorem.py` |
-| Interval rank lemma (also proved by cases) | brute force: 1,997,801 triples, n ≤ 12 | `src/lemmaI_check.py` |
-| Every class exactly certified by full polarization over basis tuples | n ≤ 6 | `src/certify_exact.py`, `src/exact.py` ([log](data/exact6.log)) |
-| Equalities derivable from flexible/alternative/Moufang/Artin laws serialised as certificates | 517/517 replay (n ≤ 5) under Dojo-1/ZFC-A- `certcheck.replay` | `src/certs.py`, [certificates/](certificates/) |
-| Partitions agree with ZFC-A-'s independent octonion tensors (F0, F1, F2) | n ≤ 6, 0 mismatches | `src/crosscheck.py` ([log](data/cross6.log)) |
-| All observed 𝕆 bracketing identities hold in the Chein Moufang loops M(S₃,2), M(D₄,2) | n ≤ 5, 1000 checks | `src/chein.py`, `src/chein_sweep.py` |
+$$
+3+19+80+286+945+2997=4330.
+$$
 
-**What is counted as proved.** Equalities: derivations from laws valid in every alternative algebra, or exact polarization. Inequalities: Lemma W, the θ³ invariant, or a distinct exact integer evaluation. The earlier randomized sweeps (`src/sweep.py`, `src/n8.py`, [data/sweep.json](data/sweep.json)) were exploratory and are no longer load-bearing.
+These are the **4,330 non-interval three-letter words of lengths four through nine** covered by the finite G3 investigation. [THEOREM.md](THEOREM.md) now carries that corrected sum.
 
-## Word spectra (new sequences, no OEIS match on 2026-11-18)
+The general mathematical proofs are **manuscript arguments**, not Lean kernel proofs in this repository. The finite classifier is exact and sampling-free within its declared range.
 
-Σ over words of length `n` (up to renaming) of the number of distinct bracketing maps:
+## 04 / The Bell-number count and its actual scope
 
-- 𝕆: `1, 2, 6, 31, 258, 2877, 38107, 572090` (n = 1..8, randomized measurement)
-- sedenions 𝕊: `1, 2, 8, 55, 529, 6248` (n = 1..6, randomized measurement)
+Up to renaming letters, words of length $n$ correspond to set partitions counted by the **Bell numbers** $B_n$.
 
-For distinct letters both are Catalan (proved for 𝕆 in THEOREM.md). Sedenion non-locality comes from cubes and long alternations; no characterization yet.
+For **$1\leq n\leq9$**, the number of words with *some disconnected kernel class* is verified to equal
 
-## Run
+$$
+D_n=B_n-2^n+n.
+$$
+
+The corresponding finite sequence is
+
+$$
+(D_1,\ldots,D_9)=(0,0,0,3,25,145,756,3892,20644).
+$$
+
+The same expression for **all** $n$ remains conditional on G3. It is **not** an established all-length formula.
+
+The [saved exact log](data/verify9.log) includes all **26,439 words for lengths three through nine**:
+
+$$
+5+15+52+203+877+4140+21147=26439.
+$$
+
+Lengths one and two are trivial. The [CI workflow](.github/workflows/verify.yml) checks a smaller regular subset and does not rerun the nine-letter campaign on every push.
+
+## 05 / A closed-form island: three-block words
+
+For positive integers $a,b,c$ and three distinct letters, take the interval word
+
+$$
+w=x^a y^b z^c.
+$$
+
+Proposition T counts the connected components of its rank-allowed flip graph:
+
+$$
+\#\pi_0(D_N(x^a y^b z^c))
+=1+b\left(\binom{a+c}{a}-1\right).
+$$
+
+Lemma M gives a Cayley-Dickson moment formula and Proposition S separates the components by octonion polynomial values. Proposition C extends the component description to general interval words through the induced shapes of distinct-letter triples.
+
+This is the supplied **all-length G2 argument**; it does not discharge the non-interval G3 obligation.
+
+[Three-block algorithm](src/three_block.py) · [Moment checks](src/lemma_m.py) · [Interval-word checks](src/sigma_complete.py) · [Mathematical theorem](THEOREM.md).
+
+## 06 / What was measured and what was proved
+
+| Instrument | Grounded scope | Boundary |
+| :-- | :-- | :-- |
+| [Exact classifier](src/verify_theorem.py) | All words through length nine; [log](data/verify9.log) | Finite length, not G3 for all $n$ |
+| [Full polarization](src/certify_exact.py) | Exact class checks through six; [log](data/exact6.log) | A different finite certificate |
+| [ZFC-A- equational replay](https://github.com/Dojo-1/ZFC-A-) | Reported **517/517** certificates through length five | Equational steps, not a Lean proof of the global theorem |
+| [Tensor cross-check](src/crosscheck.py) | Zero recorded mismatches through six; [log](data/cross6.log) | Finite implementation parity |
+| [Rigid-separator study](src/rigid_separators.py) | Full finite checks through nine; [log](data/rigid9.log) | Stronger universal G3-R fails |
+| Octonion/sedenion word spectra | Randomized numerical estimates | Neither exact proof nor guaranteed novelty |
+| W, G2 and three-block statements | Proof arguments in [THEOREM.md](THEOREM.md) | No independent Lean formalization claimed |
+
+A prior-art search recorded in the original notes found no matching treatment of certain repeated-letter spectra. That is **absence of a match in a bounded search**, not a priority or novelty certificate.
+
+## 07 / Reproduce a bounded experiment
+
+The Python tools need NumPy:
 
 ```bash
-pip install -r requirements.txt
-python src/verify_theorem.py 8        # exact proof for every word of length <= 8 (~30 s)
-python src/g3_check.py 8              # G3 for 3-letter words
-python src/lemmaI_check.py 10         # interval rank lemma, brute force
-python src/certify_exact.py 5         # full-polarization certification of classes
-# optional: certificate replay with a checkout of Dojo-1/ZFC-A-
+python -m pip install -r requirements.txt
+
+python src/verify_theorem.py 7
+python src/g3_check.py 8
+python src/rigid_separators.py 8
+python src/lemma_m.py 7 10
+python src/sigma_complete.py 8
+python src/certify_exact.py 5
+
+# Optional: with a separate ZFC-A- checkout.
 ZFCA_ROOT=/path/to/ZFC-A- python src/certs.py 5
 ```
+The [GitHub Actions contract](.github/workflows/verify.yml) runs bounded checks on pushes. Its ordinary verifier is capped at length seven; the larger archived logs are not CI results for every new commit.
 
-CI ([verify.yml](.github/workflows/verify.yml)) reruns the exact verification on every push.
+**No mathematical computations were rerun merely to author this documentation redesign.**
 
-## Prior art and scope
+## 08 / Provenance and the still-unanswered word
 
-Associative spectra for distinct variables (Csákány–Waldhauser 2000; Liebscher–Waldhauser; Huang–Lehtonen). Bol–Moufang identities, which cover the n = 4 case (Fenyves; Phillips–Vojtěchovský). The free Moufang loop word problem. A bounded search found no prior treatment of repeated-letter word spectra in 𝕆/𝕊, the flip-connectivity characterization, or the sequences above. That is absence of evidence, not a novelty certificate.
+The mathematical foundations include Artin's theorem for alternative algebras, Moufang identities, octonion multiplication, Catalan/associahedral combinatorics and the literature on associative spectra. This research grew from the kernel quotient of an associahedron through a Tendril ([Tendrils](https://github.com/Dojo-1/Tendrils)), with certificate interfaces from [ZFC-A-](https://github.com/Dojo-1/ZFC-A-).
 
-Origin: the kernel quotient of a Tendril from the associahedron into 𝕆 ([Dojo-1/Tendrils](https://github.com/Dojo-1/Tendrils)); certificate format from [Dojo-1/ZFC-A-](https://github.com/Dojo-1/ZFC-A-).
+The [verbatim original README](docs/README_MAIN_SNAPSHOT_2026-11-18.md) preserves the longer numerical and prior-art account. **No license is currently declared** in this repository; none is inferred or supplied by this edit.
 
-No license has been chosen yet.
+Evidence remains typed: **P** — mathematical proof in the supplied manuscript; **P-fin** — exhaustive exact finite procedure; **M** — measured experiment; **H** — conjecture; **R** — refuted stronger candidate.
+
+**The remaining universal gate is G3.** More beautiful notation is not a way around it.
+
+---
+
+<div align="center">
+
+### 間 — ma
+
+*Between two equal maps and a path of equalities, the determinant remembers.*
+
+**the count remembers. the bracket may not.**
+
+<sub>LEMMA / W · LOCAL WITNESS, GLOBAL REMAINDER</sub>
+
+</div>
