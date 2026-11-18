@@ -1,6 +1,6 @@
 # Prolog formalization (SWI-Prolog)
 
-Six programs. Each one checks independently what the Lean development proves:
+Seven programs. Each one checks independently what the Lean development proves:
 
 ```bash
 swipl -q -g main -t halt caterpillar.pl   # run-sequence combinatorics, finite base, constructive Prop. E
@@ -9,6 +9,7 @@ swipl -q -g main -t halt trees.pl         # G3 end to end, from words to bracket
 swipl -q -g main -t halt algebra.pl       # Lemma W expansion, L1, Artin, K (octonion side)
 swipl -q -g main -t halt g2.pl            # K (combinatorial side, Moufang lift), G2: T, M, S, C
 swipl -q -g run -t halt proofs.pl         # the Lean constructions for K's lift, C (⇐), T, M, run and validated
+swipl -q -g run -t halt assembly.pl       # moment = coefficient, moments → profiles, the assembled G2
 ```
 
 ## `caterpillar.pl`: Proposition E
@@ -88,4 +89,16 @@ Each program builds what the corresponding Lean proof builds; independent checke
 
 Control: on the non-interval word `[0,1,2,1,0]` the path builder fails for a σ-equal pair.
 
-Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.lift_separates`, `Octonion.propC_iff`, `PropT.propT`, `LemmaM.lemmaM` and `PropS.propS_interior`.
+## `assembly.pl`: the last steps of G2
+
+([log](../data/prolog_assembly.log))
+
+| Lean proof | Program | Range | Result |
+|---|---|---|---|
+| `coef_moment`, `subst_eq` | octonion polynomial multiplication of `1+se₁, 1+qe₂, 1+te₄` along the bracketing; coefficient vs. moment; evaluation at random points | every bracketing of three-block words, n ≤ 7 | 2,501 bracketings |
+| `key_of_K` | `κ(p,r)` from the coefficients alone; homogeneous sums in base `2m+1` give `N` and `M`; decode | every bracketing, n ≤ 7 | profiles equal the invariant's; 291 components separated |
+| `G2Final.g2` | differing triple → kill → renumber → Kronecker valuation → pull back → evaluate | every pair in different components of interval words with ≥ 3 letters, n ≤ 6 | 21,108 pairs separated |
+
+Control: 142 pairs in the same component take equal values.
+
+Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.lift_separates`, `Octonion.propC_iff`, `PropT.propT`, `LemmaM.lemmaM`, `PropS.propS_interior`, `Coeff.coef_moment`, `Profiles.key_of_K` and `G2Final.g2`.

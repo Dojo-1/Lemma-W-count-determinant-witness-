@@ -1,0 +1,4 @@
+control: 142 pairs in the same D_N-component take equal values, as the converse direction predicts (n ≤ 5)
+Moment as coefficient: the s^p q t^r coefficient of the substituted polynomial = the moment, and the polynomial = the map at random points, on all 2501 bracketings of three-block words, n ≤ 7: ok
+Moments to profiles: from the coefficients alone, the homogeneous sums give N and M in base 2m+1, equal to the invariant's profiles, decoding to the key; 291 components separated, n ≤ 7: ok
+Final assembly (G2Final.g2): 21108 pairs in different D_N-components of interval words (≥ 3 letters, n ≤ 6) separated by the pulled-back Kronecker valuation: ok

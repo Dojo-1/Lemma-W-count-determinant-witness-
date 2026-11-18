@@ -27,6 +27,9 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 | `Caterpillar/PropCF.lean` | **Proposition C (⇒)** in full (`sh_fill`, `sh_flip`, `reach_sig`) and **`propC_iff`**: same `D_N`-component ⟺ same σ |
 | `Caterpillar/PropT.lean` | **Proposition T, classification.** `core`, `Φ = (j, a′, c′, W)`, `key`; `sh_sub` (shape via the `q`-child of `lca(q, r)`), `sig_iff_cx`, `cx_omega` (cx read off the absorption word `ω_q ∈ {ω₊, ω₋}`), `key_iff_cx`, and **`propT`**: same `D_N`-component ⟺ same key |
 | `Caterpillar/LemmaM.lean` | **Lemma M.** Signed units; `H = ⟨1,e₁,e₄,e₅⟩` associative with `h(cℓ) = (ch)ℓ`, `(cℓ)h = (c h̄)ℓ` (`walkL`, `walkR`); `prodW_eq` (ordered product of a word); **`walk`** (a restriction is `(−1)^{#z} e^{ω} e₂`); `β_eq_ωq` (absorption word = `ω₊`/`ω₋`); subset sums (`sum_subs_perm`, `sum_S`); **`lemmaM`**: `moment T p r = σ(p,r)·[j S(ω₊) + (b−j) S(ω₋)]·E(p,r)` |
+| `Caterpillar/Coeff.lean` | **The moment as a coefficient.** `expand` (multilinear expansion: `T(1+se₁, 1+qe₂, 1+te₄) = Σ_S s^{#x} q^{#y} t^{#z} T|_S`), `polyT`, `subst_eq` (the polynomial is the substituted map), **`coef_moment`** (its `sᵖ q tʳ` coefficient is Lemma M's moment), **`coef_of_map`** (the values at one Kronecker point `s = M, q = M^{n+1}, t = M^{(n+1)²}`, `M = 2^{n+2}+1`, determine every coefficient; balanced base-`M` digits) |
+| `Caterpillar/Profiles.lean` | **Proposition S, moments to profiles.** Homogeneous sums `Phi_eq` (`Σ_p S(ω,p,1) mᵖ(m+1)^{n−p} = Σ_z (2m+1)^{#x before z}`) and `Phi'_eq`; base-`(2m+1)` digits give `N` and `M(0)`; **`key_of_K`** (equal Lemma M brackets ⟹ equal invariant, via Proposition S's decoding); **`g2_three`**: different components of `xᵃyᵇzᶜ` differ at the Kronecker valuation |
+| `Caterpillar/G2Final.lean` | **Theorem G2** (`g2`): for an interval word, bracketings in different `D_N`-components take different values at some integer octonion valuation. Kill the other letters (`sh_kill`), renumber (`rn`, `sh_rn`, `ev_rn`, `wf_of_lv`), apply `g2_three`, pull back with `kill_ev` |
 | `Caterpillar/Words.lean` | `runSeq` (run collapse), `noAdj_runSeq`, `mem_runSeq`, `valid_runSeq`, and **`cat_of_word`**: every word over three letters that uses all three and is not an interval word (`¬ (runSeq w).Nodup`) has a caterpillar certificate |
 
 **Scope.** Formalized:
@@ -36,11 +39,8 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 - L1, context cancellation, from the division-algebra property (`context_cancel`, `flip_iff_assoc`).
 - Artin's theorem and Lemma V (`artin`, `lemmaV_*`).
 - K: specialisation, restriction of (`D_N`-)flips and reachability, and the Moufang lift (`kill_DN`, `kill_reach`, `lift_mouf`, `lift_separates`).
-- G2: Proposition C as an equivalence (`propC_iff`), Proposition T's classification and count (`propT`, `propT_count`), Lemma M (`lemmaM`), Proposition S's decoding (`propS_interior`, `propS_boundary`).
+- G2: Proposition C as an equivalence (`propC_iff`), Proposition T's classification and count (`propT`, `propT_count`), Lemma M (`lemmaM`), Proposition S (decoding and moments-to-profiles), and the assembled theorem `G2Final.g2`.
 
-Not formalized (manuscript steps between the formalized pieces):
-- the identification of `moment` (defined, as in the manuscript's proof, as the sum over restrictions) with the `sᵖ q tʳ` coefficient of the substituted map (multilinear expansion);
-- Proposition S's step from the linear moments to the profiles `N`, `M(0)` (the basis `(1−s)^α(1+s)^{a−α}`);
-- the final assembly of these pieces into one Lean statement of Theorem G2.
+- **Theorem G2 in one statement** (`G2Final.g2`), with the moment-as-coefficient step (`coef_moment`, `coef_of_map`) and Proposition S's moments-to-profiles step (`key_of_K`).
 
 The interval-word predicate is used in its run form (`runSeq w` has no repeated letter).
