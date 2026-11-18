@@ -124,10 +124,13 @@ Its proof status must not be flattened:
 | At most two distinct letters | General argument using Artin's theorem |
 | **G2:** interval words have connected kernel classes | General argument in [THEOREM.md](THEOREM.md), via Propositions T, S and C |
 | Complete characterization for $1\leq n\leq9$ | **Exact exhaustive finite verification** |
-| **G3:** every non-interval word on exactly three letters has a Moufang move crossing $D_N$ components | **Open for arbitrary lengths** |
+| Complete characterization for $10\leq n\leq14$ | **Exhaustive local certificates**: Theorem B, Proposition Q′ or Lemma R′ for every non-interval 3-letter word; [log](data/g3_upto14.log) |
+| **G3:** every non-interval word on exactly three letters has a Moufang move crossing $D_N$ components | **Open for arbitrary lengths**; certified for every length $\leq14$ |
+| **Lemma R′:** self-certifying (greatest-fixpoint) node sets are constant on $D_N$ components | General argument; certifies all G3-R counterexamples |
+| **Proposition Q′:** run-comb words satisfying explicit ratio conditions are disconnected | General argument; 92.6 % of words at $n=9$ |
 | **G3-R:** such a move must toggle an absolutely rigid interval | **False from length ten** |
 
-The general only-if direction reduces to G3; proving the stronger G3-R will not work because it has counterexamples. G3 nevertheless holds in all the checked finite cases, including those particular counterexamples to G3-R.
+The general only-if direction reduces to G3; proving the stronger G3-R will not work because it has counterexamples. G3 nevertheless holds in all the checked finite cases, including those particular counterexamples to G3-R. For those cases a different local certificate takes over. Nodes that fail absolute rigidity can still certify one another: deleting any of them needs a rank-3 rotation (Lemma R′). What is still missing for all $n$ is a uniform rule for picking the Moufang move, not a different kind of certificate.
 
 A corrected count from the [finite logs](data/rigid9.log) is
 
@@ -143,7 +146,7 @@ The general mathematical proofs are **manuscript arguments**, not Lean kernel pr
 
 Up to renaming letters, words of length $n$ correspond to set partitions counted by the **Bell numbers** $B_n$.
 
-For **$1\leq n\leq9$**, the number of words with *some disconnected kernel class* is verified to equal
+For **$1\leq n\leq14$**, the number of words with *some disconnected kernel class* is verified to equal
 
 $$
 D_n=B_n-2^n+n.
@@ -154,6 +157,14 @@ The corresponding finite sequence is
 $$
 (D_1,\ldots,D_9)=(0,0,0,3,25,145,756,3892,20644).
 $$
+
+The certificate range continues it:
+
+$$
+(D_{10},\ldots,D_{14})=(114961,\ 676533,\ 4209513,\ 27636258,\ 190882952).
+$$
+
+For $n\leq9$ the classifier is exhaustive. For $10\leq n\leq14$ the "if" half is Theorem G2 (all $n$). The "only if" half certifies every non-interval 3-letter word, then lifts to all words by killing letters (Lemma K).
 
 The same expression for **all** $n$ remains conditional on G3. It is **not** an established all-length formula.
 
@@ -195,6 +206,8 @@ This is the supplied **all-length G2 argument**; it does not discharge the non-i
 | [ZFC-A- equational replay](https://github.com/Dojo-1/ZFC-A-) | Reported **517/517** certificates through length five | Equational steps, not a Lean proof of the global theorem |
 | [Tensor cross-check](src/crosscheck.py) | Zero recorded mismatches through six; [log](data/cross6.log) | Finite implementation parity |
 | [Rigid-separator study](src/rigid_separators.py) | Full finite checks through nine; [log](data/rigid9.log) | Stronger universal G3-R fails |
+| [Stable-node separators](src/stable_separators.py) | Every non-interval 3-letter word through ten; [log](data/stable10.log) | Certificate search, not a uniform rule |
+| [Run-comb certificates](src/run_comb.py) and [tiered G3 check](src/g3_upto14.py) | Every non-interval 3-letter word through fourteen; [log](data/g3_upto14.log) | Finite length, not G3 for all $n$ |
 | Octonion/sedenion word spectra | Randomized numerical estimates | Neither exact proof nor guaranteed novelty |
 | W, G2 and three-block statements | Proof arguments in [THEOREM.md](THEOREM.md) | No independent Lean formalization claimed |
 
@@ -212,6 +225,9 @@ python src/g3_check.py 8
 python src/rigid_separators.py 8
 python src/lemma_m.py 7 10
 python src/sigma_complete.py 8
+python src/stable_separators.py 8
+python src/run_comb.py 8
+python src/g3_upto14.py 11 14   # ~8 min
 python src/certify_exact.py 5
 
 # Optional: with a separate ZFC-A- checkout.
