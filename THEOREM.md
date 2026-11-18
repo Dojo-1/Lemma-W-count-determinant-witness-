@@ -114,10 +114,8 @@ The move `x(Y(xC)) → ((xY)x)C` at the last letter of `ρ_{t−1}` is an instan
 
   It uses no `sorry`, only the standard axioms.
 - **Prolog.** [`prolog/`](prolog/) runs the same definitions as logic programs. The induction proof is a program (`construct/3`) whose output, 44,670 certificates up to 12 runs, is re-checked by the certificate relation.
-- **Lemma Cat and Lemma R′ (Lean).** Lemma Cat, laminarity classification and determinants, is formalized at the level of position intervals (`Caterpillar.chain_selfCert`). Lemma R′ is formalized on planar binary trees with `D_N`-flips (`Caterpillar.stable_of_reach`, `Caterpillar.caterpillar_separates`).
-- **Not formalized.** Two pieces remain outside Lean:
-  - the translation of a run-level certificate into a position-level chain and the trees `T₀`, `T₁` (it is constructive; see `src/caterpillar.py`);
-  - the octonion lemmas (W, K, Moufang identities, G2).
+- **G3, combinatorial part (Lean).** It is formalized in full as `Caterpillar.g3_trees`. For every non-interval word over three letters it constructs bracketings `T₀`, `T₁` that are related by one Moufang move, with the repeated variable a single letter, and that lie in different `D_N`-components. This covers Proposition E, Lemma Cat, Lemma R′ and the translation into trees.
+- **Not formalized.** Only octonion algebra is left: the Moufang identities in 𝕆, Lemma W, K and G2.
 
 **Theorem G3 (P for all n).** Every non-interval word over exactly three letters has a Moufang move between different `D_N`-components. Hence (K) every non-interval word with ≥ 3 letters has a disconnected kernel class.
 *Proof.* Its run sequence is valid. Proposition E gives a caterpillar, Lemma Cat gives a self-certifying `S` and a Moufang move deleting a node of `S`, and Lemma R′ puts `T₁` in a different `D_N`-component. Lemma W turns this into disconnection, and Lemma K lifts it to words with more letters (restrict to `p, q` from a pattern `p…q…p` and any third letter). ∎

@@ -187,6 +187,18 @@ inductive Reach (R : Tree → Tree → Prop) : Tree → Tree → Prop
   | refl (t : Tree) : Reach R t t
   | tail {t u v : Tree} : Reach R t u → R u v → Reach R t v
 
+/-- Rotations are reversible with the same segment triple, so `D_N`-flips are symmetric and `Reach`
+along them is exactly "same `D_N`-component". -/
+theorem rot_symm : ∀ {t t' : Tree} {X Y Z : Ival}, Rot t t' X Y Z → Rot t' t X Y Z
+  | _, _, _, _, _, Rot.lr A B C => Rot.rl A B C
+  | _, _, _, _, _, Rot.rl A B C => Rot.lr A B C
+  | _, _, _, _, _, Rot.inl r h => Rot.inl r (rot_symm h)
+  | _, _, _, _, _, Rot.inr l h => Rot.inr l (rot_symm h)
+
+theorem dnstep_symm (w : Word) {t t' : Tree} (h : DNStep w t t') : DNStep w t' t := by
+  obtain ⟨X, Y, Z, hr, hd⟩ := h
+  exact ⟨X, Y, Z, rot_symm hr, hd⟩
+
 /-- **Lemma R′.** If `S ⊆ subs T₀` is self-certifying, every tree reachable from `T₀` by `D_N`-flips
 contains `S`. -/
 theorem stable_of_reach (w : Word) (S : List Ival) (T0 : Tree) (hwf : T0.WF)
