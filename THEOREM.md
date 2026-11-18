@@ -51,7 +51,7 @@ Exhaustive brute-force check: 1,997,801 segment triples of interval words up to 
   - No randomized identity tests are used.
 - **General n reduces to two combinatorial claims; G2 is now proved (Theorem G2 below):**
   - **(G2, P)** In an interval word, distinct `D_N`-components are distinct maps (no non-local identities).
-  - **(G3)** Every non-interval word over **exactly three** letters has a **Moufang** move between different `D_N`-components. By K this implies the disconnection claim for every non-interval word with ≥ 3 letters. `g3_check.py` verifies G3 exactly for all 3,385 such words of length ≤ 9.
+  - **(G3)** Every non-interval word over **exactly three** letters has a **Moufang** move between different `D_N`-components. By K this implies the disconnection claim for every non-interval word with ≥ 3 letters. `g3_check.py` verifies G3 exactly for all 4,330 such words of lengths 4 through 9 (3 + 19 + 80 + 286 + 945 + 2,997).
   - **(G3-R), the stronger, local form.** Every such word has a Moufang move toggling an absolutely rigid interval. `rigid_separators.py` verifies it for every word of length ≤ 9 (see `data/rigid9.log`). **It is false in general:** `xyxyzzyxyx`, `xyyxzzxyyx` (n = 10) and four words at n = 12 have no rigid separator. G3 itself still holds for all six (exact `D_N`-component check). Two-letter separators do **not** suffice: separators of length 2 through 6 occur already at n = 7. A general proof needs a uniform choice of (move, J). One family is already uniform: `J = a bᵐ a` over two letters is rigid iff no split balances the `a : b` ratio and both sides of `J` are the third letter or the boundary.
 - **Count.** With the characterization, the non-local words are those with ≥ 3 letters that are not interval words: `Bell(n) − 2^{n−1} − (2^{n−1} − n) = Bell(n) − 2ⁿ + n`.
 
@@ -82,7 +82,7 @@ By Lemmas F and K the theorem extends to every word that has a rigid factor, or 
 
 *Coverage* (`block_witness.py`, exhaustive): 100 % of non-interval 3-letter words for n ≤ 6 and n = 8; 99.55 % at n = 12 (86,079 / 86,471). Adding M6 and factor reduction leaves 2 words at n = 10 and 4 at n = 12, all near-palindromic balanced words. G3 holds for those by exact `D_N` search but not via a rigid node. **G3 for all n stays open:** what is missing is a separator mechanism for balanced near-palindromic words.
 
-**G2 reduction (rigorous implication, two open inputs).** Killing letters is a specialisation, so equal maps restrict to equal maps. Hence G2 follows from:
+**G2 reduction (rigorous implication; both inputs discharged below).** Killing letters is a specialisation, so equal maps restrict to equal maps. Hence G2 follows from:
 - **(a)** the components of the letter-triple restrictions determine the `D_N`-component, for interval words (verified for all interval words with ≥ 4 letters, n ≤ 7, `g2_reduction.py`);
 - **(b)** G2 for three-block words `xᵃyᵇzᶜ`. This is verified for all 162 such words with `a + b + c ≤ 11`, and their component count fits
 
