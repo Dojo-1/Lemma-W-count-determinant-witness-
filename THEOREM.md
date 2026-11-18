@@ -107,4 +107,26 @@ So `j` never changes. For `0 < j < b`, `a′` and `c′` never change either. Fo
 
 *Counting.* For interior `j`: `Σ_{p<a, q<c} C(p+q, p) = C(a+c, a) − 1`. For `j = 0`: `Σ_{q<c} C(a−1+q, a−1) = C(a+c−1, a)`; symmetrically for `j = b`. Pascal's rule gives the total. ∎ (`three_block.py` checks invariant completeness and counts for `a ≤ 3, b ≤ 4, c ≤ 3`.)
 
-Consequently, **G2 for three-block words is equivalent to: different invariants `Φ` give different octonion maps.** With the triple-restriction claim (a), this is now the only input G2 still needs.
+Consequently, G2 for three-block words is equivalent to: different invariants `Φ` give different octonion maps. This is proved next.
+
+**Lemma M (moment formula, P for all a, b, c).** Substitute `x = 1 + s e₁`, `y = 1 + q e₂`, `z = 1 + t e₄` into a bracketing `T` of `xᵃyᵇzᶜ`, and let `A_T(p, r)` be the coefficient of `sᵖ q tʳ`. Put
+`ω₊ = x^{a′} z^{c′} W`, `ω₋ = z^{c′} x^{a′} W` (as words in `x, z`; `Φ(T) = (j, a′, c′, W)`). For a word `ω` in `x, z`, let `P_ω ∈ Cl₂[s, t]` be the ordered product of `1 + sX` per `x` and `1 + tZ` per `z`, with `X² = Z² = 1`, `XZ = −ZX`. Let `S_ω(p, r)` be its `sᵖtʳ` coefficient. Then
+
+  `A_T(p, r) = σ(p, r) · [ j·S_{ω₊}(p, r) + (b − j)·S_{ω₋}(p, r) ]`,  with the sign `σ` independent of `T`.
+
+*Proof.* `A_T(p, r)` sums, over `p` x-leaves, one y-leaf `y_k` and `r` z-leaves, the value of `T` restricted to them on the units `e₁, e₂, e₄`. Let `H = ⟨e₁, e₄⟩ ≅ ℍ` and `ℓ = e₂ ⊥ H`. Then `𝕆 = H ⊕ Hℓ` with `h(cℓ) = (ch)ℓ` and `(cℓ)h = (c h̄)ℓ`. Subtrees without `y_k` lie in the associative `H` and evaluate to ordered products. Walking from `y_k` to the root, the value stays `cℓ`: a left sibling `h` appends `h`, and a right sibling appends `h̄`.
+
+Left siblings hold only letters left of `y_k` (x's, after deleting other y's). Right siblings hold only z's, and `conj(e₄ᵐ) = (−1)ᵐ e₄ᵐ`. So the value is `(−1)ʳ e^{ω_k} ℓ`, where `ω_k` is the word of absorbed blocks read bottom-up and `e^{ω}` its ordered unit product. Summing over the subsets gives the `sᵖtʳ` coefficient of the ordered product in `H`. Reducing to `e₁^{[p]}e₄^{[r]}` uses the same inversion sign as `Cl₂` and a square sign depending only on `(p, r)`.
+
+By Proposition T, the ancestors of `y_k` absorb the attachments in order `W`. Below them, they absorb the core: if `y_k` is in the core's left child (`j` choices), all core x's and then the core z's (`ω_k = ω₊`); otherwise the core z's and then the core x's (`ω_k = ω₋`). ∎ (`lemma_m.py`: exact agreement on every bracketing, n ≤ 7, and on every component, n = 8.)
+
+**Proposition S (separation, P for all a, b, c).** Distinct `D_N`-components of `xᵃyᵇzᶜ` have distinct octonion maps. Already the moments `A(p, 1)` and `A(1, r)` separate them.
+
+*Proof.* In the `t`-linear part of `P_ω`, each `z` with `α` x's before it contributes `A^α Z A^{a−α} = Z Ā^α A^{a−α}`, where `A = 1+sX` and `Ā = 1−sX`. On the `X = +1` eigenline these are `(1−s)^α(1+s)^{a−α}`, `α = 0..a`, a basis of polynomials of degree ≤ a. So the `t`-linear moments determine the weighted z-profile `N(α) = j N_{ω₊}(α) + (b−j) N_{ω₋}(α)`, where `N_ω(α)` counts the z's of `ω` preceded by exactly `α` x's. Symmetrically, the `s`-linear moments determine the x-profile `M(γ)`. Explicitly,
+
+  `N = b·N_W(· − a′) + j c′ δ_{a′} + (b−j) c′ δ₀`,  `M = b·M_W(· − c′) + j a′ δ₀ + (b−j) a′ δ_{c′}`.
+
+- If `N(0), M(0) > 0`, then `j` is interior. In that case `a′ = min{α > 0 : N(α) ≠ 0}`, `c′ = min{γ > 0 : M(γ) ≠ 0}` and `j = b − N(0)/c′`. Then `N_W` follows by subtraction. A binary word is fixed by its z-profile and its number of x's, so `W` is determined.
+- If `M(0) = 0`, then `j = 0` and `N = b·N_{ω₋}`. If `N(0) = 0`, then `j = b` and `N = b·N_{ω₊}`. Either way the profile fixes the join word, which is the complete invariant for boundary `j` (Proposition T). ∎ (`lemma_m.py` decodes every component, n ≤ 8, and checks injectivity of the formula over all `Φ` with `a + b + c ≤ 12`: 15,133 maps, count `1 + b(C(a+c,a) − 1)` each.)
+
+**Corollary (G2 for three-block words, P for all a, b, c).** For `xᵃyᵇzᶜ`, kernel classes coincide with `D_N`-components and are flip-connected. Input (b) of the G2 reduction is therefore proved; **G2 now rests only on (a)**, the triple-restriction completeness for interval words.

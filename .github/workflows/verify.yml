@@ -15,6 +15,8 @@ jobs:
         run: python src/g3_check.py 8
       - name: G3-R rigid-separator certificates n <= 8
         run: python src/rigid_separators.py 8
+      - name: Lemma M / Proposition S (three-block separation) n <= 7, formula a+b+c <= 10
+        run: python src/lemma_m.py 7 10
       - name: Interval rank lemma, brute force n <= 10
         run: python src/lemmaI_check.py 10
       - name: Exact class certification (full polarization) n <= 5
