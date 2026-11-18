@@ -176,7 +176,7 @@ $$
 Proposition T counts the connected components of its rank-allowed flip graph:
 
 $$
-\#\pi_0(D_N(x^a y^b z^c))
+\left|\pi_0(D_N(x^a y^b z^c))\right|
 =1+b\left(\binom{a+c}{a}-1\right).
 $$
 
