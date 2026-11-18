@@ -9,3 +9,6 @@ import Caterpillar.LemmaCat
 import Caterpillar.RPrime
 import Caterpillar.Glue
 import Caterpillar.Octonion
+import Caterpillar.LemmaW
+import Caterpillar.Division
+import Caterpillar.Artin
