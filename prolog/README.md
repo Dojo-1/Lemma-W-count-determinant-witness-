@@ -1,6 +1,6 @@
 # Prolog formalization (SWI-Prolog)
 
-Seven programs. Each one checks independently what the Lean development proves:
+Eight programs. Each one checks independently what the Lean development proves:
 
 ```bash
 swipl -q -g main -t halt caterpillar.pl   # run-sequence combinatorics, finite base, constructive Prop. E
@@ -10,6 +10,7 @@ swipl -q -g main -t halt algebra.pl       # Lemma W expansion, L1, Artin, K (oct
 swipl -q -g main -t halt g2.pl            # K (combinatorial side, Moufang lift), G2: T, M, S, C
 swipl -q -g run -t halt proofs.pl         # the Lean constructions for K's lift, C (⇐), T, M, run and validated
 swipl -q -g run -t halt assembly.pl       # moment = coefficient, moments → profiles, the assembled G2
+swipl -q -g run_closure -t halt closure.pl  # converse, g2_iff, kernel-class flip connectivity, main-theorem sweep
 ```
 
 ## `caterpillar.pl`: Proposition E
@@ -101,4 +102,16 @@ Control: on the non-interval word `[0,1,2,1,0]` the path builder fails for a σ-
 
 Control: 142 pairs in the same component take equal values.
 
-Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.lift_separates`, `Octonion.propC_iff`, `PropT.propT`, `LemmaM.lemmaM`, `PropS.propS_interior`, `Coeff.coef_moment`, `Profiles.key_of_K` and `G2Final.g2`.
+## `closure.pl`: the converse and the main-theorem sweep
+
+([log](../data/prolog_closure.log))
+
+| Lean | Check | Range | Result |
+|---|---|---|---|
+| `Closure.reach_ev` | same `D_N`-component ⇒ equal values at 8 random integer valuations | interval words, n ≤ 6 | 7,984 pairs equal |
+| `Closure.g2_iff` | different components ⇒ separated by the G2 witness valuation (exact) | interval words, n ≤ 6 | 21,108 pairs separated |
+| main theorem (not yet one Lean statement) | kernel classes (equality at 8 random valuations) flip-connected ⟺ ≤ 2 letters or interval | all 275 canonical words, n ≤ 6 | 275/275 agree; disconnected counts 0, 3, 25, 145 = Bell(n) − 2ⁿ + n |
+
+In the sweep a difference of values is exact; an equality at sampled valuations is evidence, not proof.
+
+Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.lift_separates`, `Octonion.propC_iff`, `PropT.propT`, `LemmaM.lemmaM`, `PropS.propS_interior`, `Coeff.coef_moment`, `Profiles.key_of_K` and `G2Final.g2`, `Closure.reach_ev`, `Closure.g2_iff`, `Closure.kernel_flip_connected`.

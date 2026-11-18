@@ -1,0 +1,6 @@
+g2_iff: interval words n ≤ 6 — 7984 same-component pairs take equal values; 21108 different-component pairs separated by the G2 witness
+main sweep: 275/275 words (n ≤ 6, all canonical words) agree: kernel classes flip-connected ⟺ ≤ 2 letters or interval (102 connected, 173 not)
+  n = 3: 0 words with a disconnected kernel class; Bell(n) − 2^n + n = 0
+  n = 4: 3 words with a disconnected kernel class; Bell(n) − 2^n + n = 3
+  n = 5: 25 words with a disconnected kernel class; Bell(n) − 2^n + n = 25
+  n = 6: 145 words with a disconnected kernel class; Bell(n) − 2^n + n = 145

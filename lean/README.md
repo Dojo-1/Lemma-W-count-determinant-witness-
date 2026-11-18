@@ -30,6 +30,7 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 | `Caterpillar/Coeff.lean` | **The moment as a coefficient.** `expand` (multilinear expansion: `T(1+se₁, 1+qe₂, 1+te₄) = Σ_S s^{#x} q^{#y} t^{#z} T|_S`), `polyT`, `subst_eq` (the polynomial is the substituted map), **`coef_moment`** (its `sᵖ q tʳ` coefficient is Lemma M's moment), **`coef_of_map`** (the values at one Kronecker point `s = M, q = M^{n+1}, t = M^{(n+1)²}`, `M = 2^{n+2}+1`, determine every coefficient; balanced base-`M` digits) |
 | `Caterpillar/Profiles.lean` | **Proposition S, moments to profiles.** Homogeneous sums `Phi_eq` (`Σ_p S(ω,p,1) mᵖ(m+1)^{n−p} = Σ_z (2m+1)^{#x before z}`) and `Phi'_eq`; base-`(2m+1)` digits give `N` and `M(0)`; **`key_of_K`** (equal Lemma M brackets ⟹ equal invariant, via Proposition S's decoding); **`g2_three`**: different components of `xᵃyᵇzᶜ` differ at the Kronecker valuation |
 | `Caterpillar/G2Final.lean` | **Theorem G2** (`g2`): for an interval word, bracketings in different `D_N`-components take different values at some integer octonion valuation. Kill the other letters (`sh_kill`), renumber (`rn`, `sh_rn`, `ev_rn`, `wf_of_lv`), apply `g2_three`, pull back with `kill_ev` |
+| `Caterpillar/Closure.lean` | **The converse and the equivalence.** `dn_assoc_zero` (Proposition C (⇒) + Lemma V: a `D_N`-flip of an interval word has zero local associator), `reach_ev` (same component ⇒ same map), **`g2_iff`** (equal maps ⟺ same `D_N`-component), **`kernel_flip_connected`** (interval words) and **`kernel_flip_connected_two`** (≤ 2 letters, via Artin): each kernel class is connected by map-preserving flips |
 | `Caterpillar/Words.lean` | `runSeq` (run collapse), `noAdj_runSeq`, `mem_runSeq`, `valid_runSeq`, and **`cat_of_word`**: every word over three letters that uses all three and is not an interval word (`¬ (runSeq w).Nodup`) has a caterpillar certificate |
 
 **Scope.** Formalized:
@@ -39,7 +40,7 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 - L1, context cancellation, from the division-algebra property (`context_cancel`, `flip_iff_assoc`).
 - Artin's theorem and Lemma V (`artin`, `lemmaV_*`).
 - K: specialisation, restriction of (`D_N`-)flips and reachability, and the Moufang lift (`kill_DN`, `kill_reach`, `lift_mouf`, `lift_separates`).
-- G2: Proposition C as an equivalence (`propC_iff`), Proposition T's classification and count (`propT`, `propT_count`), Lemma M (`lemmaM`), Proposition S (decoding and moments-to-profiles), and the assembled theorem `G2Final.g2`.
+- G2: Proposition C as an equivalence (`propC_iff`), Proposition T's classification and count (`propT`, `propT_count`), Lemma M (`lemmaM`), Proposition S (decoding and moments-to-profiles), and the assembled theorem `G2Final.g2`, its converse `Closure.reach_ev` and the equivalence `Closure.g2_iff`.
 
 - **Theorem G2 in one statement** (`G2Final.g2`), with the moment-as-coefficient step (`coef_moment`, `coef_of_map`) and Proposition S's moments-to-profiles step (`key_of_K`).
 
