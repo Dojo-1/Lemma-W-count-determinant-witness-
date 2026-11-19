@@ -4,8 +4,13 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath,amsthm}
 \usepackage{newpxtext,newpxmath}
-\usepackage{fontspec}
-\setmonofont[Scale=0.88]{Inconsolatazi4-Regular.otf}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[varqu,varl,scaled=0.88]{zi4}
+\else
+  \usepackage{fontspec}
+  \setmonofont[Scale=0.88]{Inconsolatazi4-Regular.otf}
+\fi
 \usepackage[margin=1.1in]{geometry}
 \usepackage{microtype}
 \usepackage{mathtools}
@@ -557,12 +562,12 @@ deletes one node ($BC$, respectively $Y(xC)$) that a self-certifying set protect
 A run sequence is \emph{valid} if it uses three letters and has $R\ge4$ runs; these are exactly the run
 sequences of non-interval three-letter words. Let $\mathrm{Good}(s,\eta)$ mean that $s$ has a
 caterpillar satisfying (C1), (C2) and admitting one of the moves, where the root, \emph{entered} by the
-letter $\eta$, also satisfies (C1) ($\eta=\varnothing$: no entry).
+letter $\eta$, also satisfies (C1) ($\eta=\emptyset$: no entry).
 
 \begin{proposition}[Proposition E]\label{prop:E}
 For valid $s$, $\mathrm{Good}(s,\eta)$ holds unless (F1) $\eta=s_0=s_{R-1}$, or (F2) $s_0=\eta$ and
 $s_0\cdots s_{R-2}$ uses only two letters, or (F2$'$) the mirror image of (F2). In particular
-$\mathrm{Good}(s,\varnothing)$ always holds.
+$\mathrm{Good}(s,\emptyset)$ always holds.
 \end{proposition}
 \begin{proof}
 Induction on $R$. The base $R\in\{4,5\}$ is a finite check of $240$ pairs $(s,\eta)$. Let $R\ge6$ and
