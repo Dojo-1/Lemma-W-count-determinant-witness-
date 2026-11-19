@@ -117,11 +117,11 @@ theorem cnt_kill (w : Nat → Nat) (K : Nat → Bool) (ℓ : Nat) :
   | .leaf i => by
     simp only [kill, cnt]
     by_cases h : K (w i) = true
-    · simp only [h, if_true, cnto]
+    · simp only [h, ite_true, cnto]
       by_cases e : w i = ℓ
       · subst e; simp [h]
       · simp [e]
-    · simp only [h, cnto, cnt]
+    · simp only [h, cnto]
       by_cases e : w i = ℓ
       · subst e; simp [h, cnt]
       · simp [e, cnt]
@@ -130,7 +130,7 @@ theorem cnt_kill (w : Nat → Nat) (K : Nat → Bool) (ℓ : Nat) :
     simp only [kill, cnt]
     revert hl hr
     cases K ℓ <;> cases kill w K l <;> cases kill w K r <;> intro hl hr <;>
-      simp only [cnto, cnt, Bool.false_eq_true, if_true, if_false] at hl hr ⊢ <;> omega
+      simp only [cnto, cnt, Bool.false_eq_true, ite_true, ite_false] at hl hr ⊢ <;> omega
 
 /-- the `3 × 3` minor of the count matrix of `(A, B, C)` on letters `p, q, r` -/
 def minor (w : Nat → Nat) (A B C : Tree) (p q r : Nat) : Int :=

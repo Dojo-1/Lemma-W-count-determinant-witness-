@@ -261,14 +261,13 @@ theorem evalO_var0 (a b c : O) : evalO (val3 a b c) (varO 0) = a := by
 theorem evalO_var8 (a b c : O) : evalO (val3 a b c) (varO 8) = b := by
   funext i
   have := i.isLt
-  simp [evalO, varO, evalP, evalM, val3]
-  rw [dif_neg (by omega), dif_pos (by omega)]; congr 1; ext; simp; omega
+  simp [evalO, varO, evalP, evalM, val3, show ¬ 8 + i.val < 8 by omega, show 8 + i.val < 16 by omega]
 
 theorem evalO_var16 (a b c : O) : evalO (val3 a b c) (varO 16) = c := by
   funext i
   have := i.isLt
-  simp [evalO, varO, evalP, evalM, val3]
-  rw [dif_neg (by omega), dif_neg (by omega), dif_pos (by omega)]; congr 1; ext; simp; omega
+  simp [evalO, varO, evalP, evalM, val3, show ¬ 16 + i.val < 8 by omega,
+    show ¬ 16 + i.val < 16 by omega, show 16 + i.val < 24 by omega]
 
 /-- the identity check for one component: the normal form of `L_k − R_k` vanishes -/
 def idCheck1 (L R : OP) (k : Fin 8) : Bool := norm (L k ++ neg (R k)) == []
@@ -283,122 +282,544 @@ theorem all8 {P : Fin 8 → Prop} (h0 : P 0) (h1 : P 1) (h2 : P 2) (h3 : P 3) (h
   | ⟨0, _⟩ => h0 | ⟨1, _⟩ => h1 | ⟨2, _⟩ => h2 | ⟨3, _⟩ => h3
   | ⟨4, _⟩ => h4 | ⟨5, _⟩ => h5 | ⟨6, _⟩ => h6 | ⟨7, _⟩ => h7
 
-/-! ## The identities (one kernel check per component keeps memory bounded) -/
+/-! ## Fast basis-expansion machinery for multilinear octonion identities -/
+
+/-- Pure 8-constructor basis index for 1-step iota reduction across all kernels. -/
+inductive Idx | i0 | i1 | i2 | i3 | i4 | i5 | i6 | i7
+
+def Idx.toFin : Idx → Fin 8
+  | .i0 => 0 | .i1 => 1 | .i2 => 2 | .i3 => 3
+  | .i4 => 4 | .i5 => 5 | .i6 => 6 | .i7 => 7
+
+def toIdx (i : Fin 8) : Idx :=
+  match i.val with
+  | 0 => .i0 | 1 => .i1 | 2 => .i2 | 3 => .i3
+  | 4 => .i4 | 5 => .i5 | 6 => .i6 | _ => .i7
+
+theorem toFin_toIdx (i : Fin 8) : (toIdx i).toFin = i := by
+  rcases i with ⟨v, hv⟩
+  match v, hv with
+  | 0, _ | 1, _ | 2, _ | 3, _ | 4, _ | 5, _ | 6, _ | 7, _ => rfl
+
+theorem toIdx_toFin (i : Idx) : toIdx i.toFin = i := by cases i <;> rfl
+
+def ieq : Idx → Idx → Bool
+  | .i0, .i0 | .i1, .i1 | .i2, .i2 | .i3, .i3
+  | .i4, .i4 | .i5, .i5 | .i6, .i6 | .i7, .i7 => true
+  | _, _ => false
+
+theorem ieq_true {a b : Idx} (h : ieq a b = true) : a = b := by
+  cases a <;> cases b <;> first | rfl | exact absurd h (by decide)
+
+theorem ieq_false {a b : Idx} (h : ieq a b = false) : a ≠ b := by
+  intro e; subst e; cases a <;> exact absurd h (by decide)
+
+def allIdx (f : Idx → Bool) : Bool :=
+  f .i0 && f .i1 && f .i2 && f .i3 && f .i4 && f .i5 && f .i6 && f .i7
+
+theorem allIdx_spec {f : Idx → Bool} (h : allIdx f = true) : ∀ i : Idx, f i = true := by
+  have h0 : f .i0 = true ∧ f .i1 = true ∧ f .i2 = true ∧ f .i3 = true ∧
+            f .i4 = true ∧ f .i5 = true ∧ f .i6 = true ∧ f .i7 = true := by
+    simp only [allIdx, Bool.and_eq_true] at h
+    exact ⟨h.1.1.1.1.1.1.1, h.1.1.1.1.1.1.2, h.1.1.1.1.1.2, h.1.1.1.1.2,
+           h.1.1.1.2, h.1.1.2, h.1.2, h.2⟩
+  intro i
+  cases i
+  · exact h0.1
+  · exact h0.2.1
+  · exact h0.2.2.1
+  · exact h0.2.2.2.1
+  · exact h0.2.2.2.2.1
+  · exact h0.2.2.2.2.2.1
+  · exact h0.2.2.2.2.2.2.1
+  · exact h0.2.2.2.2.2.2.2
+
+def allIdx2 (f : Idx → Idx → Bool) : Bool := allIdx fun i => allIdx fun j => f i j
+def allIdx3 (f : Idx → Idx → Idx → Bool) : Bool := allIdx fun i => allIdx2 fun j k => f i j k
+def allIdx4 (f : Idx → Idx → Idx → Idx → Bool) : Bool := allIdx fun i => allIdx3 fun j k l => f i j k l
+
+theorem allIdx2_spec {f} (h : allIdx2 f = true) (i j : Idx) : f i j = true :=
+  allIdx_spec (allIdx_spec h i) j
+theorem allIdx3_spec {f} (h : allIdx3 f = true) (i j k : Idx) : f i j k = true :=
+  allIdx2_spec (allIdx_spec h i) j k
+theorem allIdx4_spec {f} (h : allIdx4 f = true) (i j k l : Idx) : f i j k l = true :=
+  allIdx3_spec (allIdx_spec h i) j k l
+
+def ixr : Idx → Idx → Idx
+  | .i0, j => j | i, .i0 => i
+  | .i1, .i1 => .i0 | .i1, .i2 => .i3 | .i1, .i3 => .i2 | .i1, .i4 => .i5 | .i1, .i5 => .i4 | .i1, .i6 => .i7 | .i1, .i7 => .i6
+  | .i2, .i1 => .i3 | .i2, .i2 => .i0 | .i2, .i3 => .i1 | .i2, .i4 => .i6 | .i2, .i5 => .i7 | .i2, .i6 => .i4 | .i2, .i7 => .i5
+  | .i3, .i1 => .i2 | .i3, .i2 => .i1 | .i3, .i3 => .i0 | .i3, .i4 => .i7 | .i3, .i5 => .i6 | .i3, .i6 => .i5 | .i3, .i7 => .i4
+  | .i4, .i1 => .i5 | .i4, .i2 => .i6 | .i4, .i3 => .i7 | .i4, .i4 => .i0 | .i4, .i5 => .i1 | .i4, .i6 => .i2 | .i4, .i7 => .i3
+  | .i5, .i1 => .i4 | .i5, .i2 => .i7 | .i5, .i3 => .i6 | .i5, .i4 => .i1 | .i5, .i5 => .i0 | .i5, .i6 => .i3 | .i5, .i7 => .i2
+  | .i6, .i1 => .i7 | .i6, .i2 => .i4 | .i6, .i3 => .i5 | .i6, .i4 => .i2 | .i6, .i5 => .i3 | .i6, .i6 => .i0 | .i6, .i7 => .i1
+  | .i7, .i1 => .i6 | .i7, .i2 => .i5 | .i7, .i3 => .i4 | .i7, .i4 => .i3 | .i7, .i5 => .i2 | .i7, .i6 => .i1 | .i7, .i7 => .i0
+
+/-- `false` represents `+1`, `true` represents `-1`. -/
+def isgn : Idx → Idx → Bool
+  | .i0, _ => false | _, .i0 => false
+  | .i1, .i1 => true  | .i1, .i2 => false | .i1, .i3 => true  | .i1, .i4 => false | .i1, .i5 => true  | .i1, .i6 => true  | .i1, .i7 => false
+  | .i2, .i1 => true  | .i2, .i2 => true  | .i2, .i3 => false | .i2, .i4 => false | .i2, .i5 => false | .i2, .i6 => true  | .i2, .i7 => true
+  | .i3, .i1 => false | .i3, .i2 => true  | .i3, .i3 => true  | .i3, .i4 => false | .i3, .i5 => true  | .i3, .i6 => false | .i3, .i7 => true
+  | .i4, .i1 => true  | .i4, .i2 => true  | .i4, .i3 => true  | .i4, .i4 => true  | .i4, .i5 => false | .i4, .i6 => false | .i4, .i7 => false
+  | .i5, .i1 => false | .i5, .i2 => true  | .i5, .i3 => false | .i5, .i4 => true  | .i5, .i5 => true  | .i5, .i6 => true  | .i5, .i7 => false
+  | .i6, .i1 => false | .i6, .i2 => false | .i6, .i3 => true  | .i6, .i4 => true  | .i6, .i5 => false | .i6, .i6 => true  | .i6, .i7 => true
+  | .i7, .i1 => true  | .i7, .i2 => false | .i7, .i3 => false | .i7, .i4 => true  | .i7, .i5 => true  | .i7, .i6 => false | .i7, .i7 => true
+
+def b2i (b : Bool) : Int := if b then -1 else 1
+
+theorem b2i_xor (a b : Bool) : b2i (a != b) = b2i a * b2i b := by
+  cases a <;> cases b <;> rfl
+
+def eqSum2 (a b c d : Bool) : Bool := (a == c && b == d) || (a == d && b == c)
+
+theorem b2i_eqSum2 {a b c d : Bool} (h : eqSum2 a b c d = true) :
+    b2i a + b2i b = b2i c + b2i d := by
+  cases a <;> cases b <;> cases c <;> cases d <;> first | rfl | exact absurd h (by decide)
+
+inductive Cnt4 | c0 | c1 | c2 | c3 | c4
+
+def inc4 : Bool → Cnt4 → Cnt4
+  | false, c => c
+  | true, .c0 => .c1 | true, .c1 => .c2 | true, .c2 => .c3 | true, .c3 => .c4 | true, .c4 => .c4
+
+def cnt4Eq : Cnt4 → Cnt4 → Bool
+  | .c0, .c0 | .c1, .c1 | .c2, .c2 | .c3, .c3 | .c4, .c4 => true
+  | _, _ => false
+
+def cntVal : Cnt4 → Int
+  | .c0 => 0 | .c1 => 1 | .c2 => 2 | .c3 => 3 | .c4 => 4
+
+theorem cnt4Eq_val {x y : Cnt4} (h : cnt4Eq x y = true) : cntVal x = cntVal y := by
+  cases x <;> cases y <;> first | rfl | exact absurd h (by decide)
+
+def cnt4 (a b c d : Bool) : Cnt4 := inc4 a (inc4 b (inc4 c (inc4 d .c0)))
+
+theorem b2i_sum4_cnt (a b c d : Bool) :
+    (b2i a + b2i b) + (b2i c + b2i d) = 4 - 2 * cntVal (cnt4 a b c d) := by
+  cases a <;> cases b <;> cases c <;> cases d <;> rfl
+
+def eqSum4 (a b c d e f g h : Bool) : Bool := cnt4Eq (cnt4 a b c d) (cnt4 e f g h)
+
+theorem b2i_eqSum4 {a b c d e f g h : Bool} (hk : eqSum4 a b c d e f g h = true) :
+    (b2i a + b2i b) + (b2i c + b2i d) = (b2i e + b2i f) + (b2i g + b2i h) := by
+  rw [b2i_sum4_cnt, b2i_sum4_cnt, cnt4Eq_val hk]
+
+def bxr (i j : Fin 8) : Fin 8 := (ixr (toIdx i) (toIdx j)).toFin
+def bsgn (i j : Fin 8) : Int := b2i (isgn (toIdx i) (toIdx j))
+
+private theorem ixr_comm_b : allIdx2 (fun i j => ieq (ixr i j) (ixr j i)) = true := rfl
+private theorem ixr_assoc_b : allIdx3 (fun i j k => ieq (ixr (ixr i j) k) (ixr i (ixr j k))) = true := rfl
+
+theorem ixr_comm (i j : Idx) : ixr i j = ixr j i := ieq_true (allIdx2_spec ixr_comm_b i j)
+theorem ixr_assoc (i j k : Idx) : ixr (ixr i j) k = ixr i (ixr j k) :=
+  ieq_true (allIdx3_spec ixr_assoc_b i j k)
+
+theorem bxr_comm (i j : Fin 8) : bxr i j = bxr j i := by
+  unfold bxr; rw [ixr_comm]
+
+theorem bxr_assoc (i j k : Fin 8) : bxr (bxr i j) k = bxr i (bxr j k) := by
+  unfold bxr; simp only [toIdx_toFin]; rw [ixr_assoc]
+
+private theorem bxr_eq_b : allIdx2 (fun i j => bxr i.toFin j.toFin == xr i.toFin j.toFin) = true := rfl
+private theorem bsgn_eq_b : allIdx2 (fun i j => bsgn i.toFin j.toFin == sgn i.toFin j.toFin) = true := rfl
+private theorem ixr_inv_b : allIdx2 (fun i j => ieq (ixr i (ixr i j)) j) = true := rfl
+
+theorem bxr_eq (i j : Fin 8) : bxr i j = xr i j := by
+  have h := allIdx2_spec bxr_eq_b (toIdx i) (toIdx j)
+  rw [toFin_toIdx, toFin_toIdx] at h
+  exact beq_iff_eq.1 h
+
+theorem bsgn_eq (i j : Fin 8) : bsgn i j = sgn i j := by
+  have h := allIdx2_spec bsgn_eq_b (toIdx i) (toIdx j)
+  rw [toFin_toIdx, toFin_toIdx] at h
+  exact beq_iff_eq.1 h
+
+theorem bxr_inv (i j : Fin 8) : bxr i (bxr i j) = j := by
+  unfold bxr; simp only [toIdx_toFin]
+  rw [ieq_true (allIdx2_spec ixr_inv_b (toIdx i) (toIdx j)), toFin_toIdx]
+
+def smulO (s : Int) (a : O) : O := fun k => s * a k
+def osum8 (f : Fin 8 → O) : O := fun k => sum8 fun i => f i k
+
+theorem decompO (a : O) : a = osum8 fun i => smulO (a i) (unit i) := by
+  funext k; rcases k with ⟨k, hk⟩
+  match k, hk with
+  | 0, _ | 1, _ | 2, _ | 3, _ | 4, _ | 5, _ | 6, _ | 7, _ =>
+    simp [osum8, smulO, sum8, unit]
+
+theorem mul_osum8_l (f : Fin 8 → O) (b : O) : mul (osum8 f) b = osum8 fun i => mul (f i) b := by
+  funext k; simp only [mul, osum8, sum8, Int.mul_add, Int.add_mul]; omega
+
+theorem mul_osum8_r (a : O) (f : Fin 8 → O) : mul a (osum8 f) = osum8 fun i => mul a (f i) := by
+  funext k; simp only [mul, osum8, sum8, Int.mul_add]; omega
+
+theorem mul_smulO_l (s : Int) (a b : O) : mul (smulO s a) b = smulO s (mul a b) := by
+  funext k; simp only [mul, smulO, sum8, Int.mul_add, Int.mul_assoc, Int.mul_left_comm s]
+
+theorem mul_smulO_r (s : Int) (a b : O) : mul a (smulO s b) = smulO s (mul a b) := by
+  funext k; simp only [mul, smulO, sum8, Int.mul_add, Int.mul_assoc, Int.mul_left_comm s]
+
+theorem smulO_smulO (s t : Int) (a : O) : smulO s (smulO t a) = smulO (s * t) a := by
+  funext k; simp only [smulO, Int.mul_assoc]
+
+theorem sum8_unit_mul (i : Fin 8) (f : Fin 8 → Int) :
+    (sum8 fun m => unit i m * f m) = f i := by
+  rcases i with ⟨v, hv⟩
+  match v, hv with
+  | 0, _ | 1, _ | 2, _ | 3, _ | 4, _ | 5, _ | 6, _ | 7, _ =>
+    simp [sum8, unit]
+
+theorem mul_unit_eq (i j : Fin 8) : mul (unit i) (unit j) = smulO (bsgn i j) (unit (bxr i j)) := by
+  funext k
+  have h1 : mul (unit i) (unit j) k = sum8 fun m => unit i m * (sgn m (xr m k) * unit j (xr m k)) := by
+    simp only [mul]
+    congr 1; funext m
+    simp only [Int.mul_assoc, Int.mul_left_comm (unit i m)]
+  rw [h1, sum8_unit_mul]
+  rw [← bxr_eq i k, ← bsgn_eq i (bxr i k)]
+  simp only [smulO, unit]
+  by_cases h : bxr i k = j
+  · subst h
+    rw [bxr_inv i k]; simp only [ite_true]
+  · have hk : k ≠ bxr i j := by
+      intro e; subst e; exact h (bxr_inv i j)
+    simp only [h, hk, ite_false, Int.mul_zero]
+
+theorem sum8_add (f g : Fin 8 → Int) : sum8 f + sum8 g = sum8 fun i => f i + g i := by
+  simp only [sum8]; omega
+
+theorem sum8_swap (f : Fin 8 → Fin 8 → Int) :
+    (sum8 fun i => sum8 fun j => f i j) = (sum8 fun i => sum8 fun j => f j i) := by
+  simp only [sum8]; omega
+
+theorem sum8_mul_l (c : Int) (f : Fin 8 → Int) : c * sum8 f = sum8 fun i => c * f i := by
+  simp only [sum8, Int.mul_add]
+
+theorem eq_of_sym2 (a : O) (f g : Fin 8 → Fin 8 → Int)
+    (h : ∀ i j : Fin 8, f i j + f j i = g i j + g j i) :
+    (sum8 fun i => sum8 fun j => a i * (a j * f i j)) =
+    (sum8 fun i => sum8 fun j => a i * (a j * g i j)) := by
+  have swap : ∀ H : Fin 8 → Fin 8 → Int,
+      (sum8 fun i => sum8 fun j => a i * (a j * H i j)) =
+      (sum8 fun i => sum8 fun j => a i * (a j * H j i)) := by
+    intro H
+    rw [sum8_swap]
+    congr 1; funext i; congr 1; funext j
+    rw [← Int.mul_assoc, Int.mul_comm (a j) (a i), Int.mul_assoc]
+  have hs : (sum8 fun i => sum8 fun j => a i * (a j * f i j)) +
+            (sum8 fun i => sum8 fun j => a i * (a j * f j i)) =
+            (sum8 fun i => sum8 fun j => a i * (a j * g i j)) +
+            (sum8 fun i => sum8 fun j => a i * (a j * g j i)) := by
+    rw [sum8_add, sum8_add]
+    congr 1; funext i; rw [sum8_add, sum8_add]
+    congr 1; funext j
+    rw [← Int.mul_add, ← Int.mul_add, ← Int.mul_add, ← Int.mul_add, h i j]
+  rw [← swap f, ← swap g] at hs
+  omega
+
+theorem eq_of_sym2_2 (a b : O) (f g : Fin 8 → Fin 8 → Fin 8 → Fin 8 → Int)
+    (h : ∀ i j k l : Fin 8,
+      (f i j k l + f j i k l) + (f i j l k + f j i l k) =
+      (g i j k l + g j i k l) + (g i j l k + g j i l k)) :
+    (sum8 fun i => sum8 fun j => a i * (a j * (sum8 fun k => sum8 fun l => b k * (b l * f i j k l)))) =
+    (sum8 fun i => sum8 fun j => a i * (a j * (sum8 fun k => sum8 fun l => b k * (b l * g i j k l)))) := by
+  apply eq_of_sym2 a
+  intro i j
+  rw [sum8_add, sum8_add]
+  have h1 : (sum8 fun k => (sum8 fun l => b k * (b l * f i j k l)) + (sum8 fun l => b k * (b l * f j i k l))) =
+            (sum8 fun k => sum8 fun l => b k * (b l * (f i j k l + f j i k l))) := by
+    congr 1; funext k; rw [sum8_add]; congr 1; funext l; rw [← Int.mul_add, ← Int.mul_add]
+  have h2 : (sum8 fun k => (sum8 fun l => b k * (b l * g i j k l)) + (sum8 fun l => b k * (b l * g j i k l))) =
+            (sum8 fun k => sum8 fun l => b k * (b l * (g i j k l + g j i k l))) := by
+    congr 1; funext k; rw [sum8_add]; congr 1; funext l; rw [← Int.mul_add, ← Int.mul_add]
+  rw [h1, h2]
+  exact eq_of_sym2 b _ _ (fun k l => h i j k l)
+
+/-! ## The identities (verified by polarized basis sign identities) -/
 
 def A := varO 0
 def B := varO 8
 def C := varO 16
 
-def moufang_left_L : OP := mulP A (mulP B (mulP A C))
-def moufang_left_R : OP := mulP (mulP (mulP A B) A) C
-theorem moufang_left_c0 : idCheck1 moufang_left_L moufang_left_R 0 = true := by decide +kernel
-theorem moufang_left_c1 : idCheck1 moufang_left_L moufang_left_R 1 = true := by decide +kernel
-theorem moufang_left_c2 : idCheck1 moufang_left_L moufang_left_R 2 = true := by decide +kernel
-theorem moufang_left_c3 : idCheck1 moufang_left_L moufang_left_R 3 = true := by decide +kernel
-theorem moufang_left_c4 : idCheck1 moufang_left_L moufang_left_R 4 = true := by decide +kernel
-theorem moufang_left_c5 : idCheck1 moufang_left_L moufang_left_R 5 = true := by decide +kernel
-theorem moufang_left_c6 : idCheck1 moufang_left_L moufang_left_R 6 = true := by decide +kernel
-theorem moufang_left_c7 : idCheck1 moufang_left_L moufang_left_R 7 = true := by decide +kernel
-theorem moufang_left_all : ∀ k, idCheck1 moufang_left_L moufang_left_R k = true :=
-  all8 moufang_left_c0 moufang_left_c1 moufang_left_c2 moufang_left_c3 moufang_left_c4 moufang_left_c5 moufang_left_c6 moufang_left_c7
+private def mlB (i j k l : Idx) : Bool := (isgn j l != isgn k (ixr j l)) != isgn i (ixr k (ixr j l))
+private def mrB (i j k l : Idx) : Bool := (isgn i k != isgn (ixr i k) j) != isgn (ixr (ixr i k) j) l
+private theorem moufang_left_b :
+    allIdx4 (fun i j k l => eqSum2 (mlB i j k l) (mlB j i k l) (mrB i j k l) (mrB j i k l)) = true := rfl
 
-def moufang_right_L : OP := mulP (mulP (mulP C A) B) A
-def moufang_right_R : OP := mulP C (mulP A (mulP B A))
-theorem moufang_right_c0 : idCheck1 moufang_right_L moufang_right_R 0 = true := by decide +kernel
-theorem moufang_right_c1 : idCheck1 moufang_right_L moufang_right_R 1 = true := by decide +kernel
-theorem moufang_right_c2 : idCheck1 moufang_right_L moufang_right_R 2 = true := by decide +kernel
-theorem moufang_right_c3 : idCheck1 moufang_right_L moufang_right_R 3 = true := by decide +kernel
-theorem moufang_right_c4 : idCheck1 moufang_right_L moufang_right_R 4 = true := by decide +kernel
-theorem moufang_right_c5 : idCheck1 moufang_right_L moufang_right_R 5 = true := by decide +kernel
-theorem moufang_right_c6 : idCheck1 moufang_right_L moufang_right_R 6 = true := by decide +kernel
-theorem moufang_right_c7 : idCheck1 moufang_right_L moufang_right_R 7 = true := by decide +kernel
-theorem moufang_right_all : ∀ k, idCheck1 moufang_right_L moufang_right_R k = true :=
-  all8 moufang_right_c0 moufang_right_c1 moufang_right_c2 moufang_right_c3 moufang_right_c4 moufang_right_c5 moufang_right_c6 moufang_right_c7
+private def mrlB (i j k l : Idx) : Bool := (isgn l i != isgn (ixr l i) k) != isgn (ixr (ixr l i) k) j
+private def mrrB (i j k l : Idx) : Bool := (isgn k j != isgn i (ixr k j)) != isgn l (ixr i (ixr k j))
+private theorem moufang_right_b :
+    allIdx4 (fun i j k l => eqSum2 (mrlB i j k l) (mrlB j i k l) (mrrB i j k l) (mrrB j i k l)) = true := rfl
 
-def moufang_middle_L : OP := mulP (mulP A B) (mulP C A)
-def moufang_middle_R : OP := mulP A (mulP (mulP B C) A)
-theorem moufang_middle_c0 : idCheck1 moufang_middle_L moufang_middle_R 0 = true := by decide +kernel
-theorem moufang_middle_c1 : idCheck1 moufang_middle_L moufang_middle_R 1 = true := by decide +kernel
-theorem moufang_middle_c2 : idCheck1 moufang_middle_L moufang_middle_R 2 = true := by decide +kernel
-theorem moufang_middle_c3 : idCheck1 moufang_middle_L moufang_middle_R 3 = true := by decide +kernel
-theorem moufang_middle_c4 : idCheck1 moufang_middle_L moufang_middle_R 4 = true := by decide +kernel
-theorem moufang_middle_c5 : idCheck1 moufang_middle_L moufang_middle_R 5 = true := by decide +kernel
-theorem moufang_middle_c6 : idCheck1 moufang_middle_L moufang_middle_R 6 = true := by decide +kernel
-theorem moufang_middle_c7 : idCheck1 moufang_middle_L moufang_middle_R 7 = true := by decide +kernel
-theorem moufang_middle_all : ∀ k, idCheck1 moufang_middle_L moufang_middle_R k = true :=
-  all8 moufang_middle_c0 moufang_middle_c1 moufang_middle_c2 moufang_middle_c3 moufang_middle_c4 moufang_middle_c5 moufang_middle_c6 moufang_middle_c7
+private def mmlB (i j k l : Idx) : Bool := (isgn i k != isgn l j) != isgn (ixr i k) (ixr l j)
+private def mmrB (i j k l : Idx) : Bool := (isgn k l != isgn (ixr k l) j) != isgn i (ixr (ixr k l) j)
+private theorem moufang_middle_b :
+    allIdx4 (fun i j k l => eqSum2 (mmlB i j k l) (mmlB j i k l) (mmrB i j k l) (mmrB j i k l)) = true := rfl
 
-def left_alt_L : OP := mulP (mulP A A) B
-def left_alt_R : OP := mulP A (mulP A B)
-theorem left_alt_c0 : idCheck1 left_alt_L left_alt_R 0 = true := by decide +kernel
-theorem left_alt_c1 : idCheck1 left_alt_L left_alt_R 1 = true := by decide +kernel
-theorem left_alt_c2 : idCheck1 left_alt_L left_alt_R 2 = true := by decide +kernel
-theorem left_alt_c3 : idCheck1 left_alt_L left_alt_R 3 = true := by decide +kernel
-theorem left_alt_c4 : idCheck1 left_alt_L left_alt_R 4 = true := by decide +kernel
-theorem left_alt_c5 : idCheck1 left_alt_L left_alt_R 5 = true := by decide +kernel
-theorem left_alt_c6 : idCheck1 left_alt_L left_alt_R 6 = true := by decide +kernel
-theorem left_alt_c7 : idCheck1 left_alt_L left_alt_R 7 = true := by decide +kernel
-theorem left_alt_all : ∀ k, idCheck1 left_alt_L left_alt_R k = true :=
-  all8 left_alt_c0 left_alt_c1 left_alt_c2 left_alt_c3 left_alt_c4 left_alt_c5 left_alt_c6 left_alt_c7
+private theorem left_alt_b :
+    allIdx3 (fun i j k => eqSum2 (isgn i j != isgn (ixr i j) k) (isgn j i != isgn (ixr j i) k)
+      (isgn j k != isgn i (ixr j k)) (isgn i k != isgn j (ixr i k))) = true := rfl
 
-def right_alt_L : OP := mulP (mulP B A) A
-def right_alt_R : OP := mulP B (mulP A A)
-theorem right_alt_c0 : idCheck1 right_alt_L right_alt_R 0 = true := by decide +kernel
-theorem right_alt_c1 : idCheck1 right_alt_L right_alt_R 1 = true := by decide +kernel
-theorem right_alt_c2 : idCheck1 right_alt_L right_alt_R 2 = true := by decide +kernel
-theorem right_alt_c3 : idCheck1 right_alt_L right_alt_R 3 = true := by decide +kernel
-theorem right_alt_c4 : idCheck1 right_alt_L right_alt_R 4 = true := by decide +kernel
-theorem right_alt_c5 : idCheck1 right_alt_L right_alt_R 5 = true := by decide +kernel
-theorem right_alt_c6 : idCheck1 right_alt_L right_alt_R 6 = true := by decide +kernel
-theorem right_alt_c7 : idCheck1 right_alt_L right_alt_R 7 = true := by decide +kernel
-theorem right_alt_all : ∀ k, idCheck1 right_alt_L right_alt_R k = true :=
-  all8 right_alt_c0 right_alt_c1 right_alt_c2 right_alt_c3 right_alt_c4 right_alt_c5 right_alt_c6 right_alt_c7
+private theorem right_alt_b :
+    allIdx3 (fun i j k => eqSum2 (isgn k i != isgn (ixr k i) j) (isgn k j != isgn (ixr k j) i)
+      (isgn i j != isgn k (ixr i j)) (isgn j i != isgn k (ixr j i))) = true := rfl
 
-def flexible_id_L : OP := mulP (mulP A B) A
-def flexible_id_R : OP := mulP A (mulP B A)
-theorem flexible_id_c0 : idCheck1 flexible_id_L flexible_id_R 0 = true := by decide +kernel
-theorem flexible_id_c1 : idCheck1 flexible_id_L flexible_id_R 1 = true := by decide +kernel
-theorem flexible_id_c2 : idCheck1 flexible_id_L flexible_id_R 2 = true := by decide +kernel
-theorem flexible_id_c3 : idCheck1 flexible_id_L flexible_id_R 3 = true := by decide +kernel
-theorem flexible_id_c4 : idCheck1 flexible_id_L flexible_id_R 4 = true := by decide +kernel
-theorem flexible_id_c5 : idCheck1 flexible_id_L flexible_id_R 5 = true := by decide +kernel
-theorem flexible_id_c6 : idCheck1 flexible_id_L flexible_id_R 6 = true := by decide +kernel
-theorem flexible_id_c7 : idCheck1 flexible_id_L flexible_id_R 7 = true := by decide +kernel
-theorem flexible_id_all : ∀ k, idCheck1 flexible_id_L flexible_id_R k = true :=
-  all8 flexible_id_c0 flexible_id_c1 flexible_id_c2 flexible_id_c3 flexible_id_c4 flexible_id_c5 flexible_id_c6 flexible_id_c7
+private theorem flexible_b :
+    allIdx3 (fun i j k => eqSum2 (isgn i k != isgn (ixr i k) j) (isgn j k != isgn (ixr j k) i)
+      (isgn k j != isgn i (ixr k j)) (isgn k i != isgn j (ixr k i))) = true := rfl
+
+private def mlS (i j k l : Fin 8) : Int := bsgn j l * bsgn k (bxr j l) * bsgn i (bxr k (bxr j l))
+private def mrS (i j k l : Fin 8) : Int := bsgn i k * bsgn (bxr i k) j * bsgn (bxr (bxr i k) j) l
+private theorem moufang_left_sgn (i j k l : Fin 8) :
+    mlS i j k l + mlS j i k l = mrS i j k l + mrS j i k l := by
+  have h := b2i_eqSum2 (allIdx4_spec moufang_left_b (toIdx i) (toIdx j) (toIdx k) (toIdx l))
+  simpa only [mlS, mrS, mlB, mrB, bsgn, bxr, toIdx_toFin, b2i_xor] using h
+
+private def mrlS (i j k l : Fin 8) : Int := bsgn l i * bsgn (bxr l i) k * bsgn (bxr (bxr l i) k) j
+private def mrrS (i j k l : Fin 8) : Int := bsgn k j * bsgn i (bxr k j) * bsgn l (bxr i (bxr k j))
+private theorem moufang_right_sgn (i j k l : Fin 8) :
+    mrlS i j k l + mrlS j i k l = mrrS i j k l + mrrS j i k l := by
+  have h := b2i_eqSum2 (allIdx4_spec moufang_right_b (toIdx i) (toIdx j) (toIdx k) (toIdx l))
+  simpa only [mrlS, mrrS, mrlB, mrrB, bsgn, bxr, toIdx_toFin, b2i_xor] using h
+
+private def mmlS (i j k l : Fin 8) : Int := bsgn i k * bsgn l j * bsgn (bxr i k) (bxr l j)
+private def mmrS (i j k l : Fin 8) : Int := bsgn k l * bsgn (bxr k l) j * bsgn i (bxr (bxr k l) j)
+private theorem moufang_middle_sgn (i j k l : Fin 8) :
+    mmlS i j k l + mmlS j i k l = mmrS i j k l + mmrS j i k l := by
+  have h := b2i_eqSum2 (allIdx4_spec moufang_middle_b (toIdx i) (toIdx j) (toIdx k) (toIdx l))
+  simpa only [mmlS, mmrS, mmlB, mmrB, bsgn, bxr, toIdx_toFin, b2i_xor] using h
+
+private theorem left_alt_sgn (i j k : Fin 8) :
+    bsgn i j * bsgn (bxr i j) k + bsgn j i * bsgn (bxr j i) k =
+    bsgn j k * bsgn i (bxr j k) + bsgn i k * bsgn j (bxr i k) := by
+  have h := b2i_eqSum2 (allIdx3_spec left_alt_b (toIdx i) (toIdx j) (toIdx k))
+  simpa only [bsgn, bxr, toIdx_toFin, b2i_xor] using h
+
+private theorem right_alt_sgn (i j k : Fin 8) :
+    bsgn k i * bsgn (bxr k i) j + bsgn k j * bsgn (bxr k j) i =
+    bsgn i j * bsgn k (bxr i j) + bsgn j i * bsgn k (bxr j i) := by
+  have h := b2i_eqSum2 (allIdx3_spec right_alt_b (toIdx i) (toIdx j) (toIdx k))
+  simpa only [bsgn, bxr, toIdx_toFin, b2i_xor] using h
+
+private theorem flexible_sgn (i j k : Fin 8) :
+    bsgn i k * bsgn (bxr i k) j + bsgn j k * bsgn (bxr j k) i =
+    bsgn k j * bsgn i (bxr k j) + bsgn k i * bsgn j (bxr k i) := by
+  have h := b2i_eqSum2 (allIdx3_spec flexible_b (toIdx i) (toIdx j) (toIdx k))
+  simpa only [bsgn, bxr, toIdx_toFin, b2i_xor] using h
+
+theorem bxr_left_comm (a b c : Fin 8) : bxr a (bxr b c) = bxr b (bxr a c) := by
+  rw [← bxr_assoc, bxr_comm a b, bxr_assoc]
+
+private theorem bxr4_sym (i j k l : Fin 8) :
+    bxr i (bxr k (bxr j l)) = bxr (bxr (bxr i k) j) l ∧
+    bxr (bxr (bxr l i) k) j = bxr l (bxr i (bxr k j)) ∧
+    bxr (bxr i k) (bxr l j) = bxr i (bxr (bxr k l) j) ∧
+    bxr i (bxr k (bxr j l)) = bxr j (bxr k (bxr i l)) ∧
+    bxr l (bxr i (bxr k j)) = bxr l (bxr j (bxr k i)) ∧
+    bxr i (bxr (bxr k l) j) = bxr j (bxr (bxr k l) i) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  · simp only [bxr_assoc]
+  · simp only [bxr_assoc]
+  · simp only [bxr_assoc]
+  · rw [bxr_left_comm k j l, bxr_left_comm i j, bxr_left_comm k i l]
+  · rw [bxr_comm k j, bxr_left_comm i j, bxr_comm k i]
+  · rw [bxr_comm (bxr k l) j, bxr_left_comm i j, bxr_comm (bxr k l) i]
+
+private theorem bxr3_sym (i j k : Fin 8) :
+    bxr (bxr i j) k = bxr i (bxr j k) ∧
+    bxr (bxr k i) j = bxr k (bxr i j) ∧
+    bxr (bxr i k) j = bxr i (bxr k j) ∧
+    bxr i (bxr j k) = bxr j (bxr i k) ∧
+    bxr k (bxr i j) = bxr k (bxr j i) ∧
+    bxr i (bxr k j) = bxr j (bxr k i) := by
+  refine ⟨bxr_assoc i j k, bxr_assoc k i j, bxr_assoc i k j, bxr_left_comm i j k, ?_, ?_⟩
+  · rw [bxr_comm i j]
+  · rw [bxr_comm k j, bxr_left_comm i j, bxr_comm k i]
 
 /-- **Left Moufang identity** `a(b(ac)) = ((ab)a)c`, for all integer octonions. -/
 theorem moufang_left (a b c : O) : mul a (mul b (mul a c)) = mul (mul (mul a b) a) c := by
-  have := eq_of_idCheck1 (val3 a b c) _ _ moufang_left_all
-  simp only [moufang_left_L, moufang_left_R, evalO_mulP, A, B, C, evalO_var0, evalO_var8, evalO_var16] at this
-  exact this
+  conv => lhs; rw [decompO a, decompO b, decompO c]
+  conv => rhs; rw [decompO a, decompO b, decompO c]
+  simp only [mul_osum8_l, mul_osum8_r, mul_smulO_l, mul_smulO_r, mul_unit_eq, smulO_smulO]
+  funext m; simp only [osum8, smulO]
+  congr 1; funext l; congr 1
+  simp only [sum8_mul_l]
+  have swap23 : ∀ F : Fin 8 → Fin 8 → Fin 8 → Int,
+      (sum8 fun j => sum8 fun k => sum8 fun i => F j k i) =
+      (sum8 fun j => sum8 fun i => sum8 fun k => F j k i) := fun F => by
+    congr 1; funext j; exact sum8_swap _
+  conv => lhs; rw [swap23]
+  conv => rhs; rw [swap23]
+  have hL : (sum8 fun j => sum8 fun i => sum8 fun k =>
+      a j * bsgn j l * (b k * bsgn k (bxr j l) * (a i * bsgn i (bxr k (bxr j l)) * unit (bxr i (bxr k (bxr j l))) m))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun k => b k * (mlS i j k l * unit (bxr i (bxr k (bxr j l))) m))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext k; unfold mlS; ac_rfl
+  have hR : (sum8 fun j => sum8 fun i => sum8 fun k =>
+      a j * (b k * (a i * bsgn i k * bsgn (bxr i k) j * bsgn (bxr (bxr i k) j) l * unit (bxr (bxr (bxr i k) j) l) m))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun k => b k * (mrS i j k l * unit (bxr i (bxr k (bxr j l))) m))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext k; rw [← (bxr4_sym i j k l).1]; unfold mrS; ac_rfl
+  rw [hL, hR]
+  apply eq_of_sym2 a
+  intro j i
+  rw [sum8_add, sum8_add]
+  congr 1; funext k
+  rw [← (bxr4_sym i j k l).2.2.2.1]
+  have h1 := moufang_left_sgn i j k l
+  simp only [← Int.mul_add, ← Int.add_mul]
+  rw [h1]
 
 /-- **Right Moufang identity** `((ca)b)a = c(a(ba))`. -/
 theorem moufang_right (a b c : O) : mul (mul (mul c a) b) a = mul c (mul a (mul b a)) := by
-  have := eq_of_idCheck1 (val3 a b c) _ _ moufang_right_all
-  simp only [moufang_right_L, moufang_right_R, evalO_mulP, A, B, C, evalO_var0, evalO_var8, evalO_var16] at this
-  exact this
+  conv => lhs; rw [decompO a, decompO b, decompO c]
+  conv => rhs; rw [decompO a, decompO b, decompO c]
+  simp only [mul_osum8_l, mul_osum8_r, mul_smulO_l, mul_smulO_r, mul_unit_eq, smulO_smulO]
+  funext m; simp only [osum8, smulO, sum8_mul_l]
+  have swap23 : ∀ F : Fin 8 → Fin 8 → Fin 8 → Fin 8 → Int,
+      (sum8 fun j => sum8 fun k => sum8 fun i => sum8 fun l => F j k i l) =
+      (sum8 fun j => sum8 fun i => sum8 fun k => sum8 fun l => F j k i l) := fun F => by
+    congr 1; funext j; exact sum8_swap _
+  conv => lhs; rw [swap23]
+  conv => rhs; rw [swap23]
+  have hL : (sum8 fun j => sum8 fun i => sum8 fun k => sum8 fun l =>
+      a j * (b k * (a i * (c l * bsgn l i * bsgn (bxr l i) k * bsgn (bxr (bxr l i) k) j * unit (bxr (bxr (bxr l i) k) j) m)))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun k => sum8 fun l => b k * (c l * (mrlS i j k l * unit (bxr l (bxr i (bxr k j))) m)))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext k; congr 1; funext l; rw [(bxr4_sym i j k l).2.1]; unfold mrlS; ac_rfl
+  have hR : (sum8 fun j => sum8 fun i => sum8 fun k => sum8 fun l =>
+      a j * (b k * bsgn k j * (a i * bsgn i (bxr k j) * (c l * bsgn l (bxr i (bxr k j)) * unit (bxr l (bxr i (bxr k j))) m)))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun k => sum8 fun l => b k * (c l * (mrrS i j k l * unit (bxr l (bxr i (bxr k j))) m)))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext k; congr 1; funext l; unfold mrrS; ac_rfl
+  rw [hL, hR]
+  apply eq_of_sym2 a
+  intro j i
+  rw [sum8_add, sum8_add]
+  congr 1; funext k; rw [sum8_add, sum8_add]
+  congr 1; funext l
+  rw [← (bxr4_sym i j k l).2.2.2.2.1]
+  have h1 := moufang_right_sgn i j k l
+  simp only [← Int.mul_add, ← Int.add_mul]
+  rw [h1]
 
 /-- **Middle Moufang identity** `(ab)(ca) = a((bc)a)`. -/
 theorem moufang_middle (a b c : O) : mul (mul a b) (mul c a) = mul a (mul (mul b c) a) := by
-  have := eq_of_idCheck1 (val3 a b c) _ _ moufang_middle_all
-  simp only [moufang_middle_L, moufang_middle_R, evalO_mulP, A, B, C, evalO_var0, evalO_var8, evalO_var16] at this
-  exact this
+  conv => lhs; rw [decompO a, decompO b, decompO c]
+  conv => rhs; rw [decompO a, decompO b, decompO c]
+  simp only [mul_osum8_l, mul_osum8_r, mul_smulO_l, mul_smulO_r, mul_unit_eq, smulO_smulO]
+  funext m; simp only [osum8, smulO, sum8_mul_l]
+  have reord : ∀ F : Fin 8 → Fin 8 → Fin 8 → Fin 8 → Int,
+      (sum8 fun j => sum8 fun l => sum8 fun k => sum8 fun i => F j l k i) =
+      (sum8 fun j => sum8 fun i => sum8 fun l => sum8 fun k => F j l k i) := fun F => by
+    congr 1; funext j
+    have s1 : (sum8 fun l => sum8 fun k => sum8 fun i => F j l k i) =
+              (sum8 fun l => sum8 fun i => sum8 fun k => F j l k i) := by
+      congr 1; funext l; exact sum8_swap _
+    rw [s1]; exact sum8_swap _
+  conv => lhs; rw [reord]
+  conv => rhs; rw [reord]
+  have hL : (sum8 fun j => sum8 fun i => sum8 fun l => sum8 fun k =>
+      a j * (c l * bsgn l j * (b k * (a i * bsgn i k * bsgn (bxr i k) (bxr l j) * unit (bxr (bxr i k) (bxr l j)) m)))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun l => sum8 fun k => c l * (b k * (mmlS i j k l * unit (bxr i (bxr (bxr k l) j)) m)))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext l; congr 1; funext k; rw [(bxr4_sym i j k l).2.2.1]; unfold mmlS; ac_rfl
+  have hR : (sum8 fun j => sum8 fun i => sum8 fun l => sum8 fun k =>
+      a j * (c l * (b k * bsgn k l * bsgn (bxr k l) j * (a i * bsgn i (bxr (bxr k l) j) * unit (bxr i (bxr (bxr k l) j)) m)))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun l => sum8 fun k => c l * (b k * (mmrS i j k l * unit (bxr i (bxr (bxr k l) j)) m)))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext l; congr 1; funext k; unfold mmrS; ac_rfl
+  rw [hL, hR]
+  apply eq_of_sym2 a
+  intro j i
+  rw [sum8_add, sum8_add]
+  congr 1; funext l; rw [sum8_add, sum8_add]
+  congr 1; funext k
+  rw [← (bxr4_sym i j k l).2.2.2.2.2]
+  have h1 := moufang_middle_sgn i j k l
+  simp only [← Int.mul_add, ← Int.add_mul]
+  rw [h1]
 
 theorem left_alternative (a b : O) : mul (mul a a) b = mul a (mul a b) := by
-  have := eq_of_idCheck1 (val3 a b b) _ _ left_alt_all
-  simp only [left_alt_L, left_alt_R, evalO_mulP, A, B, evalO_var0, evalO_var8] at this
-  exact this
+  conv => lhs; rw [decompO a, decompO b]
+  conv => rhs; rw [decompO a, decompO b]
+  simp only [mul_osum8_l, mul_osum8_r, mul_smulO_l, mul_smulO_r, mul_unit_eq, smulO_smulO]
+  funext m; simp only [osum8, smulO]
+  congr 1; funext k; congr 1
+  simp only [sum8_mul_l]
+  have hL : (sum8 fun j => sum8 fun i =>
+      a j * (a i * bsgn i j * bsgn (bxr i j) k * unit (bxr (bxr i j) k) m)) =
+      (sum8 fun j => sum8 fun i => a j * (a i * ((bsgn i j * bsgn (bxr i j) k) * unit (bxr i (bxr j k)) m))) := by
+    congr 1; funext j; congr 1; funext i
+    rw [(bxr3_sym i j k).1]; ac_rfl
+  have hR : (sum8 fun j => sum8 fun i =>
+      a j * bsgn j k * (a i * bsgn i (bxr j k) * unit (bxr i (bxr j k)) m)) =
+      (sum8 fun j => sum8 fun i => a j * (a i * ((bsgn j k * bsgn i (bxr j k)) * unit (bxr i (bxr j k)) m))) := by
+    congr 1; funext j; congr 1; funext i; ac_rfl
+  rw [hL, hR]
+  apply eq_of_sym2 a
+  intro j i
+  rw [← (bxr3_sym i j k).2.2.2.1]
+  have h1 := left_alt_sgn i j k
+  simp only [← Int.add_mul]
+  rw [h1]
 
 theorem right_alternative (a b : O) : mul (mul b a) a = mul b (mul a a) := by
-  have := eq_of_idCheck1 (val3 a b b) _ _ right_alt_all
-  simp only [right_alt_L, right_alt_R, evalO_mulP, A, B, evalO_var0, evalO_var8] at this
-  exact this
+  conv => lhs; rw [decompO a, decompO b]
+  conv => rhs; rw [decompO a, decompO b]
+  simp only [mul_osum8_l, mul_osum8_r, mul_smulO_l, mul_smulO_r, mul_unit_eq, smulO_smulO]
+  funext m; simp only [osum8, smulO, sum8_mul_l]
+  have hL : (sum8 fun j => sum8 fun i => sum8 fun k =>
+      a j * (a i * (b k * bsgn k i * bsgn (bxr k i) j * unit (bxr (bxr k i) j) m))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun k => b k * ((bsgn k i * bsgn (bxr k i) j) * unit (bxr k (bxr i j)) m))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext k; rw [(bxr3_sym i j k).2.1]; ac_rfl
+  have hR : (sum8 fun j => sum8 fun i => sum8 fun k =>
+      a j * (a i * bsgn i j * (b k * bsgn k (bxr i j) * unit (bxr k (bxr i j)) m))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun k => b k * ((bsgn i j * bsgn k (bxr i j)) * unit (bxr k (bxr i j)) m))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext k; ac_rfl
+  rw [hL, hR]
+  apply eq_of_sym2 a
+  intro j i
+  rw [sum8_add, sum8_add]
+  congr 1; funext k
+  rw [← (bxr3_sym i j k).2.2.2.2.1]
+  have h1 := right_alt_sgn i j k
+  simp only [← Int.mul_add, ← Int.add_mul]
+  rw [h1]
 
 theorem flexible (a b : O) : mul (mul a b) a = mul a (mul b a) := by
-  have := eq_of_idCheck1 (val3 a b b) _ _ flexible_id_all
-  simp only [flexible_id_L, flexible_id_R, evalO_mulP, A, B, evalO_var0, evalO_var8] at this
-  exact this
+  conv => lhs; rw [decompO a, decompO b]
+  conv => rhs; rw [decompO a, decompO b]
+  simp only [mul_osum8_l, mul_osum8_r, mul_smulO_l, mul_smulO_r, mul_unit_eq, smulO_smulO]
+  funext m; simp only [osum8, smulO, sum8_mul_l]
+  have swap23 : ∀ F : Fin 8 → Fin 8 → Fin 8 → Int,
+      (sum8 fun j => sum8 fun k => sum8 fun i => F j k i) =
+      (sum8 fun j => sum8 fun i => sum8 fun k => F j k i) := fun F => by
+    congr 1; funext j; exact sum8_swap _
+  conv => lhs; rw [swap23]
+  conv => rhs; rw [swap23]
+  have hL : (sum8 fun j => sum8 fun i => sum8 fun k =>
+      a j * (b k * (a i * bsgn i k * bsgn (bxr i k) j * unit (bxr (bxr i k) j) m))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun k => b k * ((bsgn i k * bsgn (bxr i k) j) * unit (bxr i (bxr k j)) m))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext k; rw [(bxr3_sym i j k).2.2.1]; ac_rfl
+  have hR : (sum8 fun j => sum8 fun i => sum8 fun k =>
+      a j * (b k * bsgn k j * (a i * bsgn i (bxr k j) * unit (bxr i (bxr k j)) m))) =
+      (sum8 fun j => sum8 fun i => a j * (a i * sum8 fun k => b k * ((bsgn k j * bsgn i (bxr k j)) * unit (bxr i (bxr k j)) m))) := by
+    congr 1; funext j; congr 1; funext i; simp only [sum8_mul_l]
+    congr 1; funext k; ac_rfl
+  rw [hL, hR]
+  apply eq_of_sym2 a
+  intro j i
+  rw [sum8_add, sum8_add]
+  congr 1; funext k
+  rw [← (bxr3_sym i j k).2.2.2.2.2]
+  have h1 := flexible_sgn i j k
+  simp only [← Int.mul_add, ← Int.add_mul]
+  rw [h1]
 
 /-! ## Lemma W, algebraic core -/
 
@@ -454,8 +875,8 @@ theorem lemmaW_span (a b c : O) :
   have h := eq_of_idCheck1 (val3 a b c) _ _ lemmaW_all
   simp only [lemmaW_L, assocP, evalO_subP, evalO_mulP] at h
   rw [evalO_spanP a b c 0 (by simp), evalO_spanP a b c 8 (by simp), evalO_spanP a b c 16 (by simp)] at h
-  simp only [if_true, if_neg (show (8 : Nat) ≠ 0 by decide), if_neg (show (16 : Nat) ≠ 0 by decide),
-    if_neg (show (16 : Nat) ≠ 8 by decide)] at h
+  simp only [ite_true, ite_eq_right (show (8 : Nat) ≠ 0 by decide), ite_eq_right (show (16 : Nat) ≠ 0 by decide),
+    ite_eq_right (show (16 : Nat) ≠ 8 by decide)] at h
   unfold assoc
   rw [h]
   funext k
@@ -463,7 +884,7 @@ theorem lemmaW_span (a b c : O) :
   split
   · rw [evalP_psmul]; congr 1
     simp [detP, evalP, evalM, val3, det3c]
-    simp only [Int.mul_sub, Int.sub_eq_add_neg, Int.mul_add, Int.mul_assoc, Int.neg_mul, Int.mul_neg]
+    simp only [Int.sub_eq_add_neg, Int.mul_add, Int.mul_neg]
     omega
   · rfl
 

@@ -56,7 +56,7 @@ theorem mem_runSeq : ∀ (w : List L3) (c : L3), c ∈ runSeq w ↔ c ∈ w
       rw [hr] at ih
       by_cases h : a = b
       · subst h
-        simp only [if_true, List.mem_cons] at ih ⊢
+        simp only [ite_true, List.mem_cons] at ih ⊢
         constructor
         · rintro (h | h)
           · exact Or.inl h
@@ -64,7 +64,7 @@ theorem mem_runSeq : ∀ (w : List L3) (c : L3), c ∈ runSeq w ↔ c ∈ w
         · rintro (h | h)
           · exact Or.inl h
           · exact ih.2 h
-      · simp only [h, if_false, List.mem_cons] at ih ⊢; rw [ih]
+      · simp only [h, ite_false, List.mem_cons] at ih ⊢; rw [ih]
 
 /-- A list over three letters that uses all of them and has at most 3 entries has no repeat. -/
 theorem nodup_of_short (l : List L3) (h3 : AllThree l) (hl : l.length ≤ 3) : l.Nodup := by

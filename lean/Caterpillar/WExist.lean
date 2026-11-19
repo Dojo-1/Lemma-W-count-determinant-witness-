@@ -79,7 +79,7 @@ theorem lemmaW_exists (w : Nat → Nat) (A B C : Tree) (h : ¬ DN w A B C) :
     apply Classical.byContradiction; intro hne; exact hn ⟨p, q, r, hne⟩
   generalize hd : minor w A B C p q r = d at hm
   let M : Int := ((2 * d.natAbs + 1 : Nat) : Int)
-  have hM : M.natAbs = 2 * d.natAbs + 1 := Int.natAbs_ofNat _
+  have hM : M.natAbs = 2 * d.natAbs + 1 := Int.natAbs_natCast _
   refine ⟨ρM M (qxyz p q r), ?_, ?_⟩
   · intro ℓ he
     have := congrFun he 0
@@ -98,7 +98,7 @@ theorem lemmaW_exists (w : Nat → Nat) (A B C : Tree) (h : ¬ DN w A B C) :
     rw [he] at hz
     have h7 := congrFun hz 7
     simp only [tv, oadd, smul, l0, l1, l2, l3, zero] at h7
-    simp only [show ((7 : Fin 8).val = 7) from rfl, if_true, det_eq, hd] at h7
+    simp only [show ((7 : Fin 8).val = 7) from rfl, ite_true, det_eq, hd] at h7
     -- `0 = M³ (2d + M z₇)`
     have hM0 : M ≠ 0 := by intro e; rw [e] at hM; simp at hM
     have e1 : M * (M * (M * (2 * d + M * z 7))) = 0 := by

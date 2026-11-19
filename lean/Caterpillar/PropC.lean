@@ -74,7 +74,7 @@ theorem cnt_const (w : Nat → Nat) (y : Nat) (p : Nat) :
     have := h i (by simp [lv]); simp only [cnt]
     by_cases hp : p = y
     · subst hp; simp
-    · simp only [hp, if_false]; rw [this]; simp [Ne.symm hp]
+    · simp only [hp, ite_false]; rw [this]; simp [Ne.symm hp]
   | .node l r, h => by
     have hl := cnt_const w y p l (fun i hi => h i (by simp [lv, hi]))
     have hr := cnt_const w y p r (fun i hi => h i (by simp [lv, hi]))
@@ -89,7 +89,7 @@ theorem cnt_zero (w : Nat → Nat) (p : Nat) : ∀ T, (∀ i ∈ lv T, w i ≠ p
 theorem minor_pq (w : Nat → Nat) (A B C : Tree) (p r : Nat) : minor w A B C p p r = 0 := by
   simp only [minor]; simp [Int.sub_self]
 theorem minor_qr (w : Nat → Nat) (A B C : Tree) (p q : Nat) : minor w A B C p q q = 0 := by
-  simp only [minor, Int.sub_self, Int.mul_zero, Int.zero_add, Int.zero_sub]; omega
+  simp only [minor, Int.sub_self, Int.mul_zero, Int.zero_sub]; omega
 theorem minor_pr (w : Nat → Nat) (A B C : Tree) (p q : Nat) : minor w A B C p q p = 0 := by
   simp only [minor]
   have e1 : cnt w q B * cnt w p C - cnt w p B * cnt w q C = -(cnt w p B * cnt w q C - cnt w q B * cnt w p C) := by
@@ -126,8 +126,8 @@ theorem dn_AB (w : Nat → Nat) (y : Nat) (A B C : Tree) (hA : ∀ i ∈ lv A, w
   simp only [minor, cnt_const w y p A hA, cnt_const w y q A hA, cnt_const w y r A hA,
     cnt_const w y p B hB, cnt_const w y q B hB, cnt_const w y r B hB]
   by_cases hp : p = y <;> by_cases hq : q = y <;> by_cases hr : r = y <;>
-    simp only [hp, hq, hr, if_true, if_false, Int.mul_zero, Int.zero_mul, Int.sub_zero, Int.zero_sub,
-      Int.add_zero, Int.sub_self, Int.neg_zero, Int.mul_neg, Int.neg_mul] <;> omega
+    simp only [hp, hq, hr, ite_true, ite_false, Int.mul_zero, Int.zero_mul, Int.sub_zero, Int.zero_sub,
+      Int.add_zero, Int.sub_self, Int.neg_zero, Int.mul_neg] <;> omega
 
 theorem dn_BC (w : Nat → Nat) (y : Nat) (A B C : Tree) (hB : ∀ i ∈ lv B, w i = y) (hC : ∀ i ∈ lv C, w i = y) :
     DN w A B C := by
@@ -135,8 +135,7 @@ theorem dn_BC (w : Nat → Nat) (y : Nat) (A B C : Tree) (hB : ∀ i ∈ lv B, w
   simp only [minor, cnt_const w y p B hB, cnt_const w y q B hB, cnt_const w y r B hB,
     cnt_const w y p C hC, cnt_const w y q C hC, cnt_const w y r C hC]
   by_cases hp : p = y <;> by_cases hq : q = y <;> by_cases hr : r = y <;>
-    simp only [hp, hq, hr, if_true, if_false, Int.mul_zero, Int.zero_mul, Int.sub_zero, Int.zero_sub,
-      Int.add_zero, Int.sub_self, Int.neg_zero, Int.mul_neg, Int.neg_mul] <;> omega
+    simp only [hp, hq, hr, ite_true, ite_false, Int.mul_zero, Int.zero_mul, Int.add_zero, Int.sub_self] <;> omega
 
 /-! ## rotations connect all bracketings of a two-letter segment -/
 

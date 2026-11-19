@@ -483,9 +483,9 @@ theorem glue_cat (w : Word) : ∀ {s : List L3} {e : Option L3}, Cat s e →
       apply combL_sub; apply combR_sub
       rw [mem_node]; right; right; rw [mem_node]; right; left
       rcases List.mem_cons.1 hy with rfl | hy
-      · rw [mem_node]; left; exact Prod.ext (by simp only [lo]; omega) (by simp only [hi]; omega)
+      · rw [mem_node]; left; exact Prod.ext (by simp only; omega) (by simp only; omega)
       · exact hsub y hy
-    · refine ⟨_, List.mem_cons_self _ _, ?_⟩
+    · refine ⟨_, List.mem_cons_self, ?_⟩
       apply not_mem_combL _ (by simp only; omega)
       apply not_mem_combR _ (by simp only; omega)
       intro h
@@ -583,14 +583,14 @@ theorem glue_cat (w : Word) : ∀ {s : List L3} {e : Option L3}, Cat s e →
       by rw [combL_hi]; simp only [hi]; rw [hChi]; omega, ?_,
       mouf_combL w o (n1 - 1) (Mouf.left (o2 - 1) o3 _ _
         (by rw [hx1 (o2 - 1) (by omega) (by omega), hx3 o3 (by omega) (by omega)])),
-      ⟨_, List.mem_cons_self _ _, ?_⟩, ?_⟩
+      ⟨_, List.mem_cons_self, ?_⟩, ?_⟩
     · intro z hz
       apply combL_sub; rw [mem_node]; right; right
       rcases List.mem_cons.1 hz with rfl | hz
-      · rw [mem_node]; left; exact Prod.ext (by simp only [lo]; rw [hYlo]) (by simp only [hi]; rw [hChi])
+      · rw [mem_node]; left; exact Prod.ext (by simp only; rw [hYlo]) (by simp only [hi]; rw [hChi])
       rcases List.mem_cons.1 hz with rfl | hz
       · rw [mem_node]; right; right; rw [mem_node]; left
-        exact Prod.ext (by simp only [lo]) (by simp only [hi]; rw [hChi])
+        exact Prod.ext (by simp only [lo]) (by simp only; rw [hChi])
       · rw [mem_node]; right; right; rw [mem_node]; right; right; exact combL_sub _ _ _ _ (hRsub z hz)
     · apply not_mem_combL _ (by simp only; omega)
       intro h
@@ -709,7 +709,7 @@ theorem glue_cat (w : Word) : ∀ {s : List L3} {e : Option L3}, Cat s e →
       by rw [combR_hi _ _ _ (by rw [hSitehi]), hSitehi]; omega, ?_,
       mouf_combR w (oc + 1) (n1 - 1) (Mouf.right (ob - 1) oc _ _
         (by rw [hx3 (ob - 1) (by omega) (by omega), hx1 oc (by omega) (by omega)])),
-      ⟨_, List.mem_cons_self _ _, ?_⟩, ?_⟩
+      ⟨_, List.mem_cons_self, ?_⟩, ?_⟩
     · intro z hz
       apply combR_sub; rw [mem_node]; right; left
       rcases List.mem_cons.1 hz with rfl | hz
@@ -794,14 +794,14 @@ theorem rle_facts : ∀ wl : List L3,
       obtain ⟨hk, hb, hrest⟩ := h3
       by_cases hab : a = b
       · subst hab
-        simp only [if_true]
+        simp only [ite_true]
         refine ⟨rfl, by simp only [tot] at ih2 ⊢; simp only [List.length_cons]; omega, ⟨by omega, ?_, ?_⟩⟩
         · intro p h1 h2
           rcases Nat.eq_zero_or_pos p with rfl | hp
           · rfl
           · exact hb p (by omega) (by omega)
         · rw [show 0 + (k + 1) = 0 + 1 + k by omega]; exact hrest
-      · simp only [hab, if_false]
+      · simp only [hab, ite_false]
         refine ⟨rfl, by simp only [tot] at ih2 ⊢; simp only [List.length_cons]; omega, ⟨by omega, ?_, hk, hb, hrest⟩⟩
         intro p h1 h2
         obtain rfl : p = 0 := by omega

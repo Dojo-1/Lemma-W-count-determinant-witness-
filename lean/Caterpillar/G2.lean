@@ -103,7 +103,7 @@ theorem cnt_eq_count (w : Nat → Nat) (ℓ : Nat) : ∀ T, cnt w ℓ T = ((lett
     simp only [cnt, lettersT]
     by_cases h : w i = ℓ
     · subst h; simp
-    · simp [List.count_cons, h]
+    · simp [h]
   | .node l r => by
     simp only [cnt, lettersT, List.count_append, cnt_eq_count w ℓ l, cnt_eq_count w ℓ r]; push_cast; rfl
 

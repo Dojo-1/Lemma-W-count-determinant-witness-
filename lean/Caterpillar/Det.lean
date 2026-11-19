@@ -27,34 +27,34 @@ theorem det_ss_v (a b : L3) (hab : a ≠ b) (i l : Int) (v : Vec) :
   | ⟨0,_⟩, ⟨0,_⟩ | ⟨1,_⟩, ⟨1,_⟩ | ⟨2,_⟩, ⟨2,_⟩ => exact absurd rfl hab
   | ⟨0,_⟩, ⟨1,_⟩ => left; simp [det3, ev, third, Int.mul_assoc]
   | ⟨1,_⟩, ⟨0,_⟩ => right; simp [det3, ev, third, Int.mul_assoc]
-  | ⟨0,_⟩, ⟨2,_⟩ => right; simp [det3, ev, third, Int.mul_assoc]
+  | ⟨0,_⟩, ⟨2,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_neg]
   | ⟨2,_⟩, ⟨0,_⟩ => left; simp [det3, ev, third, Int.mul_assoc]
-  | ⟨1,_⟩, ⟨2,_⟩ => left; simp [det3, ev, third, Int.mul_assoc]
-  | ⟨2,_⟩, ⟨1,_⟩ => right; simp [det3, ev, third, Int.mul_assoc]
+  | ⟨1,_⟩, ⟨2,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_neg]
+  | ⟨2,_⟩, ⟨1,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_neg]
 
 theorem det_s_v_s (a b : L3) (hab : a ≠ b) (i l : Int) (v : Vec) :
     det3 (ev a i) v (ev b l) = i * l * v (third a b) ∨
     det3 (ev a i) v (ev b l) = -(i * l * v (third a b)) := by
   match a, b with
   | ⟨0,_⟩, ⟨0,_⟩ | ⟨1,_⟩, ⟨1,_⟩ | ⟨2,_⟩, ⟨2,_⟩ => exact absurd rfl hab
-  | ⟨0,_⟩, ⟨1,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨1,_⟩, ⟨0,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨0,_⟩, ⟨2,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨2,_⟩, ⟨0,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨1,_⟩, ⟨2,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨2,_⟩, ⟨1,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
+  | ⟨0,_⟩, ⟨1,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_neg]
+  | ⟨1,_⟩, ⟨0,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_neg]
+  | ⟨0,_⟩, ⟨2,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm]
+  | ⟨2,_⟩, ⟨0,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_neg]
+  | ⟨1,_⟩, ⟨2,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm]
+  | ⟨2,_⟩, ⟨1,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm]
 
 theorem det_v_s_s (a b : L3) (hab : a ≠ b) (i l : Int) (v : Vec) :
     det3 v (ev a i) (ev b l) = i * l * v (third a b) ∨
     det3 v (ev a i) (ev b l) = -(i * l * v (third a b)) := by
   match a, b with
   | ⟨0,_⟩, ⟨0,_⟩ | ⟨1,_⟩, ⟨1,_⟩ | ⟨2,_⟩, ⟨2,_⟩ => exact absurd rfl hab
-  | ⟨0,_⟩, ⟨1,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨1,_⟩, ⟨0,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨0,_⟩, ⟨2,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨2,_⟩, ⟨0,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨1,_⟩, ⟨2,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
-  | ⟨2,_⟩, ⟨1,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.mul_left_comm]
+  | ⟨0,_⟩, ⟨1,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm]
+  | ⟨1,_⟩, ⟨0,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.neg_mul]
+  | ⟨0,_⟩, ⟨2,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm]
+  | ⟨2,_⟩, ⟨0,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.neg_mul]
+  | ⟨1,_⟩, ⟨2,_⟩ => left; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm]
+  | ⟨2,_⟩, ⟨1,_⟩ => right; simp [det3, ev, third, Int.mul_assoc, Int.mul_comm, Int.neg_mul]
 
 theorem ne_zero_of_pm {d x : Int} (h : d = x ∨ d = -x) (hx : x ≠ 0) : d ≠ 0 := by
   rcases h with h | h <;> omega

@@ -84,18 +84,18 @@ theorem sh_kill (w : Nat → Nat) (K : Nat → Bool) (p q r : Nat) (hp : alive w
         have qL : q ∈ lv L := by
           rcases List.mem_append.1 mq with e | e; · exact e
           · exact absurd (pw_lt hpw hrL e) (by omega)
-        simp only [hrL, if_true]
+        simp only [hrL, ite_true]
         exact sh_kill w K p q r hp hq hr L L' pL pL' qL hrL h1 h2 hL
-      · simp only [hrL, if_false]
+      · simp only [hrL, ite_false]
         by_cases hpR : p ∈ lv R
         · have rR : r ∈ lv R := by rcases List.mem_append.1 mr with e | e; exact absurd e hrL; exact e
           have qR : q ∈ lv R := by
             rcases List.mem_append.1 mq with e | e
             · exact absurd (pw_lt hpw e hpR) (by omega)
             · exact e
-          simp only [hpR, if_true]
+          simp only [hpR, ite_true]
           exact sh_kill w K p q r hp hq hr R R' pR hpR qR rR h1 h2 hR
-        · simp only [hpR, if_false, eL q hq]
+        · simp only [hpR, ite_false, eL q hq]
 
 /-! ## renumbering the surviving leaves -/
 
@@ -113,7 +113,7 @@ theorem idx_cons (l0 : Nat) (L : List Nat) (i : Nat) : idx (l0 :: L) i = (if l0 
   simp only [idx, List.filter_cons]; split <;> simp_all <;> omega
 
 theorem idx_head (l0 : Nat) (L : List Nat) (h : ∀ z ∈ L, l0 < z) : idx (l0 :: L) l0 = 0 := by
-  rw [idx_cons, if_neg (Nat.lt_irrefl _)]; simp only [idx, Nat.zero_add]
+  rw [idx_cons, ite_eq_right (Nat.lt_irrefl _)]; simp only [idx, Nat.zero_add]
   rw [List.filter_eq_nil_iff.2 (fun z hz => by have := h z hz; simp; omega)]; rfl
 
 theorem idx_lt : ∀ (L : List Nat), L.Pairwise (· < ·) → ∀ x ∈ L, ∀ y ∈ L, x < y → idx L x < idx L y
@@ -126,11 +126,11 @@ theorem idx_lt : ∀ (L : List Nat), L.Pairwise (· < ·) → ∀ x ∈ L, ∀ y
         · omega
         · exact absurd (hp.1 x e') (by omega)
       · exact e
-    rw [idx_cons, idx_cons, if_pos (hp.1 y hy')]
+    rw [idx_cons, idx_cons, ite_eq_left (hp.1 y hy')]
     rcases List.mem_cons.1 hx with e | e
-    · subst e; rw [if_neg (Nat.lt_irrefl _)]
-      have := idx_head x L hp.1; rw [idx_cons, if_neg (Nat.lt_irrefl _)] at this; omega
-    · rw [if_pos (hp.1 x e)]; have := idx_lt L hp.2 x e y hy' hxy; omega
+    · subst e; rw [ite_eq_right (Nat.lt_irrefl _)]
+      have := idx_head x L hp.1; rw [idx_cons, ite_eq_right (Nat.lt_irrefl _)] at this; omega
+    · rw [ite_eq_left (hp.1 x e)]; have := idx_lt L hp.2 x e y hy' hxy; omega
 
 theorem idx_inj (L : List Nat) (hp : L.Pairwise (· < ·)) (x y : Nat) (hx : x ∈ L) (hy : y ∈ L)
     (h : idx L x = idx L y) : x = y := by
@@ -151,7 +151,7 @@ theorem map_idx : ∀ L : List Nat, L.Pairwise (· < ·) → L.map (idx L) = Lis
     congr 1
     rw [← map_succ_range' 0 L.length, ← map_idx L hp.2, List.map_map]
     apply List.map_congr_left; intro x hx
-    simp only [Function.comp, idx_cons, if_pos (hp.1 x hx)]; omega
+    simp only [Function.comp, idx_cons, ite_eq_left (hp.1 x hx)]; omega
 
 theorem mem_rn (L : List Nat) (hp : L.Pairwise (· < ·)) (T : Tree) (hT : ∀ y ∈ lv T, y ∈ L) (x : Nat) (hx : x ∈ L) :
     idx L x ∈ lv (rn L T) ↔ x ∈ lv T := by
@@ -238,7 +238,7 @@ theorem len_filter_or (L : List Nat) (p q : Nat → Bool) (h : ∀ z ∈ L, ¬ (
   | cons z L ih =>
     have ih := ih (fun x hx => h x (by simp [hx]))
     have hz := h z (by simp)
-    cases hp : p z <;> cases hq : q z <;> simp_all [List.filter_cons] <;> omega
+    cases hp : p z <;> cases hq : q z <;> simp_all <;> omega
 
 /-! ## the theorem -/
 
@@ -300,22 +300,22 @@ theorem g2 (w : Nat → Nat) (hw : MonoW w) (T T' : Tree) (e : lv T = lv T') (hp
     · have : idx L y < a' := len_filter_lt L _ _ (fun z hz hzy => by
           have := hw z y (by simp at hzy; omega); rcases letL z hz with e' | e' | e' <;> simp <;> omega)
         y hy (by simp [ey]) (by simp)
-      rw [if_pos this, if_pos ey]
+      rw [ite_eq_left this, ite_eq_left ey]
     · have lo : a' ≤ idx L y := len_filter_le L _ _ (fun z hz hzp => by
           simp at hzp ⊢; exact lt_of_mem z hz y hy (by omega))
       have hi : idx L y < a' + b' := by
         rw [← ab]; exact len_filter_lt L _ _ (fun z hz hzy => by
           have := hw z y (by simp at hzy; omega); rcases letL z hz with e' | e' | e' <;> simp <;> omega)
           y hy (by simp [ey]) (by simp)
-      rw [if_neg (by omega), if_pos hi, if_neg (by omega), if_pos ey]
+      rw [ite_eq_right (by omega), ite_eq_left hi, ite_eq_right (by omega), ite_eq_left ey]
     · have lo : a' + b' ≤ idx L y := by
         rw [← ab]; exact len_filter_le L _ _ (fun z hz hzp => by
           simp at hzp ⊢; rcases hzp with e' | e' <;> exact lt_of_mem z hz y hy (by omega))
-      rw [if_neg (by omega), if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+      rw [ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega)]
   -- renumber
-  have ha : 1 ≤ a' := List.length_pos.2 (List.ne_nil_of_mem (List.mem_filter.2 ⟨pL, by simp⟩))
-  have hb : 1 ≤ b' := List.length_pos.2 (List.ne_nil_of_mem (List.mem_filter.2 ⟨qL, by simp⟩))
-  have hc : 1 ≤ c' := List.length_pos.2 (List.ne_nil_of_mem (List.mem_filter.2 ⟨rL, by simp⟩))
+  have ha : 1 ≤ a' := List.length_pos_of_mem (List.mem_filter.2 ⟨pL, by simp⟩)
+  have hb : 1 ≤ b' := List.length_pos_of_mem (List.mem_filter.2 ⟨qL, by simp⟩)
+  have hc : 1 ≤ c' := List.length_pos_of_mem (List.mem_filter.2 ⟨rL, by simp⟩)
   have tb : ∀ U : Tree, lv U = L → PropT.TB a' b' c' (rn L U) := by
     intro U hU
     have := wf_of_lv (rn L U) 0 L.length (by rw [lv_rn, hU, map_idx L pwL])
@@ -350,7 +350,7 @@ theorem g2 (w : Nat → Nat) (hw : MonoW w) (T T' : Tree) (e : lv T = lv T') (hp
   refine ⟨ρ, ?_⟩
   have hK : ∀ ℓ, K ℓ = true → ρ ℓ = one := by
     intro ℓ hℓ; simp only [K, Bool.not_eq_true', Bool.or_eq_false_iff, decide_eq_false_iff_not] at hℓ
-    simp only [ρ, if_neg hℓ.1.1, if_neg hℓ.1.2, if_neg hℓ.2]
+    simp only [ρ, ite_eq_right hℓ.1.1, ite_eq_right hℓ.1.2, ite_eq_right hℓ.2]
   have hρ : ∀ U : Tree, (∀ y ∈ lv U, y ∈ L) → ev w ρ U = ev (PropT.w3 a' b') κ (rn L U) := by
     intro U hU
     apply ev_rn L w (PropT.w3 a' b') ρ κ U
@@ -360,9 +360,9 @@ theorem g2 (w : Nat → Nat) (hw : MonoW w) (T T' : Tree) (e : lv T = lv T') (hp
     by_cases e1 : w y = w p
     · simp [e1]
     · by_cases e2 : w y = w q
-      · simp [e1, e2, n3]
+      · simp [e2, n3]
       · have e3 : w y = w r := by rcases letL y (hU y hy) with h | h | h <;> simp_all
-        simp [e1, e2, e3, n1, n2]
+        simp [e3, n1, n2]
   rw [kill_ev w K ρ hK T, kill_ev w K ρ hK T', hS, hS']
   simp only [evo]
   rw [hρ S subS, hρ S' subS']

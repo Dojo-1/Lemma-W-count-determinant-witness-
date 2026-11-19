@@ -230,6 +230,6 @@ theorem chain_selfCert (w : Word) (root : Ival) (L : List (Ival × L3)) (h : PCh
   intro J hJ
   obtain ⟨x, hx, rfl⟩ := List.mem_map.1 hJ
   exact pchain_certified w root (L.map Prod.fst) L root h (Or.inl rfl)
-    (fun y hy => List.mem_map_of_mem _ hy) x hx
+    (fun y hy => List.mem_map_of_mem hy) x hx
 
 end Caterpillar

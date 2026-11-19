@@ -46,11 +46,11 @@ theorem mem_of_avoid {l : List L3} (hn : NoAdj l) (hl : 2 ≤ l.length) {x : L3}
     {c : L3} (hc : c ≠ x) : c ∈ l := by
   match l, hn, hl with
   | a :: b :: r, hn, _ =>
-    have ha : a ≠ x := fun h => hx (h ▸ List.mem_cons_self _ _)
-    have hb : b ≠ x := fun h => hx (h ▸ List.mem_cons_of_mem _ (List.mem_cons_self _ _))
+    have ha : a ≠ x := fun h => hx (h ▸ List.mem_cons_self)
+    have hb : b ≠ x := fun h => hx (h ▸ List.mem_cons_of_mem _ List.mem_cons_self)
     rcases letters_of_two a b x c hn.1 ha hb hc with h | h
-    · exact h ▸ List.mem_cons_self _ _
-    · exact h ▸ List.mem_cons_of_mem _ (List.mem_cons_self _ _)
+    · exact h ▸ List.mem_cons_self
+    · exact h ▸ List.mem_cons_of_mem _ List.mem_cons_self
 
 theorem not_allThree {t : List L3} (h : ¬ AllThree t) : ∃ x, x ∉ t := by
   rw [allThree_iff] at h
@@ -69,7 +69,7 @@ theorem split_ends : ∀ (s : List L3), 2 ≤ s.length → ∃ c0 m cl, s = c0 :
     obtain ⟨m, cl, rfl⟩ : ∃ m cl, t = m ++ [cl] := by
       rcases List.eq_nil_or_concat t with e | ⟨m, cl, e⟩
       · exact absurd e ht
-      · exact ⟨m, cl, e.trans (List.concat_eq_append _ _)⟩
+      · exact ⟨m, cl, e.trans List.concat_eq_append⟩
     exact ⟨c0, m, cl, rfl⟩
 
 theorem head?_of_two {m : List L3} (h : 1 ≤ m.length) : ∃ h0 r, m = h0 :: r := by
@@ -111,7 +111,7 @@ theorem propE : ∀ (n : Nat) (s : List L3) (e : Option L3),
   have hml : m.getLast? ≠ some cl := by
     have := hna'.2; rw [hm0] at this ⊢; simpa using this
   have hmem : ∀ x, x ∈ c0 :: (m ++ [cl]) ↔ x = c0 ∨ x ∈ m ∨ x = cl := by
-    intro x; simp [or_assoc]
+    intro x; simp
   have htail_na : NoAdj (m ++ [cl]) := noAdj_tail hna
   -- facts about the failure predicate on the pieces
   have hfail_tail : ∀ p, c0 ≠ cl ∨ AllThree (m.tail ++ [cl]) → p = c0 →
@@ -228,7 +228,7 @@ theorem propE : ∀ (n : Nat) (s : List L3) (e : Option L3),
       have hym : y ∉ m := fun h => hy (List.mem_cons_of_mem _ h)
       have hyc : y = cl := by
         rcases (hmem y).1 (hall y) with h | h | h
-        · exact absurd (h ▸ List.mem_cons_self _ _) hy
+        · exact absurd (h ▸ List.mem_cons_self) hy
         · exact absurd h hym
         · exact h
       have : y ≠ x := by rw [hxc, hyc]; exact fun h => hne h.symm
