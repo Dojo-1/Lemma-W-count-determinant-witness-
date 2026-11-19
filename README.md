@@ -253,7 +253,7 @@ The [GitHub Actions contract](.github/workflows/verify.yml) runs bounded Python 
 
 The mathematical foundations include Artin's theorem for alternative algebras, Moufang identities, octonion multiplication, Catalan/associahedral combinatorics and the literature on associative spectra. This research grew from the kernel quotient of an associahedron through a Tendril ([Tendrils](https://github.com/Dojo-1/Tendrils)), with certificate interfaces from [ZFC-A-](https://github.com/Dojo-1/ZFC-A-).
 
-The [verbatim original README](docs/README_MAIN_SNAPSHOT_2026-11-18.md) preserves the longer numerical and prior-art account. **No license is currently declared** in this repository; none is inferred or supplied by this edit.
+The [verbatim original README](docs/README_MAIN_SNAPSHOT_2026-11-18.md) preserves the longer numerical and prior-art account. This repository is licensed under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](LICENSE).
 
 Evidence remains typed: **P** — mathematical proof in the supplied manuscript; **P-fin** — exhaustive exact finite procedure; **M** — measured experiment; **H** — conjecture; **R** — refuted stronger candidate.
 
