@@ -1,0 +1,118 @@
+Toolchain: leanprover/lean4:v4.36.0
+Lean: Lean (version 4.36.0, x86_64-unknown-linux-gnu, commit 611c117bfaf7b7ae1cfcf246ce6fba31e8f509e9, Release)
+Lake: Lake version 5.0.0-src+611c117 (Lean version 4.36.0)
+Trusted Computing Base:
+  lean/Spec.lean       166 lines (zero imports, pure definitions only)
+  lean/Challenge.lean  117 lines (imports only Spec; 18 statements of record)
+  Total TCB            283 lines
+  lean/Solution.lean   314 lines
+  lean/Caterpillar*   9871 lines (30 modules)
+Kernels verified (all 6 accepted):
+  1. leanchecker-paranoid
+  2. lean4lean (6094 declarations)
+  3. nanoda (nanoda_bin)
+  4. con-leche (6093 declarations, --verified)
+  5. con-ron (6093 declarations, --verified)
+  6. lean (default C++ kernel)
+Command: ./scripts/verify_hardened.sh --no-sandbox (CI runs full bwrap sandbox without --no-sandbox)
+
+WARNING: Running with --inadvisably-no-sandbox (container fallback; CI uses full bwrap sandbox).
+=== [1/6] Static source hygiene & TCB isolation ===
+PASS: Source hygiene & TCB isolation checks passed (33 files audited).
+=== [2/6] Clean build of default targets (Spec, Caterpillar, Solution) ===
+Build completed successfully (70 jobs).
+PASS: Default targets built with 0 errors and 0 warnings.
+=== [3/6] Whole-project export & kernel verification: lake check ===
+WARNING: Sandbox disabled, this run is not trustworthy.
+Resolving dependencies
+Building and exporting
+Running Lean default kernel on solution
+Lean default kernel accepts the solution
+Uses axioms: Classical.choice, propext, Quot.sound
+PASS: lake check accepted all default targets (Spec, Caterpillar, Solution).
+=== [4/6] Multi-kernel Challenge/Solution verification: lake comparator --paranoid ===
+WARNING: Sandbox disabled, this run is not trustworthy.
+Resolving dependencies
+Building Challenge
+⚠ [4/6] Replayed Challenge
+warning: Challenge.lean:29:8: declaration uses `sorry`
+warning: Challenge.lean:35:8: declaration uses `sorry`
+warning: Challenge.lean:42:8: declaration uses `sorry`
+warning: Challenge.lean:47:8: declaration uses `sorry`
+warning: Challenge.lean:51:8: declaration uses `sorry`
+warning: Challenge.lean:56:8: declaration uses `sorry`
+warning: Challenge.lean:61:8: declaration uses `sorry`
+warning: Challenge.lean:66:8: declaration uses `sorry`
+warning: Challenge.lean:71:8: declaration uses `sorry`
+warning: Challenge.lean:77:8: declaration uses `sorry`
+warning: Challenge.lean:81:8: declaration uses `sorry`
+warning: Challenge.lean:85:8: declaration uses `sorry`
+warning: Challenge.lean:89:8: declaration uses `sorry`
+warning: Challenge.lean:96:8: declaration uses `sorry`
+warning: Challenge.lean:100:8: declaration uses `sorry`
+warning: Challenge.lean:104:8: declaration uses `sorry`
+warning: Challenge.lean:108:8: declaration uses `sorry`
+warning: Challenge.lean:112:8: declaration uses `sorry`
+Build completed successfully (6 jobs).
+Exporting #[Quot, Quot.mk, Quot.lift, Quot.ind, Challenge.main, Challenge.count_disconnected, Challenge.canonical, Challenge.rgs_nodup, Challenge.kerconn_rename, Challenge.stirling_rec, Challenge.bell_eq_sum, Challenge.lemmaW_exists, Challenge.kerflip_dn, Challenge.octonion_unital, Challenge.octonion_norm_mul, Challenge.octonion_non_associative, Challenge.octonion_moufang, Challenge.kerconn_two_letters_example, Challenge.kerconn_interval_example, Challenge.not_kerconn_example, Challenge.bell_small_values, Challenge.disconnected_count_four_five, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Challenge
+Building Solution
+Build completed successfully (68 jobs).
+Exporting #[Quot, Quot.mk, Quot.lift, Quot.ind, Challenge.main, Challenge.count_disconnected, Challenge.canonical, Challenge.rgs_nodup, Challenge.kerconn_rename, Challenge.stirling_rec, Challenge.bell_eq_sum, Challenge.lemmaW_exists, Challenge.kerflip_dn, Challenge.octonion_unital, Challenge.octonion_norm_mul, Challenge.octonion_non_associative, Challenge.octonion_moufang, Challenge.kerconn_two_letters_example, Challenge.kerconn_interval_example, Challenge.not_kerconn_example, Challenge.bell_small_values, Challenge.disconnected_count_four_five, propext, Quot.sound, Classical.choice, Nat.add, Nat.sub, Nat.mul, Nat.pow, Nat.gcd, Nat.div, Nat.mod, Nat.beq, Nat.ble, Nat.land, Nat.lor, Nat.xor, Nat.shiftLeft, Nat.shiftRight, String.ofList, Char.ofNat, List, eagerReduce, Nat, String, String.mk, Char, optParam, autoParam, semiOutParam, outParam] from Solution
+Running Lean paranoid kernel on solution
+Lean paranoid kernel accepts the solution
+Running lean4lean kernel on solution
+[anonymous]:thmDecl _private.Caterpillar.Artin.0.Octonion.assoc_base_b: lean4lean took 1928
+[anonymous]:thmDecl _private.Caterpillar.Octonion.0.Octonion.moufang_middle_b: lean4lean took 1319
+[anonymous]:thmDecl _private.Caterpillar.Octonion.0.Octonion.moufang_right_b: lean4lean took 1265
+checked 6094 declarations
+lean4lean kernel accepts the solution
+Running nanoda kernel on solution
+nanoda kernel accepts the solution
+Running con-leche kernel on solution
+con-leche: 1 inductive blocks modelled in-process: Lean.Syntax (30 generated records, checked by the fold as declarations and not counted as records of the file)
+con-leche: accepted 6093 declarations (--verified)
+con-leche kernel accepts the solution
+Running con-ron kernel on solution
+con-ron: 1 inductive blocks modelled in-process: Lean.Syntax (30 generated records, checked by the fold as declarations and not counted as records of the file)
+con-ron: accepted 6093 declarations (--verified)
+con-ron kernel accepts the solution
+Running Lean default kernel on solution
+Lean default kernel accepts the solution
+Your solution is okay!
+PASS: lake comparator --paranoid accepted by all 6 bundled kernels.
+=== [5/6] Adversarial negative controls ===
+PASS: Comparator rejected both forbidden-axiom (rc=1) and statement-mismatch (rc=1) controls.
+=== [6/6] Exact #print axioms allowlist audit ===
+'Challenge.main' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.count_disconnected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.canonical' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.rgs_nodup' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.kerconn_rename' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.stirling_rec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.bell_eq_sum' depends on axioms: [propext, Quot.sound]
+'Challenge.lemmaW_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.kerflip_dn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.octonion_unital' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.octonion_norm_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.octonion_non_associative' depends on axioms: [propext]
+'Challenge.octonion_moufang' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.kerconn_two_letters_example' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.kerconn_interval_example' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.not_kerconn_example' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Challenge.bell_small_values' depends on axioms: [propext, Quot.sound]
+'Challenge.disconnected_count_four_five' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MainThm.main' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Count.count_disconnected' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.canonical' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.rgs_nodup' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.kerconn_rename' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.stirling_rec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Canon.bell_eq_sum' depends on axioms: [propext, Quot.sound]
+'WExist.lemmaW_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WExist.kerflip_dn' depends on axioms: [propext, Classical.choice, Quot.sound]
+PASS: All 27 audited declarations depend only on subsets of {propext, Classical.choice, Quot.sound}.
+=== ALL HARDENED VERIFICATION GATES PASSED ===
+
+real	5m17.132s
+user	5m51.637s
+sys	0m26.681s

@@ -1,0 +1,30 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "Challenge.main",
+    "Challenge.count_disconnected",
+    "Challenge.canonical",
+    "Challenge.rgs_nodup",
+    "Challenge.kerconn_rename",
+    "Challenge.stirling_rec",
+    "Challenge.bell_eq_sum",
+    "Challenge.lemmaW_exists",
+    "Challenge.kerflip_dn",
+    "Challenge.octonion_unital",
+    "Challenge.octonion_norm_mul",
+    "Challenge.octonion_non_associative",
+    "Challenge.octonion_moufang",
+    "Challenge.kerconn_two_letters_example",
+    "Challenge.kerconn_interval_example",
+    "Challenge.not_kerconn_example",
+    "Challenge.bell_small_values",
+    "Challenge.disconnected_count_four_five"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ]
+}

@@ -110,8 +110,8 @@ theorem rot_facts : ∀ {t t' : Tree} {X Y Z : Ival}, Rot t t' X Y Z → t.WF �
     · simpa [hi] using hBC
     · simp [lo, hi] at hBC ⊢; omega
     · simpa [span] using lo_le_hi A hA
-    · simp [span, lo, hi] at hAB hBC ⊢; omega
-    · simp [span, lo, hi] at hAB hBC ⊢; omega
+    · simp [span, hi] at hAB hBC ⊢; omega
+    · simp [span, hi] at hAB hBC ⊢; omega
     · refine ⟨?_, ?_, ?_, ?_⟩ <;> rw [mem_node, mem_node]
       · exact Or.inr (Or.inl (Or.inr (Or.inl (span_mem A))))
       · exact Or.inr (Or.inl (Or.inr (Or.inr (span_mem B))))
@@ -134,8 +134,8 @@ theorem rot_facts : ∀ {t t' : Tree} {X Y Z : Ival}, Rot t t' X Y Z → t.WF �
     · simpa [lo] using hAB
     · simpa [lo, hi] using hBC
     · simpa [span] using lo_le_hi A hA
-    · simp [span, lo, hi] at hAB hBC ⊢; omega
-    · simp [span, lo, hi] at hAB hBC ⊢; omega
+    · simp [span, lo] at hAB hBC ⊢; omega
+    · simp [span, lo] at hAB hBC ⊢; omega
     · refine ⟨?_, ?_, ?_, ?_⟩ <;> rw [mem_node, mem_node]
       · exact Or.inr (Or.inl (span_mem A))
       · exact Or.inr (Or.inr (Or.inr (Or.inl (span_mem B))))
@@ -160,7 +160,7 @@ theorem rot_facts : ∀ {t t' : Tree} {X Y Z : Ival}, Rot t t' X Y Z → t.WF �
     · obtain ⟨del, cre, hdc, hcre, hK⟩ := f.dc
       refine ⟨del, cre, hdc, by simp [subs, hcre], ?_⟩
       intro K hKm hne
-      simp only [subs, List.mem_cons, List.mem_append, lo, f.lo] at hKm ⊢
+      simp only [subs, List.mem_cons, List.mem_append, f.lo] at hKm ⊢
       rcases hKm with h | h | h
       · exact Or.inl h
       · exact Or.inr (Or.inl (hK K h hne))
@@ -173,7 +173,7 @@ theorem rot_facts : ∀ {t t' : Tree} {X Y Z : Ival}, Rot t t' X Y Z → t.WF �
     · obtain ⟨del, cre, hdc, hcre, hK⟩ := f.dc
       refine ⟨del, cre, hdc, by simp [subs, hcre], ?_⟩
       intro K hKm hne
-      simp only [subs, List.mem_cons, List.mem_append, hi, f.hi] at hKm ⊢
+      simp only [subs, List.mem_cons, List.mem_append, f.hi] at hKm ⊢
       rcases hKm with h | h | h
       · exact Or.inl h
       · exact Or.inr (Or.inl h)
@@ -261,6 +261,6 @@ theorem caterpillar_separates (w : Word) (T0 T1 : Tree) (hwf : T0.WF) (L : List 
     (hmiss : x.1 ∉ T1.subs) : ¬ Reach (DNStep w) T0 T1 :=
   separated w (L.map Prod.fst) T0 T1 hwf
     (fun J hJ => by obtain ⟨y, hy, rfl⟩ := List.mem_map.1 hJ; exact hS y hy)
-    (chain_selfCert w T0.span L hL) x.1 (List.mem_map_of_mem _ hx) hmiss
+    (chain_selfCert w T0.span L hL) x.1 (List.mem_map_of_mem hx) hmiss
 
 end Caterpillar

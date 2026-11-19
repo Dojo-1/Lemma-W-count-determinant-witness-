@@ -241,8 +241,11 @@ python src/certify_exact.py 5
 
 # Optional: with a separate ZFC-A- checkout.
 ZFCA_ROOT=/path/to/ZFC-A- python src/certs.py 5
+
+# Hardened Lean 4.36.0 multi-kernel verification (bwrap + comparator + nanoda + 6 kernels):
+(cd lean && ./scripts/verify_hardened.sh)
 ```
-The [GitHub Actions contract](.github/workflows/verify.yml) runs bounded checks on pushes. Its ordinary verifier is capped at length seven; the larger archived logs are not CI results for every new commit.
+The [GitHub Actions contract](.github/workflows/verify.yml) runs bounded Python checks, the Prolog suite, and the full `bwrap`-sandboxed hardened Lean 4 verification (`./scripts/verify_hardened.sh`) on pushes. Its ordinary Python verifier is capped at length seven; the larger archived logs are not CI results for every new commit.
 
 **No mathematical computations were rerun merely to author this documentation redesign.**
 

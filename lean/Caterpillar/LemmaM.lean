@@ -150,10 +150,10 @@ theorem pow_form (β : Bool) : ∀ m, prodW (List.replicate m β) =
     obtain ⟨h1, h2, h3, h4, _, _⟩ := fU β
     rw [List.replicate_succ, prodW, pow_form β m]
     by_cases hm : m % 2 = 0
-    · rw [if_pos hm, if_neg (show ¬ (m + 1) % 2 = 0 by omega)]
+    · rw [ite_eq_left hm, ite_eq_right (show ¬ (m + 1) % 2 = 0 by omega)]
       simp only [mu, ub1, h1, h2, Int.one_mul, Int.mul_one, Prod.mk.injEq, and_true]
       congr 1; omega
-    · rw [if_neg hm, if_pos (show (m + 1) % 2 = 0 by omega)]
+    · rw [ite_eq_right hm, ite_eq_left (show (m + 1) % 2 = 0 by omega)]
       simp only [mu, ub1, h3, h4, Int.one_mul, Prod.mk.injEq, and_true]
       simp only [negPow]
       have : (m + 1) / 2 = m / 2 + 1 := by omega
@@ -165,8 +165,8 @@ theorem cj_pow (β : Bool) (m : Nat) : cj (prodW (List.replicate m β)) = sc (ne
   rw [pow_form β m]
   simp only [cj, sc, Prod.mk.injEq, and_true]
   by_cases hm : m % 2 = 0
-  · simp only [hm, if_true, h6, negPow]; omega
-  · simp only [hm, if_false, h5, negPow]; omega
+  · simp only [hm, ite_true, h6, negPow]; omega
+  · simp only [hm, ite_false, h5, negPow]; omega
 
 theorem mu_sc' (s : Int) (x y : SU) : mu x (sc s y) = sc s (mu x y) := by
   simp only [mu, sc, Prod.mk.injEq, and_true]; ac_rfl
@@ -185,7 +185,7 @@ theorem FZ : ∀ pp rr : Fin 2, mu (ub false) (Bs pp rr) = sc (negPow (pp + rr))
 theorem Bs_eq_of_mod {pp rr pp' rr' : Nat} (h1 : pp % 2 = pp' % 2) (h2 : rr % 2 = rr' % 2) : Bs pp rr = Bs pp' rr' := by
   simp only [Bs, h1, h2]
 
-theorem Bs_mod (pp rr : Nat) : Bs pp rr = Bs (pp % 2) (rr % 2) := by simp [Bs, Nat.mod_mod]
+theorem Bs_mod (pp rr : Nat) : Bs pp rr = Bs (pp % 2) (rr % 2) := by simp [Bs]
 
 /-- number of pairs `z` before `x` -/
 def inv : List Bool → Nat
@@ -200,10 +200,9 @@ theorem prodW_eq : ∀ ω : List Bool, prodW ω =
   | true :: ω => by
     rw [prodW, prodW_eq ω, mu_sc', Bs_mod]
     have := FX ⟨ω.count true % 2, Nat.mod_lt _ (by decide)⟩ ⟨ω.count false % 2, Nat.mod_lt _ (by decide)⟩
-    simp only [Fin.val_add, Fin.isValue] at this
     rw [this, sc_sc, ← negPow_add, Bs_mod]
-    simp only [inv, List.count_cons_self, List.count_cons, Bool.false_eq_true, if_false, beq_iff_eq]
-    simp only [reduceCtorEq, if_false, Nat.add_zero]
+    simp only [inv, List.count_cons_self, List.count_cons, beq_iff_eq]
+    simp only [reduceCtorEq, ite_false, Nat.add_zero]
     congr 1
     · apply negPow_mod; omega
     · apply Bs_eq_of_mod
@@ -212,10 +211,9 @@ theorem prodW_eq : ∀ ω : List Bool, prodW ω =
   | false :: ω => by
     rw [prodW, prodW_eq ω, mu_sc', Bs_mod]
     have := FZ ⟨ω.count true % 2, Nat.mod_lt _ (by decide)⟩ ⟨ω.count false % 2, Nat.mod_lt _ (by decide)⟩
-    simp only [Fin.val_add, Fin.isValue] at this
     rw [this, sc_sc, ← negPow_add, Bs_mod]
-    simp only [inv, List.count_cons_self, List.count_cons, Bool.false_eq_true, if_false, beq_iff_eq]
-    simp only [reduceCtorEq, if_false, Nat.add_zero]
+    simp only [inv, List.count_cons_self, List.count_cons, Bool.false_eq_true, ite_false, beq_iff_eq]
+    simp only [Nat.add_zero]
     congr 1
     · apply negPow_mod; omega
     · apply Bs_eq_of_mod
@@ -269,7 +267,7 @@ theorem walk (k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) : ∀ S : Tree, (lv S).
       have rep : (lv R).map (lb a) = List.replicate (lv R).length false :=
         List.map_eq_replicate_iff.2 (fun i hi => (zR i hi).2)
       have ih := walk k hk1 hk2 L pL hkL (fun i hi hne => hx i (by simp [hi]) hne)
-      simp only [uev, ablP, if_pos hkL, ih, hR]
+      simp only [uev, ablP, ite_eq_left hkL, ih, hR]
       rw [walkR (sc _ (prodW _)) (prodW _) (prodW_H _) (prodW_H _), rep, cj_pow]
       simp only [mu_sc, mu_sc', sc_sc, List.map_append, prodW_append, rep, List.count_append,
         List.count_replicate_self, negPow_add]
@@ -286,10 +284,10 @@ theorem walk (k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) : ∀ S : Tree, (lv S).
       have rep : (lv L).map (lb a) = List.replicate (lv L).length true :=
         List.map_eq_replicate_iff.2 (fun i hi => (xL i hi).2)
       have ih := walk k hk1 hk2 R pR hkR (fun i hi hne => hx i (by simp [hi]) hne)
-      simp only [uev, ablP, if_neg hkL, ih, hL]
+      simp only [uev, ablP, ite_eq_right hkL, ih, hL]
       rw [walkL (sc _ (prodW _)) (prodW _) (prodW_H _) (prodW_H _)]
-      simp only [mu_sc, mu_sc', sc_sc, List.map_append, prodW_append, rep, List.count_append,
-        List.count_replicate, Bool.true_eq_false, beq_iff_eq, reduceCtorEq, if_false, Nat.add_zero]
+      simp only [mu_sc, List.map_append, prodW_append, rep, List.count_append,
+        List.count_replicate, Bool.true_eq_false, beq_iff_eq, ite_false, Nat.add_zero]
 
 /-! ## restrictions and absorption lists -/
 
@@ -349,12 +347,12 @@ theorem ablP_kill (w : Nat → Nat) (Kd : Nat → Bool) (k : Nat) : ∀ T S : Tr
       cases h
       have hkR := sub' R S hR k hk
       have hkL : k ∉ lv L := fun e => dj k e k hkR rfl
-      simp only [ablP, if_neg hkL, List.filter_append, empL L hL, List.append_nil]
+      simp only [ablP, ite_eq_right hkL, List.filter_append, empL L hL, List.append_nil]
       exact ablP_kill w Kd k R S nR hR hk
     · next L' =>
       cases h
       have hkL := sub' L S hL k hk
-      simp only [ablP, if_pos hkL, List.filter_append, empL R hR, List.append_nil]
+      simp only [ablP, ite_eq_left hkL, List.filter_append, empL R hR, List.append_nil]
       exact ablP_kill w Kd k L S nL hL hk
     · next L' R' =>
       cases h
@@ -366,11 +364,11 @@ theorem ablP_kill (w : Nat → Nat) (Kd : Nat → Bool) (k : Nat) : ∀ T S : Tr
           rcases List.mem_append.1 hk with e | e
           · exact e
           · exact absurd hkL (fun e' => dj k e' k (sub' R R' hR k e) rfl)
-        simp only [ablP, if_pos hkL, if_pos hkL', List.filter_append, eR]
+        simp only [ablP, ite_eq_left hkL, ite_eq_left hkL', List.filter_append, eR]
         rw [ablP_kill w Kd k L L' nL hL hkL']
       · have hkL' : k ∉ lv L' := fun e => hkL (sub' L L' hL k e)
         have hkR' : k ∈ lv R' := by rcases List.mem_append.1 hk with e | e; exact absurd e hkL'; exact e
-        simp only [ablP, if_neg hkL, if_neg hkL', List.filter_append, eL]
+        simp only [ablP, ite_eq_right hkL, ite_eq_right hkL', List.filter_append, eL]
         rw [ablP_kill w Kd k R R' nR hR hkR']
 
 /-! ## the absorption word of `y_k` is Proposition T's `ω_k` -/
@@ -378,7 +376,7 @@ theorem ablP_kill (w : Nat → Nat) (Kd : Nat → Bool) (k : Nat) : ∀ T S : Tr
 /-- letters of positions (`y`'s dropped) -/
 def lw (l : List Nat) : List Bool := l.filterMap (fun i => if i < a then some true else if a + b ≤ i then some false else none)
 
-theorem lw_append (l l' : List Nat) : lw a b (l ++ l') = lw a b l ++ lw a b l' := List.filterMap_append l l' _
+theorem lw_append (l l' : List Nat) : lw a b (l ++ l') = lw a b l ++ lw a b l' := List.filterMap_append
 
 theorem lw_range' : ∀ m s, (lw a b (List.range' s m)).count true = min (s + m) a - min s a ∧
     (lw a b (List.range' s m)).count false = (s + m) - max s (a + b)
@@ -388,13 +386,13 @@ theorem lw_range' : ∀ m s, (lw a b (List.range' s m)).count true = min (s + m)
     rw [List.range'_succ]
     simp only [lw, List.filterMap_cons] at h1 h2 ⊢
     by_cases hs : s < a
-    · simp only [hs, if_true, List.count_cons_self, List.count_cons]; simp only [h1, h2]
+    · simp only [hs, ite_true, List.count_cons_self, List.count_cons]; simp only [h1, h2]
       constructor <;> (try simp) <;> omega
-    · simp only [hs, if_false]
+    · simp only [hs, ite_false]
       by_cases hz : a + b ≤ s
-      · simp only [hz, if_true, List.count_cons_self, List.count_cons]; simp only [h1, h2]
+      · simp only [hz, ite_true, List.count_cons_self, List.count_cons]; simp only [h1, h2]
         constructor <;> (try simp) <;> omega
-      · simp only [hz, if_false]; simp only [h1, h2]; constructor <;> omega
+      · simp only [hz, ite_false]; simp only [h1, h2]; constructor <;> omega
 
 theorem lw_erase (k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) : ∀ l : List Nat, lw a b (l.erase k) = lw a b l
   | [] => rfl
@@ -411,7 +409,7 @@ theorem lw_ge (l : List Nat) (h : ∀ i ∈ l, a ≤ i) : lw a b l = List.replic
   apply List.eq_replicate_iff.2; refine ⟨rfl, ?_⟩
   intro β hβ; simp only [lw, List.mem_filterMap] at hβ
   obtain ⟨i, hi, e⟩ := hβ; have := h i hi
-  rw [if_neg (by omega)] at e; split at e <;> simp_all
+  rw [ite_eq_right (by omega)] at e; split at e <;> simp_all
 
 theorem lw_lt (l : List Nat) (h : ∀ i ∈ l, i < a + b) : lw a b l = List.replicate (lw a b l).length true := by
   apply List.eq_replicate_iff.2; refine ⟨rfl, ?_⟩
@@ -419,7 +417,7 @@ theorem lw_lt (l : List Nat) (h : ∀ i ∈ l, i < a + b) : lw a b l = List.repl
   obtain ⟨i, hi, e⟩ := hβ; have := h i hi
   split at e
   · simp_all
-  · rw [if_neg (by omega)] at e; cases e
+  · rw [ite_eq_right (by omega)] at e; cases e
 
 /-- the absorption word of `y_k` in `S` -/
 def β (k : Nat) (S : Tree) : List Bool := lw a b (ablP k S)
@@ -446,7 +444,7 @@ theorem β_xb (k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) : ∀ S : Tree, S.WF �
     by_cases hkL : k ≤ L.hi
     · have hkL' : k ∈ lv L := (mem_wf L hL k).2 ⟨kS.1, hkL⟩
       have eβ : β a b k (.node L R) = β a b k L ++ lw a b (lv R) := by
-        simp only [β, ablP, if_pos hkL', lw_append]
+        simp only [β, ablP, ite_eq_left hkL', lw_append]
       have geR : ∀ i ∈ lv R, a ≤ i := fun i hi => by have := ((mem_wf R hR i).1 hi).1; omega
       have cR := lw_range' a b (R.hi + 1 - R.lo) R.lo
       rw [← lv_wf R hR] at cR
@@ -459,17 +457,17 @@ theorem β_xb (k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) : ∀ S : Tree, S.WF �
         rw [hs, xb_app_lt _ _ _ (by rw [c2]; omega)]
         exact β_xb k hk1 hk2 L hL hkL' t hr
       · have hs : PropT.sub k (a + b + t) (.node L R) = L := by
-          simp only [PropT.sub, if_neg hr]; rw [if_neg (by omega)]
+          simp only [PropT.sub, ite_eq_right hr]; rw [ite_eq_right (by omega)]
         rw [hs, xb_app_ge _ _ _ (by rw [c2]; omega) (by rw [c2, mR, cR.2]; omega), c1]
         omega
     · have hkR : k ∈ lv R := (mem_wf R hR k).2 ⟨by omega, kS.2⟩
       have hkL' : k ∉ lv L := fun h => hkL ((mem_wf L hL k).1 h).2
       have eβ : β a b k (.node L R) = β a b k R ++ lw a b (lv L) := by
-        simp only [β, ablP, if_neg hkL', lw_append]
+        simp only [β, ablP, ite_eq_right hkL', lw_append]
       have ltL : ∀ i ∈ lv L, i < a + b := fun i hi => by have := ((mem_wf L hL i).1 hi).2; omega
       obtain ⟨c1, c2⟩ := β_counts a b k hk1 hk2 R hR hkR
       have hs : PropT.sub k (a + b + t) (.node L R) = sub k (a + b + t) R := by
-        simp only [PropT.sub]; rw [if_neg (by omega), if_pos (by omega)]
+        simp only [PropT.sub]; rw [ite_eq_right (by omega), ite_eq_left (by omega)]
       rw [eβ, lw_lt a b (lv L) ltL, hs, xb_app_lt _ _ _ (by rw [c2]; omega)]
       exact β_xb k hk1 hk2 R hR hkR t ht
 
@@ -544,7 +542,7 @@ theorem subs_sub : ∀ (l K : List Nat), K ∈ subs l → K.Sublist l
     simp only [subs, List.mem_append, List.mem_map] at h
     rcases h with h | ⟨K', h, rfl⟩
     · exact (subs_sub l K h).cons x
-    · exact (subs_sub l K' h).cons₂ x
+    · exact (subs_sub l K' h).cons_cons x
 
 theorem filter_of_sub : ∀ (l K : List Nat), l.Nodup → K ∈ subs l → l.filter (fun i => decide (i ∈ K)) = K
   | [], K, _, h => by simp [subs] at h; subst h; rfl
@@ -568,7 +566,7 @@ theorem count_one : ∀ (l : List Nat) (x : Nat), l.Nodup → x ∈ l → l.coun
     rw [List.nodup_cons] at hn
     by_cases e : y = x
     · subst e; rw [List.count_cons_self, List.count_eq_zero_of_not_mem hn.1]
-    · rw [List.count_cons_of_ne (Ne.symm e)]
+    · rw [List.count_cons_of_ne e]
       exact count_one l x hn.2 (by simpa [Ne.symm e] using h)
 
 theorem perm_filter_mem (l K : List Nat) (hl : l.Nodup) (hK : K.Nodup) (hsub : ∀ x ∈ K, x ∈ l) :
@@ -592,11 +590,11 @@ theorem inv_false (ω : List Bool) : inv (false :: ω) = inv ω + ω.count true 
 theorem sum_S (f : Nat → Bool) : ∀ (l : List Nat) (p r : Nat),
     isum ((subs l).map (fun K => if condB f p r K then negPow (inv (K.map f)) else 0)) = Ssum (l.map f) p r
   | [], p, r => by
-    simp only [subs, List.map, isum, condB, List.count_nil]
+    simp only [subs, List.map, isum, condB, Ssum]
     by_cases h : p = 0 ∧ r = 0
-    · simp [h, Ssum, inv, negPow]
-    · simp only [Ssum, h, if_false]; simp only [decide_eq_true_eq]
-      rw [if_neg (by omega)]; rfl
+    · simp [h, inv, negPow]
+    · have h' : ¬ (0 = p ∧ 0 = r) := by omega
+      simp [h, h']
   | x :: l, p, r => by
     rw [isum_subs_cons, sum_S f l p r]
     simp only [List.map_cons]
@@ -616,13 +614,13 @@ theorem sum_S (f : Nat → Bool) : ∀ (l : List Nat) (p r : Nat),
         rw [← sum_S f l p r, ← isum_mul, List.map_map]
         congr 1; apply List.map_congr_left; intro K _
         simp only [condB, List.map_cons, hx, List.count_cons_self, List.count_cons]
-        simp only [Bool.true_eq_false, beq_iff_eq, reduceCtorEq, if_false, Nat.add_zero]
+        simp only [beq_iff_eq, reduceCtorEq, ite_false, Nat.add_zero]
         by_cases h : (K.map f).count true = p ∧ (K.map f).count false = r
-        · simp only [show (K.map f).count true = p ∧ (K.map f).count false + 1 = r + 1 by omega, decide_true,
-            if_true, inv_false, Function.comp]
+        · simp only [show (K.map f).count true = p ∧ (K.map f).count false + 1 = r + 1 by omega,
+            inv_false, Function.comp]
           rw [negPow_add, Int.mul_comm]; simp [h]
         · simp only [show ¬ ((K.map f).count true = p ∧ (K.map f).count false + 1 = r + 1) by omega,
-            decide_false, Bool.false_eq_true, if_false, Function.comp]
+            decide_false, Bool.false_eq_true, ite_false, Function.comp]
           simp [h]
     · -- x
       simp only [Ssum]; congr 1
@@ -639,9 +637,9 @@ theorem sum_S (f : Nat → Bool) : ∀ (l : List Nat) (p r : Nat),
         rw [← sum_S f l p r]
         congr 1; apply List.map_congr_left; intro K _
         simp only [condB, List.map_cons, hx, List.count_cons_self, List.count_cons]
-        simp only [Bool.false_eq_true, beq_iff_eq, reduceCtorEq, if_false, Nat.add_zero, inv]
+        simp only [beq_iff_eq, reduceCtorEq, ite_false, Nat.add_zero, inv]
         by_cases h : (K.map f).count true = p ∧ (K.map f).count false = r
-        · simp only [show (K.map f).count true + 1 = p + 1 ∧ (K.map f).count false = r by omega, decide_true, h]
+        · simp only [show (K.map f).count true + 1 = p + 1 ∧ (K.map f).count false = r by omega, h]
         · simp only [show ¬ ((K.map f).count true + 1 = p + 1 ∧ (K.map f).count false = r) by omega,
             decide_false, h]
 
@@ -703,7 +701,7 @@ theorem lw_filter_nonY (l : List Nat) : lw a b (l.filter (nonY a b)) = lw a b l 
     · rw [List.filter_cons_of_pos e]; simp only [lw, List.filterMap_cons] at ih ⊢; rw [ih]
     · rw [List.filter_cons_of_neg e]; simp only [nonY, decide_eq_true_eq] at e
       simp only [lw, List.filterMap_cons] at ih ⊢; rw [ih]
-      rw [if_neg (by omega), if_neg (by omega)]
+      rw [ite_eq_right (by omega), ite_eq_right (by omega)]
 
 theorem filter_erase_not (p : Nat → Bool) (k : Nat) (hk : p k = false) :
     ∀ l : List Nat, (l.erase k).filter p = l.filter p
@@ -728,7 +726,7 @@ set_option linter.unusedSectionVars false in
 theorem lvT : lv T = List.range' 0 (a + b + c) := by
   rw [lv_wf T h.wf, h.lo, h.hi]; simp
 
-theorem nodupT : (lv T).Nodup := by rw [lvT a b c ha hb hc T h]; exact List.nodup_range' _ _
+theorem nodupT : (lv T).Nodup := by rw [lvT a b c ha hb hc T h]; exact List.nodup_range'
 
 theorem ablP_nodup (k : Nat) (hk : k ∈ lv T) : (ablP k T).Nodup :=
   (ablP_perm k T hk).symm.nodup ((nodupT a b c ha hb hc T h).erase k)
@@ -748,7 +746,7 @@ theorem term (p r k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) (K : List Nat) (hK 
       toO (sc (σ p r * (if condB (lb a) p r K then
         negPow (inv (lw a b ((ablP k T).filter (fun i => decide (i ∈ K))))) else 0)) (Eu p r)) := by
   by_cases hcond : condB (lb a) p r K = true
-  · simp only [hcond, if_true]
+  · simp only [hcond, ite_true]
     have hk : k ∈ lv T := (mem_wf T h.wf k).2 ⟨by rw [h.lo]; omega, by have := h.hi; omega⟩
     have sub := XZ_sub a b c ha hb hc T h K hK
     have al : alive (fun i => i) (fun i => !keepK k K i) = keepK k K := by funext i; simp [alive]
@@ -782,7 +780,7 @@ theorem term (p r k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) (K : List Nat) (hK 
     have hmap : (ablP k S).map (lb a) = lw a b β' := by rw [hab, lw_map a b _ memβ]
     -- counts through the permutation `β' ~ K`
     have pK : β'.Perm K := hβ' ▸ perm_filter_mem _ _ (ablP_nodup a b c ha hb hc T h k hk)
-      ((subs_sub _ K hK).nodup ((List.nodup_range' _ _).sublist (List.filter_sublist _)))
+      ((subs_sub _ K hK).nodup (List.filter_sublist.nodup List.nodup_range'))
       (fun x hx => by
         have hxT := (sub x hx).1
         have hne : x ≠ k := by
@@ -798,7 +796,7 @@ theorem term (p r k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) (K : List Nat) (hK 
     rw [ev_uev, hw, hmap, prodW_eq, ct, cf]
     simp only [Eu, σ, mu_sc, sc_sc, negPow_add]
     congr 1; simp only [sc, Prod.mk.injEq, and_true]; ac_rfl
-  · simp only [hcond, Bool.false_eq_true, if_false, Int.mul_zero, toO_zero]
+  · simp only [hcond, Bool.false_eq_true, ite_false, Int.mul_zero, toO_zero]
 
 /-- **one `y`-leaf**: the restrictions through `y_k` sum to `S(ω_k, p, r)` -/
 theorem sum_k (p r k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) :
@@ -811,7 +809,7 @@ theorem sum_k (p r k : Nat) (hk1 : a ≤ k) (hk2 : k < a + b) :
     have := (ablP_perm k T hk).filter (nonY a b)
     rw [filter_erase_not _ k nk, lvT a b c ha hb hc T h] at this
     rw [hl']; exact this.symm
-  have nl' : l'.Nodup := by rw [hl']; exact (List.filter_sublist _).nodup (ablP_nodup a b c ha hb hc T h k hk)
+  have nl' : l'.Nodup := by rw [hl']; exact List.filter_sublist.nodup (ablP_nodup a b c ha hb hc T h k hk)
   rw [sum_subs_perm pl _ (by
     intro K K' hp
     have e1 : condB (lb a) p r K = condB (lb a) p r K' := by
@@ -862,11 +860,11 @@ theorem lemmaM (p r : Nat) :
   have e1 : (List.range' a (j a b T)).map (fun k => Ssum (ωq a b T k) p r) =
       (List.range' a (j a b T)).map (fun _ => Ssum (ωp a b T) p r) := by
     apply List.map_congr_left; intro k hk; rw [List.mem_range'_1] at hk
-    simp only [ωq]; rw [if_pos ((side k).2 (by omega))]
+    simp only [ωq]; rw [ite_eq_left ((side k).2 (by omega))]
   have e2 : (List.range' (a + j a b T) (b - j a b T)).map (fun k => Ssum (ωq a b T k) p r) =
       (List.range' (a + j a b T) (b - j a b T)).map (fun _ => Ssum (ωm a b T) p r) := by
     apply List.map_congr_left; intro k hk; rw [List.mem_range'_1] at hk
-    simp only [ωq]; rw [if_neg (fun e => by have := (side k).1 e; omega)]
+    simp only [ωq]; rw [ite_eq_right (fun e => by have := (side k).1 e; omega)]
   rw [e1, e2, isum_const, isum_const]
 
 end

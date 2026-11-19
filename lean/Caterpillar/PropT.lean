@@ -40,7 +40,7 @@ theorem lv_wf : ∀ T : Tree, T.WF → lv T = List.range' T.lo (T.hi + 1 - T.lo)
     rw [e]
     obtain ⟨m1, hm1⟩ : ∃ m, L.hi + 1 - L.lo = m := ⟨_, rfl⟩
     obtain ⟨m2, hm2⟩ : ∃ m, R.hi + 1 - (L.hi + 1) = m := ⟨_, rfl⟩
-    have h3 : R.hi + 1 - L.lo = m2 + m1 := by omega
+    have h3 : R.hi + 1 - L.lo = m1 + m2 := by omega
     have h4 : L.hi + 1 = L.lo + m1 := by omega
     rw [hm1, hm2, h3, h4, List.range'_append_1]
 
@@ -49,7 +49,7 @@ theorem mem_wf (T : Tree) (h : T.WF) (i : Nat) : i ∈ lv T ↔ T.lo ≤ i ∧ i
   rw [lv_wf T h, List.mem_range'_1]; omega
 
 theorem pw_wf (T : Tree) (h : T.WF) : (lv T).Pairwise (· < ·) := by
-  rw [lv_wf T h]; exact List.pairwise_lt_range' _ _
+  rw [lv_wf T h]; exact List.pairwise_lt_range'
 
 /-! ## shapes through the lowest common ancestor -/
 
@@ -94,18 +94,18 @@ theorem sh_sub (p q r : Nat) : ∀ T : Tree, T.WF → T.lo ≤ p → p < q → q
       exact sh_sub p q r L hL h1 h2 h3 hr
     · have hrL : r ∉ lv L := fun h => hr ((mem_wf L hL r).1 h).2
       by_cases hp : R.lo ≤ p
-      · have hs : sub q r (.node L R) = sub q r R := by simp only [sub, if_neg hr]; rw [if_pos (by omega)]
+      · have hs : sub q r (.node L R) = sub q r R := by simp only [sub, ite_eq_right hr]; rw [ite_eq_left (by omega)]
         simp only [hs]; rw [sh_R L R p q r hrL ((mem_wf R hR p).2 ⟨hp, by omega⟩)]
         exact sh_sub p q r R hR hp h2 h3 h4
       · have hpR : p ∉ lv R := fun h => hp ((mem_wf R hR p).1 h).1
         rw [sh_M L R p q r hrL hpR]
         by_cases hq : R.lo ≤ q
-        · have hs : sub q r (.node L R) = sub q r R := by simp only [sub, if_neg hr]; rw [if_pos hq]
+        · have hs : sub q r (.node L R) = sub q r R := by simp only [sub, ite_eq_right hr]; rw [ite_eq_left hq]
           simp only [hs]
           have := sub_lo q r R hR
           have hq' : q ∉ lv L := fun h => by have := ((mem_wf L hL q).1 h).2; omega
           simp only [hq', decide_false]; symm; simp only [decide_eq_false_iff_not]; omega
-        · have hs : sub q r (.node L R) = L := by simp only [sub, if_neg hr]; rw [if_neg hq]
+        · have hs : sub q r (.node L R) = L := by simp only [sub, ite_eq_right hr]; rw [ite_eq_right hq]
           simp only [hs]
           have hq' : q ∈ lv L := (mem_wf L hL q).2 ⟨by omega, by omega⟩
           simp only [hq', decide_true]; symm; simp only [decide_eq_true_eq]; omega
@@ -142,17 +142,16 @@ theorem sig_iff_cx (ha : 1 ≤ a) (hb : 1 ≤ b) (_hc : 1 ≤ c) (T T' : Tree) (
         ((mem_wf T h.wf r).2 ⟨by rw [h.lo]; omega, by have := h.hi; omega⟩) (by omega) (by omega)
       simp only [Distinct, w3]; split <;> split <;> (try split) <;> (try split) <;> (try split) <;> (try split) <;> omega
     have e1 := shx T h; have e2 := shx T' h'
-    simp only [cx] at e1 e2
     rcases Nat.lt_or_ge (sub q r T).lo (sub q r T').lo with hl | hl
     · have hp : (sub q r T).lo < a := by omega
       have := key (sub q r T).lo hp
       rw [e1 _ q r hp hq1 hq2 hr1 hr2, e2 _ q r hp hq1 hq2 hr1 hr2] at this
-      simp only [decide_eq_decide] at this; omega
+      rw [decide_eq_decide] at this; simp only [cx] at this; omega
     · have hl' : (sub q r T').lo < (sub q r T).lo := by omega
       have hp : (sub q r T').lo < a := by omega
       have := key (sub q r T').lo hp
       rw [e1 _ q r hp hq1 hq2 hr1 hr2, e2 _ q r hp hq1 hq2 hr1 hr2] at this
-      simp only [decide_eq_decide] at this; omega
+      rw [decide_eq_decide] at this; simp only [cx] at this; omega
   · intro hcx p q r hp hq hr h1 h2 hd
     have hp' := (mem_wf T h.wf p).1 hp; have hq' := (mem_wf T h.wf q).1 hq; have hr' := (mem_wf T h.wf r).1 hr
     have := h.hi; rw [h.lo] at hp' hq' hr'
@@ -237,7 +236,7 @@ theorem core_facts (hb : 1 ≤ b) : ∀ T : Tree, Good a b T → CoreFacts a b T
       refine ⟨by rw [eU]; exact f.uwf, by rw [eV]; exact f.vwf, by rw [eU, eV]; exact f.uv, by rw [eU]; exact f.ulo, by rw [eU]; exact f.uhi,
         by rw [eU]; exact f.uhi', by rw [eV]; exact f.vhi, by rw [eU]; exact f.tlo, by rw [eV]; simp only [Tree.hi]; omega,
         by rw [eW, eU]; simp [List.count_replicate, Tree.lo]; omega,
-        by rw [eW, eV]; simp [List.count_replicate, Tree.hi]; omega⟩
+        by rw [eW, eV]; simp [Tree.hi]; omega⟩
     · by_cases h2 : R.lo + 1 ≤ a
       · have f := core_facts hb R ⟨hR, h2, hhi⟩
         have eU : U a b (.node L R) = U a b R := by simp [U, core, h1, h2]
@@ -247,7 +246,7 @@ theorem core_facts (hb : 1 ≤ b) : ∀ T : Tree, Good a b T → CoreFacts a b T
         refine ⟨by rw [eU]; exact f.uwf, by rw [eV]; exact f.vwf, by rw [eU, eV]; exact f.uv, by rw [eU]; exact f.ulo, by rw [eU]; exact f.uhi,
           by rw [eU]; exact f.uhi', by rw [eV]; exact f.vhi, by rw [eU]; simp only [Tree.lo]; omega,
           by rw [eV]; exact f.thi,
-          by rw [eW, eU]; simp [List.count_replicate, Tree.lo]; omega,
+          by rw [eW, eU]; simp [Tree.lo]; omega,
           by rw [eW, eV]; simp [List.count_replicate, Tree.hi]; omega⟩
       · have eU : U a b (.node L R) = L := by simp [U, core, h1, h2]
         have eV : V a b (.node L R) = R := by simp [V, core, h1, h2]
@@ -327,7 +326,7 @@ theorem cx_omega (hb : 1 ≤ b) : ∀ T : Tree, Good a b T → ∀ q r, a ≤ q 
         simp only [cx, this]
         rw [xb_app_lt _ _ _ (by omega)]
         exact cx_omega hb L gL q r hq1 hq2 hr1 hr
-      · have : sub q r (.node L R) = L := by simp only [sub, if_neg hr]; rw [if_neg (by omega)]
+      · have : sub q r (.node L R) = L := by simp only [sub, ite_eq_right hr]; rw [ite_eq_right (by omega)]
         simp only [cx, this]
         rw [xb_app_ge _ _ _ (by omega) (by omega), cntT]
     · by_cases h2 : R.lo + 1 ≤ a
@@ -343,7 +342,7 @@ theorem cx_omega (hb : 1 ≤ b) : ∀ T : Tree, Good a b T → ∀ q r, a ≤ q 
           have := f.wf'; have := f.vhi; have := f.thi
           simp only [ωq, ωp, ωm, c']; split <;> simp [List.count_replicate] <;> omega
         have : sub q r (.node L R) = sub q r R := by
-          simp only [sub]; rw [if_neg (by omega), if_pos (by omega)]
+          simp only [sub]; rw [ite_eq_right (by omega), ite_eq_left (by omega)]
         simp only [cx, this, eq']
         rw [xb_app_lt _ _ _ (by omega)]
         exact cx_omega hb R gR q r hq1 hq2 hr1 hr2
@@ -353,16 +352,16 @@ theorem cx_omega (hb : 1 ≤ b) : ∀ T : Tree, Good a b T → ∀ q r, a ≤ q 
         have eW : W a b (.node L R) = [] := by simp [W, core, h1, h2]
         simp only [ωq, ωp, ωm, eU, eW, a', c', eV, List.append_nil]
         by_cases hq : q ≤ L.hi
-        · rw [if_pos hq]
+        · rw [ite_eq_left hq]
           have : sub q r (.node L R) = L := by
-            simp only [sub]; rw [if_neg (by omega), if_neg (by omega)]
+            simp only [sub]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
           simp only [cx, this]
           have e0 := xb_rep_false (R.hi + 1 - (a + b)) [] (r - (a + b)) (by omega)
           simp only [List.append_nil] at e0
           rw [xb_rep_true, e0]; rfl
-        · rw [if_neg hq]
+        · rw [ite_eq_right hq]
           have es : sub q r (.node L R) = sub q r R := by
-            simp only [sub]; rw [if_neg (by omega), if_pos (by omega)]
+            simp only [sub]; rw [ite_eq_right (by omega), ite_eq_left (by omega)]
           have sl := sub_lo q r R hR
           simp only [cx, es]
           rw [xb_rep_false _ _ _ (by omega)]
@@ -450,14 +449,14 @@ theorem key_iff_ωq (ha : 1 ≤ a) (hb : 1 ≤ b) (hc : 1 ≤ c) (T T' : Tree) (
     have jb1 : j a b U' ≤ b := by simp only [j]; have := f1.uhi'; omega
     simp only [key, ωq]
     by_cases j0 : j a b U' = 0
-    · simp only [j0, if_true, fam]; rw [if_neg (by rw [s1]; omega)]
+    · simp only [j0, ite_true, fam]; rw [ite_eq_right (by rw [s1]; omega)]
     by_cases jb0 : j a b U' = b
     · have hb0 : b ≠ 0 := by omega
-      simp only [j0, jb0, hb0, if_true, if_false, fam]; rw [if_pos (by rw [s1]; omega)]
-    · simp only [j0, jb0, if_false, fam, ωp, ωm]
+      simp only [jb0, hb0, ite_true, ite_false, fam]; rw [ite_eq_left (by rw [s1]; omega)]
+    · simp only [j0, jb0, ite_false, fam, ωp, ωm]
       by_cases hq : q ≤ (U a b U').hi
-      · rw [if_pos hq, if_pos (s1.1 hq)]
-      · rw [if_neg hq, if_neg (fun h => hq (s1.2 h))]
+      · rw [ite_eq_left hq, ite_eq_left (s1.1 hq)]
+      · rw [ite_eq_right hq, ite_eq_right (fun h => hq (s1.2 h))]
   constructor
   · intro hk q hq1 hq2
     rw [fam_eq T h q hq1 hq2, fam_eq T' h' q hq1 hq2, hk]
@@ -468,29 +467,29 @@ theorem key_iff_ωq (ha : 1 ≤ a) (hb : 1 ≤ b) (hc : 1 ≤ c) (T T' : Tree) (
       rcases Nat.lt_or_ge (j a b T) (j a b T') with hl | hl
       · have := hω (a + j a b T) (by omega) (by omega)
         simp only [ωq] at this
-        rw [if_neg (by rw [side]; omega), if_pos (by rw [side']; omega)] at this
+        rw [ite_eq_right (by rw [side]; omega), ite_eq_left (by rw [side']; omega)] at this
         have := congrArg List.head? this; rw [head_m a b T pc, head_p a b T' pa'] at this; simp at this
       · have := hω (a + j a b T') (by omega) (by omega)
         simp only [ωq] at this
-        rw [if_pos (by rw [side]; omega), if_neg (by rw [side']; omega)] at this
+        rw [ite_eq_left (by rw [side]; omega), ite_eq_right (by rw [side']; omega)] at this
         have := congrArg List.head? this; rw [head_p a b T pa, head_m a b T' pc'] at this; simp at this
     simp only [key, hj]
     by_cases j0 : j a b T' = 0
-    · simp only [j0, if_true]
+    · simp only [j0, ite_true]
       have := hω a (by omega) (by omega)
-      simp only [ωq] at this; rw [if_neg (by rw [side]; omega), if_neg (by rw [side']; omega)] at this
+      simp only [ωq] at this; rw [ite_eq_right (by rw [side]; omega), ite_eq_right (by rw [side']; omega)] at this
       rw [this]
     by_cases jb0 : j a b T' = b
     · have hb0 : b ≠ 0 := by omega
-      simp only [j0, jb0, hb0, if_true, if_false]
+      simp only [jb0, hb0, ite_true, ite_false]
       have := hω a (by omega) (by omega)
-      simp only [ωq] at this; rw [if_pos (by rw [side]; omega), if_pos (by rw [side']; omega)] at this
+      simp only [ωq] at this; rw [ite_eq_left (by rw [side]; omega), ite_eq_left (by rw [side']; omega)] at this
       rw [this]
-    simp only [j0, jb0, if_false, Key.inner.injEq, true_and]
+    simp only [j0, jb0, ite_false, Key.inner.injEq, true_and]
     have ep := hω a (by omega) (by omega)
-    simp only [ωq] at ep; rw [if_pos (by rw [side]; omega), if_pos (by rw [side']; omega)] at ep
+    simp only [ωq] at ep; rw [ite_eq_left (by rw [side]; omega), ite_eq_left (by rw [side']; omega)] at ep
     have em := hω (a + b - 1) (by omega) (by omega)
-    simp only [ωq] at em; rw [if_neg (by rw [side]; omega), if_neg (by rw [side']; omega)] at em
+    simp only [ωq] at em; rw [ite_eq_right (by rw [side]; omega), ite_eq_right (by rw [side']; omega)] at em
     simp only [ωp, List.append_assoc] at ep
     simp only [ωm, List.append_assoc] at em
     have ea : a' a b T = a' a b T' := lead_t _ _ _ pc ep pc'

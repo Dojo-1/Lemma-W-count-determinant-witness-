@@ -54,16 +54,16 @@ theorem hs_ext (m : Int) : ∀ N (f : Nat → Int), f (N + 1) = 0 → hs m f (N 
 /-! ## `Ssum` -/
 
 theorem Ssum_vanish : ∀ (ω : List Bool) (p r : Nat), (ω.count true < p ∨ ω.count false < r) → Ssum ω p r = 0
-  | [], p, r, h => by simp at h; simp only [Ssum]; rw [if_neg (by omega)]
+  | [], p, r, h => by simp at h; simp only [Ssum]; rw [ite_eq_right (by omega)]
   | true :: ω, p, r, h => by
-    simp only [List.count_cons_self, List.count_cons, Bool.false_eq_true, beq_iff_eq, reduceCtorEq, if_false,
+    simp only [List.count_cons_self, List.count_cons, beq_iff_eq, reduceCtorEq, ite_false,
       Nat.add_zero] at h
     simp only [Ssum, Ssum_vanish ω p r (by omega)]
     cases p with
     | zero => rfl
     | succ p => simp only [Ssum_vanish ω p r (by omega)]; rfl
   | false :: ω, p, r, h => by
-    simp only [List.count_cons_self, List.count_cons, Bool.false_eq_true, beq_iff_eq, reduceCtorEq, if_false,
+    simp only [List.count_cons_self, List.count_cons, Bool.false_eq_true, beq_iff_eq, ite_false,
       Nat.add_zero] at h
     simp only [Ssum, Ssum_vanish ω p r (by omega)]
     cases r with
@@ -139,7 +139,7 @@ def cntAfter : List Bool → Nat → Nat
 
 theorem cntAfter_vanish : ∀ (ω : List Bool) (e : Nat), ω.count false < e → cntAfter ω e = 0
   | [], _, _ => rfl
-  | true :: ω, e, h => by rw [cF] at h; simp only [cntAfter, cntAfter_vanish ω e h]; rw [if_neg (by omega)]
+  | true :: ω, e, h => by rw [cF] at h; simp only [cntAfter, cntAfter_vanish ω e h]; rw [ite_eq_right (by omega)]
   | false :: ω, e, h => by rw [cF'] at h; exact cntAfter_vanish ω e (by omega)
 
 theorem dsum_top (M : Int) : ∀ N (D : Nat → Int), D N = 0 → dsum M D (N + 1) = dsum M D N
@@ -178,7 +178,7 @@ theorem Phi'_eq (m : Int) : ∀ ω : List Bool,
 
 theorem cntAfter_lead : ∀ ω : List Bool, cntAfter ω (ω.count false) = PropS.lead ω
   | [] => rfl
-  | true :: ω => by rw [cF]; simp only [cntAfter, if_true, PropS.lead, cntAfter_lead ω]; omega
+  | true :: ω => by rw [cF]; simp only [cntAfter, ite_true, PropS.lead, cntAfter_lead ω]; omega
   | false :: ω => by rw [cF']; simp only [cntAfter, PropS.lead]; exact cntAfter_vanish ω _ (by omega)
 
 theorem zsum_prof (u : Int) : ∀ ω : List Bool,
@@ -215,7 +215,7 @@ theorem prof_vanish : ∀ (ω : List Bool) (α : Nat), ω.count true < α → Pr
   | true :: ω, 0, h => by simp [PropS.prof]
   | true :: ω, α + 1, h => by rw [cT] at h; simp only [PropS.prof]; exact prof_vanish ω α (by omega)
   | false :: ω, α, h => by
-    rw [cT'] at h; simp only [PropS.prof, prof_vanish ω α h]; rw [if_neg (by omega)]
+    rw [cT'] at h; simp only [PropS.prof, prof_vanish ω α h]; rw [ite_eq_right (by omega)]
 
 theorem cntAfter_le : ∀ (ω : List Bool) (e : Nat), cntAfter ω e ≤ ω.count true
   | [], _ => by simp [cntAfter]
@@ -272,7 +272,7 @@ theorem K_of_moment (T T' : Tree) (h : PropT.TB a b c T) (h' : PropT.TB a b c T'
     (hm : moment a b c T p r = moment a b c T' p r) : Kc a b T p r = Kc a b T' p r := by
   rw [lemmaM a b c ha hb hc T h, lemmaM a b c ha hb hc T' h'] at hm
   have := congrFun hm (Eu p r).2
-  simp only [toO, sc, smul, unit, if_true, Int.mul_one] at this
+  simp only [toO, sc, smul, unit, ite_true, Int.mul_one] at this
   have hs : σ p r = 1 ∨ σ p r = -1 := by simp only [σ, negPow]; split <;> simp
   rcases Eu_sign p r with e | e <;> rcases hs with s | s <;> simp only [e, s] at this <;> simp only [Kc] <;> omega
 
@@ -328,7 +328,7 @@ theorem key_of_K (T T' : Tree) (h : PropT.TB a b c T) (h' : PropT.TB a b c T')
     intro α
     simp only [PropS.N, ← ωp_eq, ← ωm_eq]
     by_cases hα : α < a + 1
-    · have h0 : DN a b T α = DN a b T' α := by have := z α hα; simp only at this; omega
+    · have h0 : DN a b T α = DN a b T' α := by have := z α hα; omega
       simp only [DN] at h0
       have e : ((PropT.j a b T * PropS.prof (PropT.ωp a b T) α + (b - PropT.j a b T) * PropS.prof (PropT.ωm a b T) α : Nat) : Int) =
           ((PropT.j a b T' * PropS.prof (PropT.ωp a b T') α + (b - PropT.j a b T') * PropS.prof (PropT.ωm a b T') α : Nat) : Int) := by
@@ -348,7 +348,7 @@ theorem key_of_K (T T' : Tree) (h : PropT.TB a b c T) (h' : PropT.TB a b c T')
       have u2 : 0 ≤ DA a b T' e ∧ DA a b T' e ≤ (b : Int) * a := dig T' _ _ a hj1' (by have := cntAfter_le (PropT.ωp a b T') e; omega) (by have := cntAfter_le (PropT.ωm a b T') e; omega)
       show -(2 * mm a b c + 1) < 2 * (DA a b T e - DA a b T' e) ∧ 2 * (DA a b T e - DA a b T' e) < 2 * mm a b c + 1
       omega) (by rw [dsum_sub, heq]; omega) c (by omega)
-    have h0 : DA a b T c = DA a b T' c := by simp only at z; omega
+    have h0 : DA a b T c = DA a b T' c := by omega
     simp only [DA] at h0
     have l1 := cntAfter_lead (PropT.ωp a b T); have l2 := cntAfter_lead (PropT.ωm a b T)
     have l3 := cntAfter_lead (PropT.ωp a b T'); have l4 := cntAfter_lead (PropT.ωm a b T')
@@ -369,7 +369,7 @@ theorem key_of_K (T T' : Tree) (h : PropT.TB a b c T) (h' : PropT.TB a b c T')
   · have z2 : PropT.j a b T' = 0 := by
       apply Classical.byContradiction; intro hne
       have := k1'.2 (by omega); have := k1.1 this; omega
-    simp only [z1, z2, if_true, PropT.Key.join.injEq]
+    simp only [z1, z2, ite_true, PropT.Key.join.injEq]
     rw [ωm_eq, ωm_eq]
     apply PropS.propS_boundary b (by omega) _ _ (by rw [nx_count, nx_count, ← ωm_eq, ← ωm_eq, m1, m1'])
     intro α; have := hN α; rw [z1, z2, PropS.N_boundary0, PropS.N_boundary0] at this; exact this
@@ -377,9 +377,8 @@ theorem key_of_K (T T' : Tree) (h : PropT.TB a b c T) (h' : PropT.TB a b c T')
   · have z2 : PropT.j a b T' = b := by
       apply Classical.byContradiction; intro hne
       have := k2'.2 (by omega); have := k2.1 this; omega
-    have z2' : PropT.j a b T' ≠ 0 := by omega
     have hb0 : ¬ b = 0 := by omega
-    simp only [z1, zb, z2, z2', hb0, if_true, if_false, PropT.Key.join.injEq]
+    simp only [zb, z2, hb0, ite_true, ite_false, PropT.Key.join.injEq]
     rw [ωp_eq, ωp_eq]
     apply PropS.propS_boundary b (by omega) _ _ (by rw [nx_count, nx_count, ← ωp_eq, ← ωp_eq, p1, p1'])
     intro α; rw [← PropS.N_boundaryb, ← PropS.N_boundaryb]
@@ -388,7 +387,7 @@ theorem key_of_K (T T' : Tree) (h : PropT.TB a b c T) (h' : PropT.TB a b c T')
       intro e; have := k1.2 (by omega); have := k1'.1 this; omega
     have zb2 : PropT.j a b T' ≠ b := by
       intro e; have := k2.2 (by omega); have := k2'.1 this; omega
-    simp only [z1, zb, z2, zb2, if_false, PropT.Key.inner.injEq]
+    simp only [z1, zb, z2, zb2, ite_false, PropT.Key.inner.injEq]
     exact PropS.propS_interior b _ _ _ _ _ _ _ _ ⟨by omega, by omega⟩ ⟨by omega, by omega⟩ ha1 hc1 ha1' hc1' hx hN hM
 
 /-- the Kronecker valuation `x, y, z ↦ 1 + M e₁, 1 + M^{n+1} e₂, 1 + M^{(n+1)²} e₄` -/

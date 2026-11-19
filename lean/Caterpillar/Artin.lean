@@ -57,17 +57,22 @@ def commR : OP := addP (addP (addP (negP (mulP A B)) (constP [(2, [0])] B)) (con
   (scal0 (psmul 2 (mulP A B 0) ++ [(-4, [0, 8])]))
 theorem comm_all : ∀ k, idCheck1 commL commR k = true := by apply all8 <;> decide +kernel
 
-/-- `[u, v, uv] = 0` -/
-def baseL : OP := mulP (mulP A B) (mulP A B)
-def baseR : OP := mulP A (mulP B (mulP A B))
-theorem base_c0 : idCheck1 baseL baseR 0 = true := by decide +kernel
-theorem base_c1 : idCheck1 baseL baseR 1 = true := by decide +kernel
-theorem base_c2 : idCheck1 baseL baseR 2 = true := by decide +kernel
-theorem base_c3 : idCheck1 baseL baseR 3 = true := by decide +kernel
-theorem base_c4 : idCheck1 baseL baseR 4 = true := by decide +kernel
-theorem base_c5 : idCheck1 baseL baseR 5 = true := by decide +kernel
-theorem base_c6 : idCheck1 baseL baseR 6 = true := by decide +kernel
-theorem base_c7 : idCheck1 baseL baseR 7 = true := by decide +kernel
+private def abLB (i j k l : Idx) : Bool := (isgn i k != isgn j l) != isgn (ixr i k) (ixr j l)
+private def abRB (i j k l : Idx) : Bool := (isgn j l != isgn k (ixr j l)) != isgn i (ixr k (ixr j l))
+
+private theorem assoc_base_b :
+    allIdx4 (fun i j k l =>
+      eqSum4 (abLB i j k l) (abLB j i k l) (abLB i j l k) (abLB j i l k)
+             (abRB i j k l) (abRB j i k l) (abRB i j l k) (abRB j i l k)) = true := rfl
+
+private def abLS (i j k l : Fin 8) : Int := bsgn i k * bsgn j l * bsgn (bxr i k) (bxr j l)
+private def abRS (i j k l : Fin 8) : Int := bsgn j l * bsgn k (bxr j l) * bsgn i (bxr k (bxr j l))
+
+private theorem assoc_base_sgn (i j k l : Fin 8) :
+    (abLS i j k l + abLS j i k l) + (abLS i j l k + abLS j i l k) =
+    (abRS i j k l + abRS j i k l) + (abRS i j l k + abRS j i l k) := by
+  have h := b2i_eqSum4 (allIdx4_spec assoc_base_b (toIdx i) (toIdx j) (toIdx k) (toIdx l))
+  simpa only [abLS, abRS, abLB, abRB, bsgn, bxr, toIdx_toFin, b2i_xor] using h
 
 theorem evalO_const (ρ : Nat → Int) (p : Poly) (P : OP) :
     evalO ρ (fun k => pmul p (P k)) = smul (evalP ρ p) (evalO ρ P) := by
@@ -91,26 +96,72 @@ theorem comm (u v : O) : mul v u = oadd (oadd (oadd (negO (mul u v)) (smul (tr u
   have hs : 2 * mul u v 0 + -4 * (u 0 * v 0) = 2 * mul u v 0 - 4 * (u 0 * v 0) := by omega
   rw [hs]
 
+/-- `[u, v, uv] = 0` -/
 theorem assoc_base (u v : O) : assoc u v (mul u v) = zero := by
-  have := eq_of_idCheck1 (val3 u v v) baseL baseR
-    (all8 base_c0 base_c1 base_c2 base_c3 base_c4 base_c5 base_c6 base_c7)
-  simp only [baseL, baseR, evalO_mulP, A, B, evalO_var0, evalO_var8] at this
-  unfold assoc; rw [this]; exact (sub_eq_zero _ _).2 rfl
+  have heq : mul (mul u v) (mul u v) = mul u (mul v (mul u v)) := by
+    conv => lhs; rw [decompO u, decompO v]
+    conv => rhs; rw [decompO u, decompO v]
+    simp only [mul_osum8_l, mul_osum8_r, mul_smulO_l, mul_smulO_r, mul_unit_eq, smulO_smulO]
+    funext m; simp only [osum8, smulO, sum8_mul_l]
+    have reord : ∀ F : Fin 8 → Fin 8 → Fin 8 → Fin 8 → Int,
+        (sum8 fun l => sum8 fun j => sum8 fun k => sum8 fun i => F i j k l) =
+        (sum8 fun i => sum8 fun j => sum8 fun k => sum8 fun l => F i j k l) := fun F => by
+      have s1 : (sum8 fun l => sum8 fun j => sum8 fun k => sum8 fun i => F i j k l) =
+                (sum8 fun j => sum8 fun l => sum8 fun k => sum8 fun i => F i j k l) := sum8_swap _
+      rw [s1]
+      have s2 : (sum8 fun j => sum8 fun l => sum8 fun k => sum8 fun i => F i j k l) =
+                (sum8 fun j => sum8 fun k => sum8 fun l => sum8 fun i => F i j k l) := by
+        congr 1; funext j; exact sum8_swap _
+      rw [s2]
+      have s3 : (sum8 fun j => sum8 fun k => sum8 fun l => sum8 fun i => F i j k l) =
+                (sum8 fun j => sum8 fun k => sum8 fun i => sum8 fun l => F i j k l) := by
+        congr 1; funext j; congr 1; funext k; exact sum8_swap _
+      rw [s3]
+      have s4 : (sum8 fun j => sum8 fun k => sum8 fun i => sum8 fun l => F i j k l) =
+                (sum8 fun j => sum8 fun i => sum8 fun k => sum8 fun l => F i j k l) := by
+        congr 1; funext j; exact sum8_swap _
+      rw [s4]; exact sum8_swap _
+    conv => lhs; rw [reord]
+    conv => rhs; rw [reord]
+    have hbxr : ∀ i j k l : Fin 8, bxr (bxr i k) (bxr j l) = bxr i (bxr k (bxr j l)) := fun i j k l =>
+      bxr_assoc i k (bxr j l)
+    have hbxr_ij : ∀ i j k l : Fin 8, bxr i (bxr k (bxr j l)) = bxr j (bxr k (bxr i l)) := fun i j k l => by
+      rw [bxr_left_comm k j l, bxr_left_comm i j, bxr_left_comm k i l]
+    have hbxr_kl : ∀ i j k l : Fin 8, bxr i (bxr k (bxr j l)) = bxr i (bxr l (bxr j k)) := fun i j k l => by
+      rw [bxr_comm j l, bxr_left_comm k l j, bxr_comm j k]
+    have hL : (sum8 fun i => sum8 fun j => sum8 fun k => sum8 fun l =>
+        v l * (u j * bsgn j l * (v k * (u i * bsgn i k * bsgn (bxr i k) (bxr j l) * unit (bxr (bxr i k) (bxr j l)) m)))) =
+        (sum8 fun i => sum8 fun j => u i * (u j * (sum8 fun k => sum8 fun l => v k * (v l * (abLS i j k l * unit (bxr i (bxr k (bxr j l))) m))))) := by
+      congr 1; funext i; congr 1; funext j; simp only [sum8_mul_l]
+      congr 1; funext k; congr 1; funext l; rw [hbxr]; unfold abLS; ac_rfl
+    have hR : (sum8 fun i => sum8 fun j => sum8 fun k => sum8 fun l =>
+        v l * (u j * bsgn j l * (v k * bsgn k (bxr j l) * (u i * bsgn i (bxr k (bxr j l)) * unit (bxr i (bxr k (bxr j l))) m)))) =
+        (sum8 fun i => sum8 fun j => u i * (u j * (sum8 fun k => sum8 fun l => v k * (v l * (abRS i j k l * unit (bxr i (bxr k (bxr j l))) m))))) := by
+      congr 1; funext i; congr 1; funext j; simp only [sum8_mul_l]
+      congr 1; funext k; congr 1; funext l; unfold abRS; ac_rfl
+    rw [hL, hR]
+    apply eq_of_sym2_2 u v
+    intro i j k l
+    rw [← hbxr_ij i j k l, ← hbxr_kl i j k l, ← hbxr_ij i j l k, ← hbxr_kl i j k l]
+    have h1 := assoc_base_sgn i j k l
+    simp only [← Int.add_mul]
+    rw [h1]
+  unfold assoc; rw [heq]; exact (sub_eq_zero _ _).2 rfl
 
 /-! ## The associator is trilinear and alternating -/
 
 theorem assoc_add1 (a a' b c : O) : assoc (oadd a a') b c = oadd (assoc a b c) (assoc a' b c) := by
-  simp only [assoc, add_mul, mul_add]; funext k; simp only [sub, oadd]; omega
+  simp only [assoc, add_mul]; funext k; simp only [sub, oadd]; omega
 theorem assoc_add2 (a b b' c : O) : assoc a (oadd b b') c = oadd (assoc a b c) (assoc a b' c) := by
   simp only [assoc, add_mul, mul_add]; funext k; simp only [sub, oadd]; omega
 theorem assoc_add3 (a b c c' : O) : assoc a b (oadd c c') = oadd (assoc a b c) (assoc a b c') := by
-  simp only [assoc, add_mul, mul_add]; funext k; simp only [sub, oadd]; omega
+  simp only [assoc, mul_add]; funext k; simp only [sub, oadd]; omega
 theorem assoc_smul1 (s : Int) (a b c : O) : assoc (smul s a) b c = smul s (assoc a b c) := by
-  simp only [assoc, smul_mul, mul_smul]; funext k; simp only [sub, smul]; rw [Int.mul_sub]
+  simp only [assoc, smul_mul]; funext k; simp only [sub, smul]; rw [Int.mul_sub]
 theorem assoc_smul2 (s : Int) (a b c : O) : assoc a (smul s b) c = smul s (assoc a b c) := by
   simp only [assoc, smul_mul, mul_smul]; funext k; simp only [sub, smul]; rw [Int.mul_sub]
 theorem assoc_smul3 (s : Int) (a b c : O) : assoc a b (smul s c) = smul s (assoc a b c) := by
-  simp only [assoc, smul_mul, mul_smul]; funext k; simp only [sub, smul]; rw [Int.mul_sub]
+  simp only [assoc, mul_smul]; funext k; simp only [sub, smul]; rw [Int.mul_sub]
 
 theorem assoc_xxy (x y : O) : assoc x x y = zero := by
   unfold assoc; rw [left_alternative]; exact (sub_eq_zero _ _).2 rfl
@@ -193,7 +244,7 @@ theorem sp_basis (u v : O) : ∀ e f, e ∈ [one, u, v, mul u v] → f ∈ [one,
     refine sp_add (sp_add (sp_add (sp_neg huuv) (sp_smul _ (sp_uv u v))) (sp_smul _ (hq u (sp_u u v))))
       (sp_smul _ (sp_u u v))
   intro e f he hf
-  simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at he hf
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at he hf
   rcases he with h1 | h1 | h1 | h1 <;> rcases hf with h2 | h2 | h2 | h2 <;> rw [h1, h2]
   · rw [one_mul]; exact sp_one u v
   · rw [one_mul]; exact sp_u u v
@@ -247,7 +298,7 @@ theorem assoc_basis (u v : O) : ∀ e f g, e ∈ [one, u, v, mul u v] → f ∈ 
   have p5 : assoc v (mul u v) u = zero := by rw [skew23, p2, negO_zero]
   have p6 : assoc (mul u v) v u = zero := by rw [skew12, p5, negO_zero]
   intro e f g he hf hg
-  simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at he hf hg
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at he hf hg
   rcases he with h1 | h1 | h1 | h1 <;> rcases hf with h2 | h2 | h2 | h2 <;>
     rcases hg with h3 | h3 | h3 | h3 <;> rw [h1, h2, h3]
   · exact assoc_one1 _ _

@@ -55,7 +55,7 @@ theorem osum_congr {α : Type} (l : List α) (f g : α → O) (h : ∀ x ∈ l, 
 theorem mul_oadd_l (x y z : O) : mul (oadd x y) z = oadd (mul x z) (mul y z) := by
   funext k; simp only [mul, oadd, sum8, Int.mul_add, Int.add_mul]; omega
 theorem mul_oadd_r (x y z : O) : mul z (oadd x y) = oadd (mul z x) (mul z y) := by
-  funext k; simp only [mul, oadd, sum8, Int.mul_add, Int.add_mul]; omega
+  funext k; simp only [mul, oadd, sum8, Int.mul_add]; omega
 theorem mul_zero_l (x : O) : mul zero x = zero := by funext k; simp [mul, zero, sum8]
 theorem mul_zero_r (x : O) : mul x zero = zero := by funext k; simp [mul, zero, sum8]
 
@@ -103,7 +103,7 @@ def subsT : Tree → List (List Nat)
 
 theorem subsT_sub : ∀ (T : Tree) (S : List Nat), S ∈ subsT T → ∀ i ∈ S, i ∈ lv T
   | .leaf i, S, h, j, hj => by
-    simp only [subsT, List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at h
+    simp only [subsT, List.mem_cons, List.not_mem_nil, or_false] at h
     rcases h with rfl | rfl <;> simp_all [lv]
   | .node L R, S, h, j, hj => by
     simp only [subsT, List.mem_flatMap, List.mem_map] at h
@@ -164,7 +164,7 @@ theorem expand (s q t : Int) : ∀ T : Tree, (lv T).Pairwise (· < ·) →
       osum ((subsT T).map fun S => smul (mono a b s q t S) (evo (w3 a b) ρO (restrictTo T S)))
   | .leaf i, _ => by
     simp only [subsT, List.map, osum, ev, ρs, restrictTo, kill, List.not_mem_nil, decide_false,
-      Bool.not_false, if_true, List.mem_singleton, decide_true, Bool.not_true, Bool.false_eq_true, if_false]
+      Bool.not_false, ite_true, List.mem_singleton, decide_true, Bool.not_true, Bool.false_eq_true, ite_false]
     simp only [evo, ev, ρO, mono, ex, ey, ez, List.filter_nil, List.filter_cons, List.length_nil, ipow]
     funext k
     simp only [oadd, smul, zero, w3]
@@ -285,7 +285,7 @@ theorem osum_one (isY : Nat → Bool) (Z : List Nat) (hZ : ∀ z ∈ Z, isY z = 
       have : 2 ≤ ((y :: S).filter isY).length := by
         rw [List.filter_cons_of_pos hy, List.length_cons]
         have : x ∈ S.filter isY := List.mem_filter.2 ⟨hx, hxy⟩
-        have := List.length_pos.2 (List.ne_nil_of_mem this); omega
+        have := List.length_pos_of_mem this; omega
       omega
     rw [hd]
 
@@ -296,19 +296,18 @@ def isY (i : Nat) : Bool := decide (a ≤ i ∧ i < a + b)
 theorem count_map_true (f : Nat → Bool) : ∀ K : List Nat, (K.map f).count true = (K.filter f).length
   | [] => rfl
   | x :: K => by
-    cases h : f x <;> simp [List.filter_cons, h, count_map_true f K]
+    cases h : f x <;> simp [h, count_map_true f K]
 
 theorem count_map_false (f : Nat → Bool) : ∀ K : List Nat, (K.map f).count false = (K.filter fun i => !f i).length
   | [] => rfl
   | x :: K => by
-    cases h : f x <;> simp [List.filter_cons, h, count_map_false f K]
+    cases h : f x <;> simp [h, count_map_false f K]
 
 theorem range_split (c : Nat) : List.range' 0 (a + b + c) = List.range' 0 a ++ List.range' a b ++ List.range' (a + b) c := by
-  have h1 := List.range'_append_1 0 a b
-  have h2 := List.range'_append_1 0 (b + a) c
+  have h1 : List.range' 0 a ++ List.range' (0 + a) b = List.range' 0 (a + b) := List.range'_append_1
+  have h2 : List.range' 0 (a + b) ++ List.range' (0 + (a + b)) c = List.range' 0 (a + b + c) := List.range'_append_1
   simp only [Nat.zero_add] at h1 h2
-  rw [← h1, Nat.add_comm b a] at h2
-  rw [h2]; congr 1; omega
+  rw [h1, h2]
 
 theorem filter_isY (c : Nat) : (List.range' 0 (a + b + c)).filter (isY a b) = List.range' a b := by
   rw [range_split, List.filter_append, List.filter_append]
@@ -339,22 +338,23 @@ theorem coef_moment (p r : Nat) : coef (polyT a b T) (p, 1, r) = moment a b c T 
   rw [osum_subs_perm pY g (by
     intro K K' hp
     have e1 : ∀ f : Nat → Bool, (K.filter f).length = (K'.filter f).length := fun f => (hp.filter f).length_eq
+    have he : (ex a K, ey a b K, ez a b K) = (ex a K', ey a b K', ez a b K') := by simp only [ex, ey, ez, e1]
     have e2 : restrictTo T K = restrictTo T K' := by
       simp only [restrictTo]; congr 1; funext i; simp [hp.mem_iff]
-    simp only [g, ex, ey, ez, e1, e2])]
+    simp only [g, he, e2])]
   rw [osum_one (isY a b) (XZ a b c) (fun z hz => by
       simp only [XZ, List.mem_filter, nonY, decide_eq_true_eq] at hz; simp [isY]; omega)
     (List.range' a b) g (fun y hy => by simp [List.mem_range'_1] at hy; simp [isY]; omega)
     (fun S hS => by
-      simp only [g]; rw [if_neg]; intro e; simp only [Prod.mk.injEq] at e; apply hS; simp only [ey] at e
+      simp only [g]; rw [ite_eq_right]; intro e; simp only [Prod.mk.injEq] at e; apply hS; simp only [ey] at e
       rw [← e.2.1]; rfl)]
   simp only [moment]
   apply osum_congr; intro k hk; apply osum_congr; intro K hK
   simp only [List.mem_range'_1] at hk
   have sub : ∀ i ∈ K, nonY a b i = true := fun i hi =>
     (List.mem_filter.1 ((subs_sub _ K hK).subset hi)).2
-  have hx : ex a (k :: K) = ex a K := by simp [ex, List.filter_cons, show ¬ k < a by omega]
-  have hz : ez a b (k :: K) = ez a b K := by simp [ez, List.filter_cons, show ¬ a + b ≤ k by omega]
+  have hx : ex a (k :: K) = ex a K := by simp [ex, show ¬ k < a by omega]
+  have hz : ez a b (k :: K) = ez a b K := by simp [ez, show ¬ a + b ≤ k by omega]
   have hy : ey a b (k :: K) = 1 := by
     have : K.filter (fun i => decide (a ≤ i ∧ i < a + b)) = [] := List.filter_eq_nil_iff.2 (fun i hi => by
       have := sub i hi; simp only [nonY, decide_eq_true_eq] at this; simp only [decide_eq_true_eq]; omega)
@@ -398,11 +398,11 @@ theorem dsum_zero (M : Int) : ∀ N, dsum M (fun _ => 0) N = 0
 theorem dsum_single (M : Int) (d : Int) : ∀ (N e0 : Nat), e0 < N → dsum M (fun e => if e0 = e then d else 0) N = ipow M e0 * d
   | 0, _, h => absurd h (Nat.not_lt_zero _)
   | N + 1, 0, _ => by
-    simp only [dsum, if_true]
+    simp only [dsum, ite_true]
     have : (fun e => if 0 = e + 1 then d else (0 : Int)) = fun _ => 0 := funext fun e => by simp
     rw [this, dsum_zero]; simp [ipow]
   | N + 1, e0 + 1, h => by
-    simp only [dsum, show ¬ (e0 + 1 = 0) by omega, if_false, Nat.add_right_cancel_iff]
+    simp only [dsum, show ¬ (e0 + 1 = 0) by omega, ite_false, Nat.add_right_cancel_iff]
     rw [dsum_single M d N e0 (by omega), ipow]; simp only [Int.zero_add]
     rw [Int.mul_comm (ipow M e0) M, Int.mul_assoc]
 
@@ -516,7 +516,7 @@ theorem coef_of_map
     coef (polyT a b T) (i, j, l) = coef (polyT a b T') (i, j, l) := by
   generalize hn : a + b + c = n at hev hi hj hl
   generalize hM : ipow 2 (n + 2) + 1 = M at hev
-  have X0 : (0 : Int) ≤ ((2 ^ n : Nat) : Int) := Int.ofNat_nonneg _
+  have X0 : (0 : Int) ≤ ((2 ^ n : Nat) : Int) := Int.natCast_nonneg _
   have hM4 : M = 4 * ((2 ^ n : Nat) : Int) + 1 := by
     rw [← hM, ipow_two, show n + 2 = n + 1 + 1 by omega, Nat.pow_succ, Nat.pow_succ]; push_cast; omega
   have hM0 : 0 < M := by omega
@@ -541,15 +541,15 @@ theorem coef_of_map
     rw [subst_eq a b U (pw_wf U hU.wf), evalPoly, polyT, List.map_map, osum_apply]
     rw [← regroup M (kron a b n) (fun S => v U S k) N (subsT U) (kb U hlen)]
     congr 1; apply List.map_congr_left; intro S _
-    simp only [Function.comp, smul, mono, ipow_mul, kron, v, A]
+    simp only [Function.comp, smul, ipow_mul, kron, v]
     rw [← ipow_add, ← ipow_add]
     congr 2; rw [Nat.mul_assoc (n + 1) (n + 1), Nat.mul_add (n + 1) (ey a b S)]; omega
   have hbound : ∀ U : Tree, (lv U).length = n → ∀ k e, -((2 ^ n : Nat) : Int) ≤ C U k e ∧ C U k e ≤ ((2 ^ n : Nat) : Int) := by
     intro U hU k e
     have := isum_bound (fun S => if kron a b n S = e then v U S k else 0) (fun S => by
       by_cases hk : kron a b n S = e
-      · simp only [hk, if_true]; exact term_bound a b U S k
-      · simp only [hk, if_false]; omega) (subsT U)
+      · simp only [hk, ite_true]; exact term_bound a b U S k
+      · simp only [hk, ite_false]; omega) (subsT U)
     rw [subsT_length, hU] at this; exact this
   have coefC : ∀ U : Tree, (lv U).length = n → ∀ k,
       coef (polyT a b U) (i, j, l) k = C U k (kron0 i j l n) := by
@@ -558,15 +558,16 @@ theorem coef_of_map
     apply congrArg isum; apply List.map_congr_left; intro S hS
     have := sub_len U S hS
     have e1 := ex_le a S; have e2 := ey_le a b S
-    simp only [Function.comp, v, kron0, kron]
+    simp only [Function.comp, v]
     by_cases e : (ex a S, ey a b S, ez a b S) = (i, j, l)
     · simp only [Prod.mk.injEq] at e; obtain ⟨r1, r2, r3⟩ := e
-      simp only [r1, r2, r3, if_true]
-    · have ne : ¬ (ex a S + (n + 1) * (ey a b S + (n + 1) * ez a b S) = i + (n + 1) * (j + (n + 1) * l)) := by
-        intro e'
+      have ke : kron a b n S = kron0 i j l n := by simp only [kron, kron0, r1, r2, r3]
+      simp only [r1, r2, r3, ke, ite_true]
+    · have ne : kron a b n S ≠ kron0 i j l n := by
+        simp only [kron, kron0]; intro e'
         obtain ⟨r1, r2, r3⟩ := kron_inj (n + 1) _ _ _ _ _ _ (by omega) (by omega) (by omega) (by omega) (by omega) e'
         exact e (by rw [r1, r2, r3])
-      rw [if_neg e, if_neg ne]; simp [zero]
+      rw [ite_eq_right e, ite_eq_right ne]; simp [zero]
   funext k
   rw [coefC T lenT k, coefC T' lenT' k]
   have hd : dsum M (fun e => C T k e - C T' k e) N = 0 := by

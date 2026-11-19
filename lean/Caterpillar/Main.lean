@@ -58,7 +58,7 @@ theorem ker_tr (w w' : Nat → Nat) (n : Nat) (hww : ∀ p q, p < n → q < n �
     intro t ht
     have hh : ∃ p, p < n ∧ w' p = w' t := ⟨t, ht, rfl⟩
     show ρ (w t) = dite _ _ _
-    rw [dif_pos hh]
+    rw [dite_eq_left hh]
     obtain ⟨h1, h2⟩ := Classical.choose_spec hh
     rw [hww _ _ h1 ht h2]
   rw [ev_tr w w' ρ ρ' T (fun t ht => key t (hT t ht)), ev_tr w w' ρ ρ' U (fun t ht => key t (hU t ht)), h ρ']
@@ -154,7 +154,7 @@ theorem kerconn_of_interval (wl : List Nat) (hI : Interval wl) : KerConn (wd wl)
   have h' : ∀ ρ, ev (rk wl) ρ T = ev (rk wl) ρ T' :=
     ker_tr (rk wl) (wd wl) _ (fun p q hp hq e => (rk_iff wl hI p q hp hq).2 e) T T' (bnd hT) (bnd hT') h
   have r := Closure.kernel_flip_connected (rk wl) (rk_mono wl) T T' (hT.trans hT'.symm)
-    (by rw [hT]; exact List.pairwise_lt_range _) h'
+    (by rw [hT]; exact List.pairwise_lt_range) h'
   exact kerflip_tr (wd wl) (rk wl) _ (fun p q hp hq e => (rk_iff wl hI p q hp hq).1 e) r (bnd hT)
 
 theorem kerconn_of_two (wl : List Nat) (h2 : TwoLetters wl) : KerConn (wd wl) wl.length := by
@@ -392,7 +392,7 @@ theorem dn_tr (w w' : Nat → Nat) (A B C A' B' C' : Tree) (f : Nat → Nat) (P 
   have hm := h (f p) (f q) (f r)
   simp only [minor] at hm ⊢
   simp only [hA, hB, hC]
-  by_cases hp : P p <;> by_cases hq : P q <;> by_cases hr : P r <;> simp only [hp, hq, hr, if_true, if_false] <;>
+  by_cases hp : P p <;> by_cases hq : P q <;> by_cases hr : P r <;> simp only [hp, hq, hr, ite_true, ite_false] <;>
     first | exact hm | simp
 
 /-! ## three letters `a, b, c` -/
@@ -511,7 +511,7 @@ theorem not_kerconn (wl : List Nat) (h2 : ¬ TwoLetters wl) (hI : ¬ Interval wl
   let S := (List.range n).filter (alive w K)
   have hS : ∀ t, t ∈ S ↔ t < n ∧ (w t = a ∨ w t = b ∨ w t = c) := by
     intro t; simp [S, List.mem_filter, alive, K, Kset]
-  have hSp : S.Pairwise (· < ·) := (List.pairwise_lt_range n).sublist (List.filter_sublist _)
+  have hSp : S.Pairwise (· < ·) := List.pairwise_lt_range.sublist List.filter_sublist
   have hiS : i ∈ S := (hS i).2 ⟨by omega, Or.inl ha⟩
   have hjS : j ∈ S := (hS j).2 ⟨by omega, Or.inr (Or.inl hb)⟩
   have hkS : k ∈ S := (hS k).2 ⟨hk, Or.inl hik.symm⟩
@@ -528,7 +528,7 @@ theorem not_kerconn (wl : List Nat) (h2 : ¬ TwoLetters wl) (hI : ¬ Interval wl
   let wl3 : List L3 := S.map (fun t => code a b (w t))
   let w3 : Caterpillar.Word := fun p => wl3.getD p 0
   let w3n : Nat → Nat := fun p => (w3 p).val
-  have hlen : wl3.length = S.length := List.length_map _ _
+  have hlen : wl3.length = S.length := List.length_map _
   have hw3x : ∀ x, x < S.length → w3 x = code a b (w (S.getD x 0)) := by
     intro x hx
     show wl3.getD x 0 = _

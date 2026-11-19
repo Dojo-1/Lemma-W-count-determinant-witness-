@@ -24,7 +24,7 @@ theorem rgs_nodup : ∀ n, (rgs n).Nodup
     rw [List.pairwise_flatMap]
     refine ⟨fun v _ => ?_, (rgs_nodup n).imp ?_⟩
     · simp only [ext]; rw [List.pairwise_map]
-      exact (List.nodup_range _).imp (fun h e => h (by simpa using e))
+      exact List.nodup_range.imp (fun h e => h (by simpa using e))
     · intro a b hab x hx y hy e
       simp only [ext, List.mem_map] at hx hy
       obtain ⟨c, _, rfl⟩ := hx; obtain ⟨d, _, rfl⟩ := hy
@@ -41,7 +41,7 @@ theorem mem_foldl : ∀ (w acc : List Nat) (x : Nat), x ∈ w.foldl step acc ↔
   | y :: t, acc, x => by
     rw [List.foldl_cons, mem_foldl t _ x]; simp only [step]
     by_cases hy : y ∈ acc
-    · simp only [hy, if_true, List.mem_cons]
+    · simp only [hy, ite_true, List.mem_cons]
       constructor
       · rintro (h | h)
         · exact Or.inl h
@@ -50,7 +50,7 @@ theorem mem_foldl : ∀ (w acc : List Nat) (x : Nat), x ∈ w.foldl step acc ↔
         · exact Or.inl h
         · subst h; exact Or.inl hy
         · exact Or.inr h
-    · simp only [hy, if_false, List.mem_append, List.mem_singleton, List.mem_cons, or_assoc, List.not_mem_nil, false_or]
+    · simp only [hy, ite_false, List.mem_append, List.mem_cons, or_assoc, List.not_mem_nil, false_or]
 
 theorem mem_firsts (w : List Nat) (x : Nat) : x ∈ firsts w ↔ x ∈ w := by
   simp [firsts, mem_foldl]
@@ -101,7 +101,7 @@ theorem pos_new : ∀ (F : List Nat) (x : Nat), x ∉ F → pos (F ++ [x]) x = F
     show pos (y :: (ys ++ [x])) x = (y :: ys).length
     simp only [pos, List.length_cons]
     have : y ≠ x := fun e => h (by simp [e])
-    rw [if_neg this, pos_new ys x (fun h' => h (by simp [h']))]
+    rw [ite_eq_right this, pos_new ys x (fun h' => h (by simp [h']))]
 
 theorem pos_inj : ∀ (F : List Nat) (x y : Nat), x ∈ F → y ∈ F → pos F x = pos F y → x = y
   | [], _, _, h, _, _ => by simp at h
@@ -109,9 +109,9 @@ theorem pos_inj : ∀ (F : List Nat) (x y : Nat), x ∈ F → y ∈ F → pos F 
     simp only [pos] at e
     by_cases hzx : z = x <;> by_cases hzy : z = y
     · exact hzx.symm.trans hzy
-    · rw [if_pos hzx, if_neg hzy] at e; omega
-    · rw [if_neg hzx, if_pos hzy] at e; omega
-    · rw [if_neg hzx, if_neg hzy] at e
+    · rw [ite_eq_left hzx, ite_eq_right hzy] at e; omega
+    · rw [ite_eq_right hzx, ite_eq_left hzy] at e; omega
+    · rw [ite_eq_right hzx, ite_eq_right hzy] at e
       exact pos_inj zs x y (mem_tail hx hzx) (mem_tail hy hzy) (by omega)
 
 theorem pos_get : ∀ (F : List Nat), F.Nodup → ∀ i (hi : i < F.length), pos F F[i] = i
@@ -124,7 +124,7 @@ theorem pos_get : ∀ (F : List Nat), F.Nodup → ∀ i (hi : i < F.length), pos
       simp only [List.getElem_cons_succ, pos]
       have hj : j < ys.length := by simp at hi; omega
       have : y ≠ ys[j] := fun e => hn.1 (by rw [e]; exact List.getElem_mem hj)
-      rw [if_neg this, pos_get ys hn.2 j hj]
+      rw [ite_eq_right this, pos_get ys hn.2 j hj]
 
 /-! ## the canonical form -/
 
@@ -145,11 +145,11 @@ theorem len_le_nl (u : List Nat) : (firsts u).length ≤ nl (canon u) := by
   · have hi : (firsts u).length - 1 < (firsts u).length := by omega
     have hm : (firsts u)[(firsts u).length - 1] ∈ u := (mem_firsts u _).1 (List.getElem_mem hi)
     have := lt_nl (canon u) ((firsts u).length - 1)
-      (by rw [← pos_get (firsts u) (firsts_nodup u) _ hi]; exact List.mem_map_of_mem _ hm)
+      (by rw [← pos_get (firsts u) (firsts_nodup u) _ hi]; exact List.mem_map_of_mem hm)
     omega
 
 theorem canon_mem : ∀ n, ∀ w : List Nat, w.length = n → canon w ∈ rgs n
-  | 0, w, h => by rw [List.length_eq_zero.1 h]; simp [canon, rgs]
+  | 0, w, h => by rw [List.eq_nil_of_length_eq_zero h]; simp [canon, rgs]
   | n + 1, w, h => by
     have hw : w ≠ [] := by intro e; rw [e] at h; simp at h
     obtain ⟨u, c, rfl⟩ : ∃ u c, w = u ++ [c] := ⟨w.dropLast, w.getLast hw, (List.dropLast_concat_getLast hw).symm⟩
@@ -211,7 +211,7 @@ theorem rename_compose (w v v' : List Nat) (h1 : Renaming w v) (h2 : Renaming w 
     intro x hx
     have hh : ∃ x', x' ∈ w ∧ f x' = f x := ⟨x, hx, rfl⟩
     show dite _ _ _ = _
-    rw [dif_pos hh]
+    rw [dite_eq_left hh]
     obtain ⟨m, e⟩ := Classical.choose_spec hh
     rw [hf _ m x hx e]
   refine ⟨h, ?_, ?_⟩
@@ -282,7 +282,7 @@ theorem ext_stirling (w : List Nat) (hw : w ≠ []) (k : Nat) :
   by_cases h1 : nl w = k + 1
   · have e : ((fun v => decide (nl v = k + 1)) ∘ fun c => w ++ [c]) = fun c => decide (c < k + 1) := by
       funext c; simp only [Function.comp, nl_append, h1, Nat.max_def]; congr 1; apply propext; split <;> omega
-    rw [e, cnt_lt, h1]; simp [Nat.min_def]
+    rw [e, cnt_lt, h1]; simp
   · by_cases h2 : nl w = k
     · have e : ((fun v => decide (nl v = k + 1)) ∘ fun c => w ++ [c]) = fun c => decide (c = k) := by
         funext c; simp only [Function.comp, nl_append, h2, Nat.max_def]; congr 1; apply propext; split <;> omega
@@ -323,7 +323,7 @@ theorem ssum_ind (j : Nat) : ∀ M, ssum (fun k => if j = k then 1 else 0) M = i
     · have : j ≠ M := by omega
       simp [h1, this, show j < M + 1 by omega]
     · by_cases h2 : j = M
-      · simp [h1, h2]
+      · simp [h2]
       · simp [h1, h2, show ¬ j < M + 1 by omega]
 
 theorem len_ssum (N : Nat) : ∀ l : List (List Nat), (∀ w ∈ l, nl w ≤ N) →
@@ -333,7 +333,7 @@ theorem len_ssum (N : Nat) : ∀ l : List (List Nat), (∀ w ∈ l, nl w ≤ N) 
     have ih := len_ssum N l (fun w hw => h w (by simp [hw]))
     have ha := h a (by simp)
     simp only [List.countP_cons, decide_eq_true_eq, List.length_cons]
-    rw [ssum_add, ssum_ind, ← ih, if_pos (by omega)]
+    rw [ssum_add, ssum_ind, ← ih, ite_eq_left (by omega)]
 
 /-- **Bell numbers are sums of Stirling numbers**: `Bell(n) = Σ_{k ≤ n} S(n, k)`. -/
 theorem bell_eq_sum (n : Nat) : bell n = ssum (stirling n) (n + 1) :=

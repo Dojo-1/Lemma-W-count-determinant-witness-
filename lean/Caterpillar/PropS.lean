@@ -58,10 +58,10 @@ theorem prof_xs (W : List Bool) : ∀ a α, prof (List.replicate a true ++ W) α
     simp only [List.replicate_succ, List.cons_append, prof_x, prof_xs W a]
     by_cases h : α = 0
     · simp [h]
-    · simp only [h, if_false]
+    · simp only [h, ite_false]
       by_cases h2 : a ≤ α - 1
-      · rw [if_pos h2, if_pos (by omega)]; congr 1; omega
-      · rw [if_neg h2, if_neg (by omega)]
+      · rw [ite_eq_left h2, ite_eq_left (by omega)]; congr 1; omega
+      · rw [ite_eq_right h2, ite_eq_right (by omega)]
 
 theorem prof_zs (W : List Bool) : ∀ c α, prof (List.replicate c false ++ W) α = (if α = 0 then c else 0) + prof W α
   | 0, α => by simp
@@ -101,14 +101,14 @@ theorem N_below (b j a c : Nat) (W : List Bool) (α : Nat) (h0 : 0 < α) (h1 : �
 theorem N_ata (b j a c : Nat) (W : List Bool) (hj : j ≤ b) (ha : 1 ≤ a) :
     N b j a c W a = b * prof W 0 + j * c := by
   simp only [N, ωp, ωm, prof_xs, prof_zs]
-  simp only [Nat.le_refl, if_true, Nat.sub_self, show a ≠ 0 by omega, if_false, Nat.zero_add, Nat.mul_add]
+  simp only [Nat.le_refl, ite_true, Nat.sub_self, show a ≠ 0 by omega, ite_false, Nat.zero_add, Nat.mul_add]
   have := jb_mul b j (prof W 0) hj; omega
 
 theorem N_above (b j a c : Nat) (W : List Bool) (hj : j ≤ b) (β : Nat) (hβ : 0 < β) :
     N b j a c W (a + β) = b * prof W β := by
   simp only [N, ωp, ωm, prof_xs, prof_zs]
-  simp only [show a ≤ a + β by omega, if_true, Nat.add_sub_cancel_left, show a + β ≠ 0 by omega, if_false,
-    Nat.zero_add, prof_zs, show β ≠ 0 by omega]
+  simp only [show a ≤ a + β by omega, ite_true, Nat.add_sub_cancel_left, show a + β ≠ 0 by omega, ite_false,
+    Nat.zero_add, show β ≠ 0 by omega]
   exact jb_mul b j _ hj
 
 theorem M0_eq (b j a c : Nat) (W : List Bool) (hc : 1 ≤ c) : M0 b j a c W = j * a := by
