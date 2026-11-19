@@ -62,7 +62,7 @@ theorem cnt_const (w : Word) (I : Ival) (a : L3) (hI : I.1 ≤ I.2)
   split <;> simp
 
 /-- A segment containing the interval `J` contains each of its letters. -/
-theorem cnt_pos_of_sub (w : Word) (I J : Ival) (c : L3) (hJ : J.1 ≤ J.2) (hsub : I.1 ≤ J.1 ∧ J.2 ≤ I.2)
+theorem cnt_pos_of_sub (w : Word) (I J : Ival) (c : L3) (_hJ : J.1 ≤ J.2) (hsub : I.1 ≤ J.1 ∧ J.2 ≤ I.2)
     (hc : ∃ p, J.1 ≤ p ∧ p ≤ J.2 ∧ w p = c) : cnt w I c ≠ 0 := by
   obtain ⟨p, h1, h2, hp⟩ := hc
   have := cntR_pos w c I.1 (I.2 + 1 - I.1) p (by omega) (by omega) hp

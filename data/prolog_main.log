@@ -16,3 +16,11 @@ count over restricted growth strings:
   n = 8: Bell 4140, two-letter 128, interval 128, both 8, all-zero 1, disconnected 3892 = Bell − 2ⁿ + n
   n = 9: Bell 21147, two-letter 256, interval 256, both 9, all-zero 1, disconnected 20644 = Bell − 2ⁿ + n
   n = 10: Bell 115975, two-letter 512, interval 512, both 10, all-zero 1, disconnected 114961 = Bell − 2ⁿ + n
+canonical representatives:
+  n = 1: 1 words over 1 letters fall into 1 renaming classes, one per restricted growth string
+  n = 2: 4 words over 2 letters fall into 2 renaming classes, one per restricted growth string
+  n = 3: 27 words over 3 letters fall into 5 renaming classes, one per restricted growth string
+  n = 4: 256 words over 4 letters fall into 15 renaming classes, one per restricted growth string
+  n = 5: 3125 words over 5 letters fall into 52 renaming classes, one per restricted growth string
+  n = 6: 46656 words over 6 letters fall into 203 renaming classes, one per restricted growth string
+Stirling recurrence S(n+1,k+1) = (k+1)S(n,k+1) + S(n,k): 52 cases, n ≤ 8

@@ -724,6 +724,7 @@ section
 variable (c : Nat) (ha : 1 ≤ a) (hb : 1 ≤ b) (hc : 1 ≤ c) (T : Tree) (h : TB a b c T)
 include ha hb hc h
 
+set_option linter.unusedSectionVars false in
 theorem lvT : lv T = List.range' 0 (a + b + c) := by
   rw [lv_wf T h.wf, h.lo, h.hi]; simp
 

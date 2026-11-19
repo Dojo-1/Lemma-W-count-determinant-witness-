@@ -86,7 +86,7 @@ check_rk(NMax) :-
                  forall(( nth0(P, W, X), nth0(Q, W, Y) ), ( nth0(P, R, RP), nth0(Q, R, RQ), ( X == Y -> RP == RQ ; RP \== RQ ) )) ), L),
     length(L, NL),
     format("rk: ~d interval words (n ≤ ~d, letters renamed) — run index monotone, same equalities as the letters~n", [NL, NMax]).
-shuffle_letters(W0, W) :- maplist([X, Y]>>(Y is (X * 5 + 3) mod 11), W0, W).
+shuffle_letters(W0, W) :- maplist([X, Y]>>(Y is 7 * X + 3), W0, W).   % injective for every length
 
 /* ---- the count over restricted growth strings ---- */
 
@@ -112,6 +112,32 @@ check_count(NMax) :-
         format("  n = ~d: Bell ~d, two-letter ~d, interval ~d, both ~d, all-zero ~d, disconnected ~d = Bell − 2ⁿ + n~n",
                [N, B, CT, CI, CTI, CZ, Bad]) )).
 
+/* ---- canonical representatives and Stirling numbers (Lean Canon.lean) ---- */
+
+canon_word(W, C) :- cw_(W, [], C).
+cw_([], _, []).
+cw_([X | Xs], Seen, [I | Is]) :-
+    ( nth0(I, Seen, X) -> Seen1 = Seen ; length(Seen, I), append(Seen, [X], Seen1) ), cw_(Xs, Seen1, Is).
+
+check_canon(NMax) :-
+    forall(between(1, NMax, N),
+      ( rgs(N, L), list_to_ord_set(L, LS), length(L, B), length(LS, B),
+        N1 is N - 1,
+        findall(C, ( length(W, N), maplist([X]>>between(0, N1, X), W), canon_word(W, C) ), Cs0),
+        sort(Cs0, Cs),
+        ( Cs == LS -> true ; format("FAIL canon n = ~d~n", [N]), fail ),
+        format("  n = ~d: ~d words over ~d letters fall into ~d renaming classes, one per restricted growth string~n",
+               [N, N ** N, N, B]) )).
+
+stirling_num(N, K, S) :- rgs(N, L), aggregate_all(count, (member(W, L), nl_rgs(W, K)), S).
+
+check_stirling(NMax) :-
+    findall(1, ( between(1, NMax, N), N1 is N + 1, between(0, N1, K), K1 is K + 1,
+                 stirling_num(N1, K1, A), stirling_num(N, K1, B), stirling_num(N, K, C),
+                 ( A =:= K1 * B + C -> true ; format("FAIL Stirling ~d ~d~n", [N, K]), fail ) ), L),
+    length(L, NL),
+    format("Stirling recurrence S(n+1,k+1) = (k+1)S(n,k+1) + S(n,k): ~d cases, n ≤ ~d~n", [NL, NMax]).
+
 run_main :-
     set_stream(user_output, encoding(utf8)),
     set_random(seed(20261119)),
@@ -120,4 +146,7 @@ run_main :-
     check_only_if(6),
     check_rk(8),
     format("count over restricted growth strings:~n"),
-    check_count(10).
+    check_count(10),
+    format("canonical representatives:~n"),
+    check_canon(6),
+    check_stirling(8).

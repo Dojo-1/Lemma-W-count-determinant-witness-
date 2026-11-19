@@ -47,12 +47,12 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Build the Lean formalization (Proposition E, finite base, Lemma Cat determinants)
+      - name: Build the Lean formalization (G3, G2, Lemma W over Z, MainThm.main, Count.count_disconnected)
         working-directory: lean
         run: |
           lake build
           grep -rn "sorry\|admit\|native_decide" Caterpillar/ && exit 1 || true
-          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n#print axioms Caterpillar.caterpillar_separates\n#print axioms Caterpillar.g3_trees\n#print axioms Octonion.moufang_middle\n#print axioms Octonion.lemmaW_span\n#print axioms Octonion.lemmaW_expansion\n#print axioms Octonion.context_cancel\n#print axioms Octonion.artin\n#print axioms Octonion.kill_DN\n#print axioms Octonion.propT_count\n#print axioms Octonion.propC_forward\n#print axioms PropS.propS_interior\n#print axioms Octonion.lift_separates\n#print axioms Octonion.propC_iff\n#print axioms PropT.propT\n#print axioms LemmaM.lemmaM\n#print axioms Coeff.coef_moment\n#print axioms Coeff.coef_of_map\n#print axioms Profiles.key_of_K\n#print axioms G2Final.g2\n#print axioms Closure.reach_ev\n#print axioms Closure.g2_iff\n#print axioms Closure.kernel_flip_connected\n#print axioms Closure.kernel_flip_connected_two\n#print axioms WExist.lemmaW_exists\n#print axioms WExist.kerflip_dn\n#print axioms MainThm.main\n#print axioms Count.count_disconnected\n' > Axioms.lean
+          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n#print axioms Caterpillar.caterpillar_separates\n#print axioms Caterpillar.g3_trees\n#print axioms Octonion.moufang_middle\n#print axioms Octonion.lemmaW_span\n#print axioms Octonion.lemmaW_expansion\n#print axioms Octonion.context_cancel\n#print axioms Octonion.artin\n#print axioms Octonion.kill_DN\n#print axioms Octonion.propT_count\n#print axioms Octonion.propC_forward\n#print axioms PropS.propS_interior\n#print axioms Octonion.lift_separates\n#print axioms Octonion.propC_iff\n#print axioms PropT.propT\n#print axioms LemmaM.lemmaM\n#print axioms Coeff.coef_moment\n#print axioms Coeff.coef_of_map\n#print axioms Profiles.key_of_K\n#print axioms G2Final.g2\n#print axioms Closure.reach_ev\n#print axioms Closure.g2_iff\n#print axioms Closure.kernel_flip_connected\n#print axioms Closure.kernel_flip_connected_two\n#print axioms WExist.lemmaW_exists\n#print axioms WExist.kerflip_dn\n#print axioms MainThm.main\n#print axioms Count.count_disconnected\n#print axioms Canon.canonical\n#print axioms Canon.kerconn_rename\n#print axioms Canon.stirling_rec\n#print axioms Canon.bell_eq_sum\n' > Axioms.lean
           lake env lean Axioms.lean
   prolog:
     runs-on: ubuntu-latest

@@ -27,3 +27,4 @@ import Caterpillar.Closure
 import Caterpillar.WExist
 import Caterpillar.Main
 import Caterpillar.Count
+import Caterpillar.Canon

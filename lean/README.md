@@ -34,6 +34,7 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 | `Caterpillar/WExist.lean` | **Lemma W over ℤ** (`lemmaW_exists`): a rank-3 flip has a nonzero associator at the integer valuation `ℓ ↦ 1 + M q_ℓ`, `M = 2|det| + 1` (the truncated series of `lemmaW_expansion` become congruences mod `M⁴`). Hence **`kerflip_dn`**: for every word, a flip that keeps the map is a `D_N`-flip |
 | `Caterpillar/Main.lean` | **The main theorem** (`main`): `KerConn (wd wl) wl.length ↔ TwoLetters wl ∨ Interval wl`. "If": run renumbering `rk` (monotone, `rk_iff`) and kernel-class transfer (`ker_tr`, `kerflip_tr`) to `Closure`. "Only if": a pattern `a…b…a` plus a third letter, the three-letter subword over `L3` (`interval_of_nodup`), `g3_trees`, the bridge to octonion bracketings (`cmouf`, `dn_bridge`, `reach_bridge`, `relab`, `rn_reach`), `lift_separates`, Moufang (`mouf_ev`), `kerreach_dn` |
 | `Caterpillar/Count.lean` | **The count** (`count_disconnected`): over restricted growth strings (`rgs`, `bell`), two-letter words `2ⁿ⁻¹`, interval words `2ⁿ⁻¹`, both `n` (`closed`), so `Bell(n) − 2ⁿ + n` words have a kernel class that is not flip-connected |
+| `Caterpillar/Canon.lean` | **Canonical words**: `rgs_nodup`; `canonical` (every word is a renaming of exactly one restricted growth string, `canon` = first-occurrence numbering); `kerconn_rename`; the Stirling recurrence `stirling_rec` and `bell_eq_sum` (`Bell(n) = Σ_k S(n,k)`) |
 | `Caterpillar/Words.lean` | `runSeq` (run collapse), `noAdj_runSeq`, `mem_runSeq`, `valid_runSeq`, and **`cat_of_word`**: every word over three letters that uses all three and is not an interval word (`¬ (runSeq w).Nodup`) has a caterpillar certificate |
 
 **Scope.** Formalized:
@@ -44,8 +45,8 @@ Lean 4.15, core library only (no Mathlib). Build with `lake build`. It contains 
 - Artin's theorem and Lemma V (`artin`, `lemmaV_*`).
 - K: specialisation, restriction of (`D_N`-)flips and reachability, and the Moufang lift (`kill_DN`, `kill_reach`, `lift_mouf`, `lift_separates`).
 - G2: Proposition C as an equivalence (`propC_iff`), Proposition T's classification and count (`propT`, `propT_count`), Lemma M (`lemmaM`), Proposition S (decoding and moments-to-profiles), and the assembled theorem `G2Final.g2`, its converse `Closure.reach_ev` and the equivalence `Closure.g2_iff`.
-- **The main theorem for all n** (`MainThm.main`) and **its count** `Bell(n) − 2ⁿ + n` (`Count.count_disconnected`), with Lemma W over ℤ (`WExist.lemmaW_exists`).
+- **The main theorem for all n** (`MainThm.main`) and **its count** `Bell(n) − 2ⁿ + n` (`Count.count_disconnected`), with Lemma W over ℤ (`WExist.lemmaW_exists`); `rgs n` holds exactly one word per renaming class (`Canon.canonical`, `Canon.rgs_nodup`), flip-connectivity is renaming-invariant (`Canon.kerconn_rename`), and `bell` satisfies the Stirling recurrence and Bell sum (`Canon.stirling_rec`, `Canon.bell_eq_sum`).
+- **Scope of the valuations.** Octonions are `Fin 8 → Int`. A bracketing is a polynomial map with integer coefficients, so two bracketings agree on all integer valuations iff they agree as polynomials, hence over ℝ. That step is a metatheorem, not a Lean statement.
 
-- **Theorem G2 in one statement** (`G2Final.g2`), with the moment-as-coefficient step (`coef_moment`, `coef_of_map`) and Proposition S's moments-to-profiles step (`key_of_K`).
 
 The interval-word predicate is used in its run form (`runSeq w` has no repeated letter).

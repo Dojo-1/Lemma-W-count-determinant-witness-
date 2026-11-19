@@ -120,7 +120,7 @@ structure TB (T : Tree) : Prop where
   hi : T.hi + 1 = a + b + c
 
 /-- **σ is the function `cx`.** -/
-theorem sig_iff_cx (ha : 1 ≤ a) (hb : 1 ≤ b) (hc : 1 ≤ c) (T T' : Tree) (h : TB a b c T) (h' : TB a b c T') :
+theorem sig_iff_cx (ha : 1 ≤ a) (hb : 1 ≤ b) (_hc : 1 ≤ c) (T T' : Tree) (h : TB a b c T) (h' : TB a b c T') :
     SigEq (w3 a b) T T' ↔ ∀ q r, a ≤ q → q < a + b → a + b ≤ r → r < a + b + c → cx a T q r = cx a T' q r := by
   have shx : ∀ U : Tree, TB a b c U → ∀ p q r, p < a → a ≤ q → q < a + b → a + b ≤ r → r < a + b + c →
       sh U p q r = decide (a - cx a U q r ≤ p) := by

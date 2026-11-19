@@ -24,14 +24,14 @@ A *word* `w = w₁…wₙ` over letters; a *bracketing* is a planar binary tree 
 **I (interval rank lemma).** If `w` is an interval word, `a, b, c` are consecutive segments, `abc` has ≥ 3 letters, and no two of `a, b, c` are powers of one letter, then `rank N = 3`.
 *Proof.* Order letters by block. Supports are letter-intervals with `max S_a ≤ min S_b`, `max S_b ≤ min S_c`.
 - *Case |S_b| = 1*, `S_b = {p}`. Neither `a` nor `c` is a power of `p`, so `a` has a letter `x < p` and `c` has a letter `z > p`. On columns `(x, p, z)` the matrix is `[[aₓ, a_p, 0], [0, b_p, 0], [0, c_p, c_z]]`, with determinant `aₓ b_p c_z ≠ 0`.
-- *Case |S_b| ≥ 2*, `p = min S_b < q = max S_b`; then `S_a ∩ S_c = ∅`. Either `S_a = {p}` or `a` has `x < p`; either `S_c = {q}` or `c` has `z > q`. Choose `y ∈ S_b` with `p < y < q` when it exists. In each of the four combinations the matrix on columns chosen from `{x or p} × {y or p or q} × {z or q}` is triangular with nonzero diagonal. If `S_a = {p}` and `S_c = {q}`, the ≥ 3-letter hypothesis forces such a `y` to exist. ∎
+- *Case |S_b| ≥ 2*, `p = min S_b < q = max S_b`; then `S_a ∩ S_c = ∅`. Either `S_a = {p}` or `a` has `x < p`; either `S_c = {q}` or `c` has `z > q`. Choose `y ∈ S_b` with `p < y < q` when it exists. In each of the four combinations take columns from `{x or p} × {y or p or q} × {z or q}`. Row `a` is zero outside the first column and the middle column `p`, and row `c` is zero outside the last column and the middle column `q`; with the chosen middle column, one of these rows has a single nonzero entry, and expanding along it leaves a 2×2 triangular block. So the determinant is the product of three nonzero counts (in the case `S_a = {p}`, `S_c = {q}` with columns `(p, y, q)` the matrix is not triangular, but rows `a` and `c` each have one nonzero entry). If `S_a = {p}` and `S_c = {q}`, the ≥ 3-letter hypothesis forces such a `y` to exist. ∎
 Exhaustive brute-force check: 1,997,801 segment triples of interval words up to length 12, 0 violations.
 *Corollary.* For interval words the in-class flip graph **equals** `D_N` (W gives ⊆; I + V give ⊇). Classes are unions of `D_N`-components.
 
 **Θ (θ³ invariant).** For integer vectors `v_ℓ ∈ ℤ³` let `I_v(T) = Σ_{i<j<k} det(v_{wᵢ}, v_{wⱼ}, v_{wₖ}) · s_T(i,j,k)`, with `s_T = +1` if `T` induces `((ij)k)` on `{i,j,k}` and `−1` if `(i(jk))`. If `I_v(T) ≠ I_v(T')` then `T ≁ T'`.
 *Proof.* Specialise `ℓ ↦ exp(θ q_ℓ)` with `q_ℓ = v_ℓ¹e₁ + v_ℓ²e₂ + v_ℓ³e₄`. Up to `θ³`, two bracketings differ only through associators of three distinct positions. Repeated-letter triples cancel (flexible and alternative laws). Associators of three generic elements of the span of `e₁, e₂, e₄` equal `det · [e₁,e₂,e₄]`. So `value(T) − value(T') = ½(I_v(T) − I_v(T'))[e₁,e₂,e₄]θ³ + O(θ⁴)`. ∎
 
-**K (killing).** Setting a letter to `1` sends bracketings of `w` to bracketings of the shorter word `w′`. It maps `D_N`-edges to `D_N`-edges or to identities (deleting columns cannot raise rank), and identities to identities. **Moufang moves lift.** In each pattern, `(ab)(ca)`, `((ab)a)c`, `((ca)b)a`, every gap between consecutive leaves borders a non-repeated variable (`b` or `c`), so killed letters can be absorbed there or into the context. Hence a Moufang move between different `D_N`-components of `w′` lifts to one in `w`. (Alternative-law moves need not lift: `(xx)y` from `x d x y`.)
+**K (killing).** Setting a letter to `1` sends bracketings of `w` to bracketings of the shorter word `w′`. It maps `D_N`-edges to `D_N`-edges or to identities (deleting columns cannot raise rank), and identities to identities. **Moufang moves whose repeated variable is a single letter lift.** In each pattern, `(ab)(ca)`, `((ab)a)c`, `((ca)b)a`, every gap between consecutive leaves borders a non-repeated variable (`b` or `c`), so killed letters can be absorbed there or into the context. Hence a Moufang move between different `D_N`-components of `w′` lifts to one in `w`. (Alternative-law moves need not lift: `(xx)y` from `x d x y`.)
 
 **R (rigid separator).** Call an interval `J` (|J| ≥ 2) *absolutely rigid* if every triple (split of `J`, adjacent nonempty interval on either side) has `rank N = 3`.
 - **Lemma.** If `J` is absolutely rigid, then "`J` is a node of `T`" is constant on `D_N`-components.
@@ -159,7 +159,7 @@ The move `x(Y(xC)) → ((xY)x)C` at the last letter of `ρ_{t−1}` is an instan
 **F (factor reduction, P).** Let `J` be absolutely rigid in `w`, and `u = w[J]`. Then restricting to the subtree at `J` maps `D_N(w)`-paths through bracketings containing `J` to `D_N(u)`-paths: flips inside `J` see the same count matrices, flips outside treat `J` as one block, and no flip removes `J`. So a Moufang pair separated in `u` lifts, inside any fixed context, to a separated Moufang pair in `w`. G3 for `w` follows from G3 for any rigid non-interval 3-letter proper factor.
 
 **Theorem B (P, every n).** Let `w` be a 3-letter word. Suppose some letter `r` has a maximal `r`-free block `J` over `{p, q}` such that:
-- **(R1)** `J` contains both `p` and `q`, and no proper prefix of `J` has the `p : q` ratio of `J`;
+- **(R1)** `J` contains both `p` and `q`, and no nonempty proper prefix of `J` has the `p : q` ratio of `J`;
 - one of the following holds:
   - **(M1)** the first letter of `J` occurs after `J`;
   - **(M2)** the last letter occurs before `J`;
@@ -173,7 +173,7 @@ Then `w` has a disconnected kernel class.
 - M2: `(sB)(Cs)` with `J = Cs`;
 - M4: `((pB)p)C ↔ p(B(pC))` with `J = pC`;
 - M5: `((Cs)B)s` with `J = Cs`;
-- M3: `((pB)p)C` or `C((pB)p)`, with `J = (pB)p`.
+- M3: `((pB)p)C ↔ p(B(pC))` with `J = (pB)p`, or `C(p(Bp)) ↔ ((Cp)B)p` with `J = p(Bp)`.
 
 The repeated variable is a single letter in every case, and every gap borders the third letter, so all variables are nonempty. Lemma R gives different `D_N`-components, and Lemma W gives disconnection. ∎
 
@@ -196,11 +196,12 @@ By Lemmas F and K the theorem extends to every word that has a rigid factor, or 
 
 *Proof.* Flips inside `U`, inside `V` or inside a one-letter block involve at most two letters, so they keep `Φ`. The remaining flips are:
 - rotation at `K` moving an `x`-block across: determinant `p·j·c′`;
+- rotation at `K` moving a `z`-block across (the mirror case): determinant `a′·(b−j)·q`;
 - rotation at `K` moving `k` `y`'s across: determinant `a′·k·c′`;
 - an `x`-attachment against a `z`-attachment, through a node holding `n_y ≥ 1` `y`'s: determinant `p·q·n_y`;
 - merging two adjacent attachments on the same side: they are powers of one letter, so the flip is in `D_N` and leaves `W` unchanged.
 
-So `j` never changes. For `0 < j < b`, `a′` and `c′` never change either. For `j = 0` (resp. `j = b`) the first determinant vanishes, and only the merge of core `x`'s (resp. `z`'s) with the adjacent outer run becomes possible.
+So `j` never changes. For `0 < j < b`, `a′` and `c′` never change either. For `j = 0` the `x`-block determinant vanishes (resp. for `j = b` the `z`-block determinant), and only the merge of core `x`'s (resp. `z`'s) with the adjacent outer run becomes possible.
 
 *Completeness.* Trees with equal invariant differ only in bracketings of ≤ 2-letter regions and in the grouping of consecutive same-side blocks; these are joined by `D_N` moves.
 

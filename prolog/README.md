@@ -126,5 +126,7 @@ In the sweep a difference of values is exact; an equality at sampled valuations 
 | `MainThm.not_kerconn` | a Moufang pair in different `D_N`-components, equal at sampled valuations | every non-interval word with ≥ 3 letters, n ≤ 6 | 0, 3, 25, 145 words (n = 3…6) |
 | `MainThm.rk_iff` | run index monotone, same equalities as the letters | 255 interval words, n ≤ 8 | all |
 | `Count.closed`, `Count.count_disconnected` | two-letter `2ⁿ⁻¹`, interval `2ⁿ⁻¹`, both `n`, all-zero `1`, disconnected `Bell(n) − 2ⁿ + n` | n ≤ 10 | all, Bell(10) = 115,975 |
+| `Canon.canonical` | first-occurrence numbering of all `nⁿ` words gives exactly the restricted growth strings | n ≤ 6 (46,656 words) | 1, 2, 5, 15, 52, 203 classes |
+| `Canon.stirling_rec` | `S(n+1,k+1) = (k+1)S(n,k+1) + S(n,k)` | n ≤ 8 | 52 cases |
 
 Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.lift_separates`, `Octonion.propC_iff`, `PropT.propT`, `LemmaM.lemmaM`, `PropS.propS_interior`, `Coeff.coef_moment`, `Profiles.key_of_K` and `G2Final.g2`, `Closure.reach_ev`, `Closure.g2_iff`, `Closure.kernel_flip_connected`, `WExist.lemmaW_exists`, `MainThm.main`, `Count.count_disconnected`.
