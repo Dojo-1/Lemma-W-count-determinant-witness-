@@ -8,7 +8,7 @@
     - Kernel classes flip-connected (Lean `kernel_flip_connected`, `kernel_flip_connected_two`): for interval
       words and for words with at most two letters, each class of equal values is connected by flips whose
       two ends take equal values.
-    - Main-theorem sweep (not yet a Lean statement): over all words with n ≤ NMax, the kernel classes are
+    - Main-theorem sweep (Lean `MainThm.main`, `Count.count_disconnected`): over all words with n ≤ NMax, the kernel classes are
       flip-connected exactly when the word has at most two letters or is an interval word. Here "equal maps"
       is approximated by equality at S random integer valuations (a difference is exact; an equality is
       evidence, not proof).

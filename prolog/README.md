@@ -1,6 +1,6 @@
 # Prolog formalization (SWI-Prolog)
 
-Eight programs. Each one checks independently what the Lean development proves:
+Nine programs. Each one checks independently what the Lean development proves:
 
 ```bash
 swipl -q -g main -t halt caterpillar.pl   # run-sequence combinatorics, finite base, constructive Prop. E
@@ -11,6 +11,7 @@ swipl -q -g main -t halt g2.pl            # K (combinatorial side, Moufang lift)
 swipl -q -g run -t halt proofs.pl         # the Lean constructions for K's lift, C (⇐), T, M, run and validated
 swipl -q -g run -t halt assembly.pl       # moment = coefficient, moments → profiles, the assembled G2
 swipl -q -g run_closure -t halt closure.pl  # converse, g2_iff, kernel-class flip connectivity, main-theorem sweep
+swipl -q -g run_main -t halt main.pl        # Lemma W over Z, the only-if pairs, run renumbering, the count
 ```
 
 ## `caterpillar.pl`: Proposition E
@@ -110,8 +111,20 @@ Control: 142 pairs in the same component take equal values.
 |---|---|---|---|
 | `Closure.reach_ev` | same `D_N`-component ⇒ equal values at 8 random integer valuations | interval words, n ≤ 6 | 7,984 pairs equal |
 | `Closure.g2_iff` | different components ⇒ separated by the G2 witness valuation (exact) | interval words, n ≤ 6 | 21,108 pairs separated |
-| main theorem (not yet one Lean statement) | kernel classes (equality at 8 random valuations) flip-connected ⟺ ≤ 2 letters or interval | all 275 canonical words, n ≤ 6 | 275/275 agree; disconnected counts 0, 3, 25, 145 = Bell(n) − 2ⁿ + n |
+| `MainThm.main` | kernel classes (equality at 8 random valuations) flip-connected ⟺ ≤ 2 letters or interval | all 275 canonical words, n ≤ 6 | 275/275 agree; disconnected counts 0, 3, 25, 145 = Bell(n) − 2ⁿ + n |
 
 In the sweep a difference of values is exact; an equality at sampled valuations is evidence, not proof.
 
-Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.lift_separates`, `Octonion.propC_iff`, `PropT.propT`, `LemmaM.lemmaM`, `PropS.propS_interior`, `Coeff.coef_moment`, `Profiles.key_of_K` and `G2Final.g2`, `Closure.reach_ev`, `Closure.g2_iff`, `Closure.kernel_flip_connected`.
+## `main.pl`: the closed loop
+
+([log](../data/prolog_main.log))
+
+| Lean | Check | Range | Result |
+|---|---|---|---|
+| `WExist.lemmaW_exists` | every rank-3 flip: nonzero associator at `M = 2\|det\| + 1`, `e₇ ≡ 2·det·M³ (mod M⁴)` | all canonical words, n ≤ 6 | 20,984 flips |
+| `WExist.kerflip_dn` | flips that keep the sampled values are `D_N`-flips | n ≤ 6 | 15,254 flips |
+| `MainThm.not_kerconn` | a Moufang pair in different `D_N`-components, equal at sampled valuations | every non-interval word with ≥ 3 letters, n ≤ 6 | 0, 3, 25, 145 words (n = 3…6) |
+| `MainThm.rk_iff` | run index monotone, same equalities as the letters | 255 interval words, n ≤ 8 | all |
+| `Count.closed`, `Count.count_disconnected` | two-letter `2ⁿ⁻¹`, interval `2ⁿ⁻¹`, both `n`, all-zero `1`, disconnected `Bell(n) − 2ⁿ + n` | n ≤ 10 | all, Bell(10) = 115,975 |
+
+Prolog executes and checks. It is not a proof assistant: the all-length statements are the Lean theorems `Caterpillar.propE`, `Caterpillar.g3_trees`, `Octonion.moufang_*`, `Octonion.lemmaW_expansion`, `Octonion.context_cancel`, `Octonion.artin`, `Octonion.kill_DN`, `Octonion.lift_separates`, `Octonion.propC_iff`, `PropT.propT`, `LemmaM.lemmaM`, `PropS.propS_interior`, `Coeff.coef_moment`, `Profiles.key_of_K` and `G2Final.g2`, `Closure.reach_ev`, `Closure.g2_iff`, `Closure.kernel_flip_connected`, `WExist.lemmaW_exists`, `MainThm.main`, `Count.count_disconnected`.

@@ -52,7 +52,7 @@ jobs:
         run: |
           lake build
           grep -rn "sorry\|admit\|native_decide" Caterpillar/ && exit 1 || true
-          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n#print axioms Caterpillar.caterpillar_separates\n#print axioms Caterpillar.g3_trees\n#print axioms Octonion.moufang_middle\n#print axioms Octonion.lemmaW_span\n#print axioms Octonion.lemmaW_expansion\n#print axioms Octonion.context_cancel\n#print axioms Octonion.artin\n#print axioms Octonion.kill_DN\n#print axioms Octonion.propT_count\n#print axioms Octonion.propC_forward\n#print axioms PropS.propS_interior\n#print axioms Octonion.lift_separates\n#print axioms Octonion.propC_iff\n#print axioms PropT.propT\n#print axioms LemmaM.lemmaM\n#print axioms Coeff.coef_moment\n#print axioms Coeff.coef_of_map\n#print axioms Profiles.key_of_K\n#print axioms G2Final.g2\n#print axioms Closure.reach_ev\n#print axioms Closure.g2_iff\n#print axioms Closure.kernel_flip_connected\n#print axioms Closure.kernel_flip_connected_two\n' > Axioms.lean
+          printf 'import Caterpillar\n#print axioms Caterpillar.cat_of_word\n#print axioms Caterpillar.rank3\n#print axioms Caterpillar.caterpillar_separates\n#print axioms Caterpillar.g3_trees\n#print axioms Octonion.moufang_middle\n#print axioms Octonion.lemmaW_span\n#print axioms Octonion.lemmaW_expansion\n#print axioms Octonion.context_cancel\n#print axioms Octonion.artin\n#print axioms Octonion.kill_DN\n#print axioms Octonion.propT_count\n#print axioms Octonion.propC_forward\n#print axioms PropS.propS_interior\n#print axioms Octonion.lift_separates\n#print axioms Octonion.propC_iff\n#print axioms PropT.propT\n#print axioms LemmaM.lemmaM\n#print axioms Coeff.coef_moment\n#print axioms Coeff.coef_of_map\n#print axioms Profiles.key_of_K\n#print axioms G2Final.g2\n#print axioms Closure.reach_ev\n#print axioms Closure.g2_iff\n#print axioms Closure.kernel_flip_connected\n#print axioms Closure.kernel_flip_connected_two\n#print axioms WExist.lemmaW_exists\n#print axioms WExist.kerflip_dn\n#print axioms MainThm.main\n#print axioms Count.count_disconnected\n' > Axioms.lean
           lake env lean Axioms.lean
   prolog:
     runs-on: ubuntu-latest
@@ -71,3 +71,4 @@ jobs:
           swipl -q -g run -t halt proofs.pl
           swipl -q -g run -t halt assembly.pl
           swipl -q -g run_closure -t halt closure.pl
+          swipl -q -g run_main -t halt main.pl

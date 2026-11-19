@@ -1,0 +1,18 @@
+Lemma W over Z: 20984 rank-3 flips (n ≤ 6), each with a nonzero associator at M = 2|det|+1, e7 ≡ 2·det·M³ (mod M⁴)
+kerflip_dn: 15254 flips that keep the sampled values (n ≤ 6), all D_N-flips
+only if, n = 3: 0/0 non-interval words with ≥ 3 letters have a Moufang pair in different D_N-components, equal at sampled valuations (Bell − 2ⁿ + n = 0)
+only if, n = 4: 3/3 non-interval words with ≥ 3 letters have a Moufang pair in different D_N-components, equal at sampled valuations (Bell − 2ⁿ + n = 3)
+only if, n = 5: 25/25 non-interval words with ≥ 3 letters have a Moufang pair in different D_N-components, equal at sampled valuations (Bell − 2ⁿ + n = 25)
+only if, n = 6: 145/145 non-interval words with ≥ 3 letters have a Moufang pair in different D_N-components, equal at sampled valuations (Bell − 2ⁿ + n = 145)
+rk: 255 interval words (n ≤ 8, letters renamed) — run index monotone, same equalities as the letters
+count over restricted growth strings:
+  n = 1: Bell 1, two-letter 1, interval 1, both 1, all-zero 1, disconnected 0 = Bell − 2ⁿ + n
+  n = 2: Bell 2, two-letter 2, interval 2, both 2, all-zero 1, disconnected 0 = Bell − 2ⁿ + n
+  n = 3: Bell 5, two-letter 4, interval 4, both 3, all-zero 1, disconnected 0 = Bell − 2ⁿ + n
+  n = 4: Bell 15, two-letter 8, interval 8, both 4, all-zero 1, disconnected 3 = Bell − 2ⁿ + n
+  n = 5: Bell 52, two-letter 16, interval 16, both 5, all-zero 1, disconnected 25 = Bell − 2ⁿ + n
+  n = 6: Bell 203, two-letter 32, interval 32, both 6, all-zero 1, disconnected 145 = Bell − 2ⁿ + n
+  n = 7: Bell 877, two-letter 64, interval 64, both 7, all-zero 1, disconnected 756 = Bell − 2ⁿ + n
+  n = 8: Bell 4140, two-letter 128, interval 128, both 8, all-zero 1, disconnected 3892 = Bell − 2ⁿ + n
+  n = 9: Bell 21147, two-letter 256, interval 256, both 9, all-zero 1, disconnected 20644 = Bell − 2ⁿ + n
+  n = 10: Bell 115975, two-letter 512, interval 512, both 10, all-zero 1, disconnected 114961 = Bell − 2ⁿ + n
